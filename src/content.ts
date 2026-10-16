@@ -45,10 +45,10 @@ export const hero = {
     'Traenos un boceto o una idea. Lo diseñamos en 3D, imprimimos el modelo, lo pasamos a metal y lo terminamos a mano.',
   etapasTitulo: 'Una misma pieza, de la idea al metal',
   etapas: [
-    { nombre: 'Boceto', foto: { archivo: 'hero/1-boceto', alt: 'Boceto a mano de un anillo', etiqueta: 'Boceto · 3:4' } },
-    { nombre: 'Modelo 3D', foto: { archivo: 'hero/2-modelo-3d', alt: 'Modelo 3D del anillo en el programa de diseño', etiqueta: 'Render CAD · 3:4' } },
-    { nombre: 'Resina', foto: { archivo: 'hero/3-resina', alt: 'Modelo del anillo impreso en resina de alto detalle', etiqueta: 'Resina impresa · 3:4' } },
-    { nombre: 'Plata 925', foto: { archivo: 'hero/4-metal', alt: 'Anillo terminado en plata 925, pulido a mano', etiqueta: 'Pieza terminada · 3:4' } },
+    { nombre: 'Boceto', foto: { archivo: 'hero/1-boceto', alt: 'Boceto a mano del escudo para un anillo sello', etiqueta: 'Boceto · 3:4' } },
+    { nombre: 'Modelo 3D', foto: { archivo: 'hero/2-modelo-3d', alt: 'Modelo 3D de dos anillos sello con escudo en el programa de diseño', etiqueta: 'Render CAD · 3:4' } },
+    { nombre: 'Resina', foto: { archivo: 'hero/3-resina', alt: 'Anillo sello impreso en resina de alto detalle, sostenido en la mano', etiqueta: 'Resina impresa · 3:4' } },
+    { nombre: 'Metal', foto: { archivo: 'hero/4-metal', alt: 'Anillo sello con escudo terminado en metal, sostenido en la mano', etiqueta: 'Pieza terminada · 3:4' } },
   ] satisfies { nombre: string; foto: Foto }[],
 };
 
@@ -62,7 +62,7 @@ export const pasos = [
       'Formas que la joyería tradicional no puede hacer',
       'Ajustamos el diseño con vos hasta que te convenza',
     ],
-    foto: { archivo: 'pasos/1-idea', alt: 'Diseño de un anillo en pantalla, en el programa de modelado 3D', etiqueta: 'Boceto o CAD en pantalla · vertical' },
+    foto: { archivo: 'pasos/1-idea', alt: 'Boceto a mano del escudo para un anillo sello', etiqueta: 'Boceto o CAD en pantalla · vertical' },
   },
   {
     titulo: 'Después, la fabricación',
@@ -74,7 +74,7 @@ export const pasos = [
       'Molde, cera y fundición a la cera perdida',
       'Engarce de piedras, si lleva, y terminación a mano',
     ],
-    foto: { archivo: 'pasos/2-fabricacion', alt: 'Prototipo de anillo impreso en resina, recién salido de la impresora', etiqueta: 'Prototipo ABS o resina · vertical' },
+    foto: { archivo: 'pasos/2-fabricacion', alt: 'Anillo sello impreso en resina de alto detalle', etiqueta: 'Prototipo ABS o resina · vertical' },
   },
   {
     titulo: 'Y te la entregamos',
@@ -84,7 +84,7 @@ export const pasos = [
       'Pieza única: se hace una sola, la tuya',
       'Retiro en CABA y envíos [confirmar alcance]',
     ],
-    foto: { archivo: 'pasos/3-entrega', alt: 'Anillo terminado en la mano, listo para entregar', etiqueta: 'Pieza en mano o packaging · vertical' },
+    foto: { archivo: 'pasos/3-entrega', alt: 'Anillo sello con escudo terminado, puesto en la mano', etiqueta: 'Pieza en mano o packaging · vertical' },
     cta: true,
   },
 ] satisfies { titulo: string; texto: string; items: string[]; foto: Foto; cta?: boolean }[];
@@ -99,10 +99,10 @@ export const trabajos = {
   titulo: 'Lo que ya hicimos',
   // TODO: reemplazar por los 4 casos reales. No inventar clientes ni frases.
   casos: [
-    { nombre: 'Anillo con piedra', contexto: '[Qué se pidió y qué se hizo]', foto: { archivo: 'trabajos/trabajo-1', alt: 'Anillo a medida con piedra engarzada', etiqueta: 'Trabajo 1 · 3:4' } },
-    { nombre: 'Encargo a medida', contexto: '[Qué se pidió y qué se hizo]', foto: { archivo: 'trabajos/trabajo-2', alt: '[Describir la pieza]', etiqueta: 'Trabajo 2 · 3:4' } },
-    { nombre: 'Encargo a medida', contexto: '[Qué se pidió y qué se hizo]', foto: { archivo: 'trabajos/trabajo-3', alt: '[Describir la pieza]', etiqueta: 'Trabajo 3 · 3:4' } },
-    { nombre: 'Encargo a medida', contexto: '[Qué se pidió y qué se hizo]', foto: { archivo: 'trabajos/trabajo-4', alt: '[Describir la pieza]', etiqueta: 'Trabajo 4 · 3:4' } },
+    { nombre: 'Anillo sello con escudo', contexto: 'Del boceto a mano al anillo en metal. [Completar: metal y qué se pidió]', foto: { archivo: 'trabajos/trabajo-1', alt: 'Dos anillos sello con escudo terminados, sobre una mesa de madera', etiqueta: 'Trabajo 1 · 3:4' } },
+    { nombre: 'Encargo a medida', contexto: '[Foto provisoria: reemplazar por otro trabajo]', foto: { archivo: 'trabajos/trabajo-2', alt: 'Anillo sello con escudo puesto en la mano', etiqueta: 'Trabajo 2 · 3:4' } },
+    { nombre: 'Encargo a medida', contexto: '[Foto provisoria: reemplazar por otro trabajo]', foto: { archivo: 'trabajos/trabajo-3', alt: 'Anillo sello con escudo en tono dorado, sostenido en la mano', etiqueta: 'Trabajo 3 · 3:4' } },
+    { nombre: 'Encargo a medida', contexto: '[Foto provisoria: reemplazar por otro trabajo]', foto: { archivo: 'trabajos/trabajo-4', alt: 'Anillo sello con escudo en metal claro, sostenido en la mano', etiqueta: 'Trabajo 4 · 3:4' } },
   ] satisfies { nombre: string; contexto: string; foto: Foto }[],
 };
 
@@ -115,31 +115,31 @@ export const proceso = {
       titulo: 'Diseño',
       icono: 'pen-nib-light',
       texto: 'Partimos de tu **boceto, foto o idea** y definimos la pieza **con vos**.',
-      foto: { archivo: 'proceso/1-diseno', alt: 'Boceto a mano de la pieza', etiqueta: 'Boceto · 4:5' },
+      foto: { archivo: 'proceso/1-diseno', alt: 'Boceto a mano del escudo para un anillo sello', etiqueta: 'Boceto · 4:5' },
     },
     {
       titulo: 'Modelado 3D',
       icono: 'cube-transparent-light',
       texto: 'La dibujamos en **CAD**, pensada para fabricarse: **espesores, engarces y contracción del metal**.',
-      foto: { archivo: 'proceso/2-modelado-3d', alt: 'Modelo 3D de la pieza en el programa de diseño', etiqueta: 'Render CAD · 4:5' },
+      foto: { archivo: 'proceso/2-modelado-3d', alt: 'Modelo 3D de dos anillos sello con escudo', etiqueta: 'Render CAD · 4:5' },
     },
     {
       titulo: 'Impresión 3D',
       icono: 'stack-light',
       texto: '**Prototipo en ABS** para probar el tamaño. **Modelo maestro en resina de alto detalle** para el molde.',
-      foto: { archivo: 'proceso/3-impresion-3d', alt: 'Modelo maestro de la pieza impreso en resina de alto detalle', etiqueta: 'Pieza impresa en resina · 4:5' },
+      foto: { archivo: 'proceso/3-impresion-3d', alt: 'Anillo sello impreso en resina de alto detalle', etiqueta: 'Pieza impresa en resina · 4:5' },
     },
     {
       titulo: 'Fundición',
       icono: 'fire-light',
       texto: '**Molde de silicona**, cera y **cera perdida** en **plata, oro, alpaca o bronce**. El molde queda: **se puede repetir**.',
-      foto: { archivo: 'proceso/4-fundicion', alt: 'La pieza recién fundida en metal, antes de pulir', etiqueta: 'Pieza fundida en bruto · 4:5' },
+      foto: { archivo: 'proceso/4-fundicion', alt: 'Anillo sello en metal claro después de la fundición', etiqueta: 'Pieza fundida en bruto · 4:5' },
     },
     {
       titulo: 'Terminación',
       icono: 'diamond-light',
       texto: '**Engarce de piedras**, si lleva, y **pulido a mano** hasta el brillo final.',
-      foto: { archivo: 'proceso/5-terminacion', alt: 'Pieza terminada en metal, pulida a mano', etiqueta: 'Pieza terminada · 4:5' },
+      foto: { archivo: 'proceso/5-terminacion', alt: 'Dos anillos sello con escudo terminados y pulidos', etiqueta: 'Pieza terminada · 4:5' },
     },
   ] satisfies { titulo: string; icono: string; texto: string; foto: Foto }[],
 };
@@ -274,10 +274,10 @@ export const ctaFinal = {
   titulo: 'Ahora contanos qué imaginaste',
   texto: 'Mandanos tu idea, aunque sea un garabato. Te respondemos con cómo hacerla realidad.',
   fotos: [
-    { archivo: 'cta-final/1', alt: 'Anillo a medida terminado', etiqueta: 'Collage 1 · 3:4' },
-    { archivo: 'cta-final/2', alt: 'Detalle de una pieza pulida a mano', etiqueta: 'Collage 2 · 3:4' },
-    { archivo: 'cta-final/3', alt: 'Modelo en resina junto a la pieza en metal', etiqueta: 'Collage 3 · 3:4' },
-    { archivo: 'cta-final/4', alt: 'Pieza en mano', etiqueta: 'Collage 4 · 3:4' },
+    { archivo: 'cta-final/1', alt: 'Dos anillos sello con escudo terminados', etiqueta: 'Collage 1 · 3:4' },
+    { archivo: 'cta-final/2', alt: 'Anillo sello con escudo en tono dorado', etiqueta: 'Collage 2 · 3:4' },
+    { archivo: 'cta-final/3', alt: 'Anillo sello impreso en resina', etiqueta: 'Collage 3 · 3:4' },
+    { archivo: 'cta-final/4', alt: 'Anillo sello con escudo puesto en la mano', etiqueta: 'Collage 4 · 3:4' },
   ] satisfies Foto[],
 };
 
