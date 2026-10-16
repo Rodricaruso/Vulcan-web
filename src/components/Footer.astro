@@ -75,6 +75,9 @@ const enlaces = [...menu, pie.menuExtra];
 
   .pie__menu {
     display: grid;
+    grid-template-columns: repeat(2, auto);
+    justify-content: start;
+    column-gap: var(--space-7);
   }
 
   .pie__menu a,
@@ -127,7 +130,6 @@ const enlaces = [...menu, pie.menuExtra];
     }
 
     .pie__menu {
-      grid-template-columns: repeat(2, auto);
       column-gap: var(--space-6);
     }
   }

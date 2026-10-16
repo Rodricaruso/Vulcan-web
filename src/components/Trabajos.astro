@@ -5,42 +5,39 @@ import BotonContacto from './BotonContacto.astro';
 ---
 
 <section id="trabajos" class="seccion" aria-labelledby="trabajos-titulo">
-  <div class="contenedor">
-    <div class="trabajos__cabecera">
-      <h2 id="trabajos-titulo">{trabajos.titulo}</h2>
-      <BotonContacto origen="web-trabajos" variante="secundario" />
-    </div>
+  <div class="contenedor trabajos">
+    <h2 id="trabajos-titulo" class="trabajos__titulo">{trabajos.titulo}</h2>
     <ul class="trabajos__grilla">
       {trabajos.casos.map((caso) => (
         <li class="caso">
-          <Foto foto={caso.foto} proporcion="3 / 4" sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw" />
+          <Foto foto={caso.foto} proporcion="3 / 4" sizes="(min-width: 1024px) 25vw, 50vw" />
           <h3 class="caso__nombre">{caso.nombre}</h3>
           <p class="caso__contexto">{caso.contexto}</p>
         </li>
       ))}
     </ul>
+    <BotonContacto origen="web-trabajos" variante="secundario" class="trabajos__cta" />
   </div>
 </section>
 
 <style>
-  .trabajos__cabecera {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    justify-content: space-between;
-    gap: var(--space-4);
-    margin-bottom: var(--space-7);
+  /* Mobile: título, grilla de 2 columnas y el botón al final, a lo ancho. */
+  .trabajos {
+    display: grid;
+    gap: var(--space-6);
   }
 
   .trabajos__grilla {
     list-style: none;
     padding: 0;
     display: grid;
-    gap: var(--space-7) var(--space-4);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5) var(--space-3);
   }
 
   .caso__nombre {
-    margin-top: var(--space-4);
+    margin-top: var(--space-3);
+    font-size: var(--text-body);
   }
 
   .caso__contexto {
@@ -49,9 +46,28 @@ import BotonContacto from './BotonContacto.astro';
     font-size: var(--text-small);
   }
 
+  /* Desktop: el botón sube al lado del título. */
   @media (min-width: 768px) {
+    .trabajos {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      row-gap: var(--space-7);
+    }
+
     .trabajos__grilla {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-column: 1 / -1;
+      grid-row: 2;
+      gap: var(--space-7) var(--space-4);
+    }
+
+    .trabajos :global(.trabajos__cta) {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .caso__nombre {
+      margin-top: var(--space-4);
+      font-size: var(--text-h3);
     }
   }
 

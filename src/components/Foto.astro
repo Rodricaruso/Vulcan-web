@@ -7,7 +7,7 @@ import type { Foto } from '../content';
 
 interface Props {
   foto: Foto;
-  proporcion: string; // ej. '3 / 4'
+  proporcion: string; // ej. '3 / 4'. Una sección puede cambiarla en mobile pisando aspect-ratio.
   carga?: 'eager' | 'lazy';
   sizes?: string;
   class?: string;
@@ -30,10 +30,10 @@ const imagen = encontrada?.[1].default;
     format="webp"
     quality={80}
     loading={carga}
-    style={`aspect-ratio: ${proporcion}`}
+    style={`--proporcion: ${proporcion}`}
   />
 ) : (
-  <div class:list={['foto foto--placeholder', clase]} style={`aspect-ratio: ${proporcion}`} role="img" aria-label={foto.alt}>
+  <div class:list={['foto foto--placeholder', clase]} style={`--proporcion: ${proporcion}`} role="img" aria-label={foto.alt}>
     <span>{foto.etiqueta}<br />imagenes/{foto.archivo}</span>
   </div>
 )}
@@ -41,6 +41,7 @@ const imagen = encontrada?.[1].default;
 <style>
   .foto {
     width: 100%;
+    aspect-ratio: var(--proporcion);
     object-fit: cover;
     border-radius: var(--radius);
   }
@@ -59,9 +60,21 @@ const imagen = encontrada?.[1].default;
     text-align: center;
   }
 
+  .foto--placeholder {
+    container-type: inline-size;
+  }
+
   .foto--placeholder span {
     background: var(--fondo);
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius);
+    overflow-wrap: anywhere;
+  }
+
+  /* En recuadros muy chicos el rótulo no entra: se oculta (el alt sigue estando). */
+  @container (max-width: 120px) {
+    .foto--placeholder span {
+      display: none;
+    }
   }
 </style>

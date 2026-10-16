@@ -4,7 +4,7 @@ import { filas, hayDatos, fechaActualizacion, fuentes, pesos, porcentaje } from 
 import BotonContacto from './BotonContacto.astro';
 
 const estado = (v: number | null) => {
-  if (v === null) return { clase: 'neutro', simbolo: '', texto: metales.sinComparacion };
+  if (v === null) return { clase: 'neutro', simbolo: '—', texto: metales.sinComparacion, soloLector: true };
   if (Math.abs(v) < 0.05) return { clase: 'neutro', simbolo: '=', texto: metales.igual };
   return v > 0
     ? { clase: 'sube', simbolo: '▲', texto: `${metales.sube} ${porcentaje(v)}` }
@@ -17,7 +17,6 @@ const estado = (v: number | null) => {
     <div class="metales__intro">
       <h2 id="metales-titulo">{metales.titulo}</h2>
       <p class="bajada">{metales.bajada}</p>
-      <BotonContacto origen="web-metales" variante="secundario" />
     </div>
 
     <div class="metales__panel">
@@ -44,7 +43,7 @@ const estado = (v: number | null) => {
                     <td class="num tabla__valor">{pesos(fila.valor)}</td>
                     <td class:list={['num tabla__variacion', e.clase]}>
                       {e.simbolo && <span aria-hidden="true">{e.simbolo} </span>}
-                      {e.texto}
+                      <span class:list={{ 'sr-only': e.soloLector }}>{e.texto}</span>
                     </td>
                   </tr>
                 );
@@ -62,6 +61,8 @@ const estado = (v: number | null) => {
         <p class="metales__nota">{metales.sinDatos}</p>
       )}
     </div>
+
+    <BotonContacto origen="web-metales" variante="secundario" class="metales__cta" />
   </div>
 </section>
 
@@ -70,9 +71,19 @@ const estado = (v: number | null) => {
     border-top: 1px solid var(--color-border);
   }
 
+  /* Mobile: título, tabla y botón, en ese orden. */
   .metales__grilla {
     display: grid;
-    gap: var(--space-7);
+    gap: var(--space-6);
+  }
+
+  .metales__grilla :global(.metales__cta) {
+    justify-self: stretch;
+  }
+
+  .tabla tbody th,
+  .tabla__variacion {
+    white-space: nowrap;
   }
 
   .metales__intro {
@@ -162,10 +173,35 @@ const estado = (v: number | null) => {
     }
   }
 
+  @media (max-width: 767px) {
+    .metales__panel {
+      padding: var(--space-4);
+    }
+
+    .tabla__valor {
+      font-size: var(--text-body);
+    }
+  }
+
+  /* Desktop: texto y botón a la izquierda, tabla a la derecha. */
   @media (min-width: 1024px) {
     .metales__grilla {
       grid-template-columns: 5fr 7fr;
-      gap: var(--space-8);
+      grid-template-rows: auto 1fr;
+      column-gap: var(--space-8);
+      row-gap: var(--space-5);
+    }
+
+    .metales__panel {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+
+    .metales__grilla :global(.metales__cta) {
+      grid-column: 1;
+      grid-row: 2;
+      justify-self: start;
+      align-self: start;
     }
   }
 </style>

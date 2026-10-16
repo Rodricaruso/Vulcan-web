@@ -68,6 +68,22 @@ import BotonContacto from './BotonContacto.astro';
     color: var(--color-text-muted);
   }
 
+  /* Mobile: tarjetas más compactas y botón a lo ancho. */
+  @media (max-width: 767px) {
+    .servicios__cabecera {
+      margin-bottom: var(--space-6);
+    }
+
+    .tarjeta {
+      gap: var(--space-3);
+      padding: var(--space-5) var(--space-4);
+    }
+
+    .tarjeta :global(.tarjeta__cta) {
+      align-self: stretch;
+    }
+  }
+
   @media (min-width: 1024px) {
     .servicios__grilla {
       grid-template-columns: repeat(3, minmax(0, 1fr));

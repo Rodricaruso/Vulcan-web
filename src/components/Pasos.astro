@@ -8,7 +8,7 @@ import BotonContacto from './BotonContacto.astro';
   <div class="contenedor pasos__lista">
     {pasos.map((paso, i) => (
       <article class:list={['paso', { 'paso--espejo': i % 2 === 1 }]} aria-labelledby={`paso-${i + 1}`}>
-        <Foto foto={paso.foto} proporcion="5 / 6" class="paso__foto" />
+        <Foto foto={paso.foto} proporcion="5 / 6" class="paso__foto" sizes="(min-width: 768px) 40vw, 100vw" />
         <div class="paso__texto">
           <p class="etiqueta-mono paso__numero">{textosUI.paso} {i + 1}</p>
           <h2 id={`paso-${i + 1}`}>{paso.titulo}</h2>
@@ -47,6 +47,25 @@ import BotonContacto from './BotonContacto.astro';
 
   .paso__texto :global(.paso__cta) {
     margin-top: var(--space-3);
+  }
+
+  /* Mobile: foto apaisada y más baja, para que cada paso entre casi en una pantalla. */
+  @media (max-width: 767px) {
+    .pasos__lista {
+      gap: var(--space-7);
+    }
+
+    .paso {
+      gap: var(--space-4);
+    }
+
+    .paso :global(.paso__foto) {
+      aspect-ratio: 4 / 3;
+    }
+
+    .paso__texto :global(.paso__cta) {
+      justify-self: stretch;
+    }
   }
 
   @media (min-width: 768px) {

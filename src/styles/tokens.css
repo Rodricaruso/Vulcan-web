@@ -48,7 +48,7 @@
   --space-8: 64px;
   --space-9: 96px;
   --gutter: var(--space-4);
-  --seccion: var(--space-8);
+  --seccion: var(--space-7); /* mobile: secciones más juntas */
 
   /* Forma */
   --radius: 4px;

@@ -13,7 +13,7 @@ import BotonContacto from './BotonContacto.astro';
         <BotonContacto origen="web-final" />
       </div>
       <div class="cta__collage">
-        {ctaFinal.fotos.map((foto) => <Foto foto={foto} proporcion="3 / 4" sizes="(min-width: 768px) 15vw, 50vw" />)}
+        {ctaFinal.fotos.map((foto) => <Foto foto={foto} proporcion="3 / 4" sizes="(min-width: 768px) 15vw, 25vw" />)}
       </div>
     </div>
   </div>
@@ -36,10 +36,22 @@ import BotonContacto from './BotonContacto.astro';
     align-content: center;
   }
 
+  /* Mobile: tira de 4 fotos chicas en una fila, debajo del botón. */
   .cta__collage {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-3);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  @media (max-width: 767px) {
+    .cta {
+      gap: var(--space-6);
+      padding: var(--space-6) var(--space-4) var(--space-4);
+    }
+
+    .cta__texto :global(.boton) {
+      justify-self: stretch;
+    }
   }
 
   @media (min-width: 768px) {
@@ -48,7 +60,7 @@ import BotonContacto from './BotonContacto.astro';
     }
 
     .cta__collage {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-3);
     }
   }
 

@@ -19,7 +19,7 @@ import BotonContacto from './BotonContacto.astro';
 
     <figure class="hero__etapas">
       <figcaption class="sr-only">{hero.etapasTitulo}</figcaption>
-      <ol class="etapas">
+      <ol class="etapas" tabindex="0" aria-label={hero.etapasTitulo}>
         {hero.etapas.map((etapa, i) => (
           <li class="etapa" style={`--i: ${i}`}>
             <Foto foto={etapa.foto} proporcion="3 / 4" carga="eager" sizes="(min-width: 768px) 25vw, 50vw" />
@@ -61,12 +61,41 @@ import BotonContacto from './BotonContacto.astro';
     gap: var(--space-3);
   }
 
+  /* Mobile: fila que se desliza con el dedo; se ve una etapa y media para invitar a deslizar. */
   .etapas {
     list-style: none;
-    padding: 0;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-5) var(--space-3);
+    grid-auto-flow: column;
+    grid-auto-columns: 64%;
+    gap: var(--space-3);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    margin-inline: calc(-1 * var(--gutter));
+    padding: 0 var(--gutter) var(--space-2);
+    scroll-padding-inline: var(--gutter);
+  }
+
+  .etapas::-webkit-scrollbar {
+    display: none;
+  }
+
+  .etapa {
+    scroll-snap-align: start;
+  }
+
+  @media (max-width: 767px) {
+    .hero {
+      padding-top: var(--space-6);
+    }
+
+    .hero__texto {
+      margin-bottom: var(--space-6);
+    }
+
+    .hero__acciones {
+      display: grid;
+    }
   }
 
   .etapa__nombre {
@@ -97,8 +126,12 @@ import BotonContacto from './BotonContacto.astro';
 
   @media (min-width: 768px) {
     .etapas {
+      grid-auto-flow: row;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: var(--space-4);
+      overflow: visible;
+      margin-inline: 0;
+      padding: 0;
     }
   }
 
