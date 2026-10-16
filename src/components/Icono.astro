@@ -1,0 +1,26 @@
+---
+// Íconos de Iconify (Phosphor Light), insertados como SVG al compilar: cero JS en el navegador.
+import { getIconData, iconToSVG, iconToHTML, replaceIDs } from '@iconify/utils';
+import ph from '@iconify-json/ph/icons.json';
+
+interface Props {
+  nombre: string; // ej. 'pen-nib-light'
+  tamano?: number;
+  class?: string;
+}
+
+const { nombre, tamano = 24, class: clase } = Astro.props;
+const datos = getIconData(ph as Parameters<typeof getIconData>[0], nombre);
+if (!datos) throw new Error(`Ícono inexistente: ph:${nombre}`);
+
+const { attributes, body } = iconToSVG(datos, { height: tamano });
+const svg = iconToHTML(replaceIDs(body), {
+  ...attributes,
+  'aria-hidden': 'true',
+  focusable: 'false',
+  fill: 'currentColor',
+  ...(clase ? { class: clase } : {}),
+});
+---
+
+<Fragment set:html={svg} />

@@ -1,0 +1,63 @@
+---
+import { trabajos } from '../content';
+import Foto from './Foto.astro';
+import BotonContacto from './BotonContacto.astro';
+---
+
+<section id="trabajos" class="seccion" aria-labelledby="trabajos-titulo">
+  <div class="contenedor">
+    <div class="trabajos__cabecera">
+      <h2 id="trabajos-titulo">{trabajos.titulo}</h2>
+      <BotonContacto origen="web-trabajos" variante="secundario" />
+    </div>
+    <ul class="trabajos__grilla">
+      {trabajos.casos.map((caso) => (
+        <li class="caso">
+          <Foto foto={caso.foto} proporcion="3 / 4" sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw" />
+          <h3 class="caso__nombre">{caso.nombre}</h3>
+          <p class="caso__contexto">{caso.contexto}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .trabajos__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-7);
+  }
+
+  .trabajos__grilla {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-7) var(--space-4);
+  }
+
+  .caso__nombre {
+    margin-top: var(--space-4);
+  }
+
+  .caso__contexto {
+    margin-top: var(--space-1);
+    color: var(--texto-suave);
+    font-size: var(--text-small);
+  }
+
+  @media (min-width: 768px) {
+    .trabajos__grilla {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .trabajos__grilla {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>

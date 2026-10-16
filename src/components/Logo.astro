@@ -1,0 +1,24 @@
+---
+// Placeholder tipográfico hasta tener el logo real (SVG). El contenedor tiene alto fijo
+// para que el reemplazo no mueva el layout.
+import { sitio } from '../content';
+---
+
+<a class="logo" href="/" aria-label={`${sitio.nombre}, inicio`}>
+  <span aria-hidden="true">{sitio.nombre}</span>
+</a>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    height: var(--tactil);
+    color: inherit;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-right: -0.18em;
+  }
+</style>

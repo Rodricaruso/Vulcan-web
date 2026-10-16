@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import { sitio } from '../content';
+---
+
+<Base title={`Política de privacidad | ${sitio.nombre}`} description={`Cómo ${sitio.nombre} trata los datos de quienes visitan el sitio.`}>
+  <Navbar />
+  <main id="contenido" tabindex="-1" class="seccion">
+    <div class="contenedor">
+      <h1>Política de privacidad</h1>
+      <p class="bajada">[Texto pendiente: qué datos se recolectan (analytics), para qué se usan y cómo pedir que se borren.]</p>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .contenedor {
+    display: grid;
+    gap: var(--space-5);
+    min-height: 50vh;
+  }
+</style>

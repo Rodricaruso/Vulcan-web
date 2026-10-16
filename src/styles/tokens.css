@@ -1,0 +1,81 @@
+/* Tokens de Vulcan. Contrastes verificados (WCAG) en la sección 2 del MD. */
+:root {
+  /* Color */
+  --color-bg: #1d0605;            /* Forja */
+  --color-surface: #2a100c;       /* Fragua */
+  --color-surface-2: #361812;     /* Escoria */
+  --color-accent: #bf9b74;        /* Bronce: único acento */
+  --color-accent-hover: #d3b48f;  /* Bronce claro */
+  --color-text: #f2e9df;          /* Cera */
+  --color-text-muted: #b8a595;    /* Ceniza */
+  --color-accent-on-light: #6b4a2c; /* Bronce profundo */
+  --color-up: #8fae7e;            /* Salvia */
+  --color-down: #d9826a;          /* Cobre */
+  --color-border: rgb(242 233 223 / 0.1);
+  --color-border-strong: rgb(242 233 223 / 0.24);
+
+  /* Roles que cambian en la sección clara */
+  --fondo: var(--color-bg);
+  --texto: var(--color-text);
+  --texto-suave: var(--color-text-muted);
+  --acento: var(--color-accent);
+  --borde: var(--color-border);
+  --foco: var(--color-accent);
+
+  /* Tipografía */
+  --font-display: 'Marcellus', 'Times New Roman', serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --text-meta: 0.75rem;   /* 12 */
+  --text-small: 0.875rem; /* 14 */
+  --text-body: 1rem;      /* 16 */
+  --text-lead: 1.125rem;  /* 18 */
+  --text-h3: 1.25rem;
+  --text-h2: clamp(1.75rem, 1.35rem + 1.7vw, 2.75rem);
+  --text-h1: clamp(2.25rem, 1.45rem + 3.4vw, 4.25rem);
+  --leading-tight: 1.15;
+  --leading-body: 1.55;
+  --medida: 68ch;
+
+  /* Espaciado */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --gutter: var(--space-4);
+  --seccion: var(--space-8);
+
+  /* Forma */
+  --radius: 4px;
+  --tactil: 44px;
+
+  /* Movimiento */
+  --dur-1: 100ms;
+  --dur-2: 150ms;
+  --dur-3: 200ms;
+  --dur-4: 300ms;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: var(--space-6);
+    --seccion: var(--space-9);
+  }
+}
+
+/* Sección clara: Cera de fondo, el acento pasa a Bronce profundo. */
+.tema-claro {
+  --fondo: var(--color-text);
+  --texto: var(--color-bg);
+  --texto-suave: #5e4a3f;
+  --acento: var(--color-accent-on-light);
+  --borde: rgb(29 6 5 / 0.14);
+  --foco: var(--color-accent-on-light);
+}

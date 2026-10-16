@@ -1,0 +1,19 @@
+{
+  "fuentes": {
+    "dolar": "Dólar oficial Banco Nación, venta (dolarapi.com)",
+    "metales": "Precio internacional spot (gold-api.com)"
+  },
+  "historial": [
+    {
+      "fecha": "2026-10-16",
+      "actualizado": "2026-10-16T21:47:15.587Z",
+      "dolarVenta": 1535,
+      "plata925": 2607.35,
+      "oro18k": 154202.03,
+      "usdOnza": {
+        "plata": 57.116001,
+        "oro": 4166.100098
+      }
+    }
+  ]
+}

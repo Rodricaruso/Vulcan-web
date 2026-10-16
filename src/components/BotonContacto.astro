@@ -1,0 +1,23 @@
+---
+import { acciones, type TipoMensaje } from '../content';
+import { enlaceWhatsApp } from '../lib/whatsapp';
+
+interface Props {
+  origen: string; // código web-* que va en el mensaje y en el evento
+  tipo?: TipoMensaje;
+  variante?: 'principal' | 'secundario';
+  class?: string;
+}
+
+const { origen, tipo = 'cliente', variante = 'principal', class: clase } = Astro.props;
+---
+
+<a
+  class:list={['boton', `boton--${variante}`, clase]}
+  href={enlaceWhatsApp(origen, tipo)}
+  target="_blank"
+  rel="noopener"
+  data-ref={origen}
+>
+  {acciones.principal}
+</a>

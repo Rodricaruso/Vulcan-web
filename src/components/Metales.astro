@@ -1,0 +1,171 @@
+---
+import { metales } from '../content';
+import { filas, hayDatos, fechaActualizacion, fuentes, pesos, porcentaje } from '../lib/metales';
+import BotonContacto from './BotonContacto.astro';
+
+const estado = (v: number | null) => {
+  if (v === null) return { clase: 'neutro', simbolo: '', texto: metales.sinComparacion };
+  if (Math.abs(v) < 0.05) return { clase: 'neutro', simbolo: '=', texto: metales.igual };
+  return v > 0
+    ? { clase: 'sube', simbolo: '▲', texto: `${metales.sube} ${porcentaje(v)}` }
+    : { clase: 'baja', simbolo: '▼', texto: `${metales.baja} ${porcentaje(v)}` };
+};
+---
+
+<section id="metales" class="seccion metales" aria-labelledby="metales-titulo">
+  <div class="contenedor metales__grilla">
+    <div class="metales__intro">
+      <h2 id="metales-titulo">{metales.titulo}</h2>
+      <p class="bajada">{metales.bajada}</p>
+      <BotonContacto origen="web-metales" variante="secundario" />
+    </div>
+
+    <div class="metales__panel">
+      {hayDatos ? (
+        <>
+          <table class="tabla">
+            <caption class="sr-only">{metales.titulo}, actualizado el {fechaActualizacion}</caption>
+            <thead>
+              <tr>
+                <th scope="col">{metales.columnas.metal}</th>
+                <th scope="col" class="num">{metales.columnas.valor}</th>
+                <th scope="col" class="num">{metales.columnas.variacion}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filas.map((fila) => {
+                const e = estado(fila.variacion);
+                return (
+                  <tr>
+                    <th scope="row">
+                      {fila.nombre}
+                      <span class="tabla__unidad">{fila.unidad}</span>
+                    </th>
+                    <td class="num tabla__valor">{pesos(fila.valor)}</td>
+                    <td class:list={['num tabla__variacion', e.clase]}>
+                      {e.simbolo && <span aria-hidden="true">{e.simbolo} </span>}
+                      {e.texto}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <p class="metales__nota">
+            {metales.aclaracion} {metales.otros}
+            <br />
+            <span class="etiqueta-mono">Actualizado el {fechaActualizacion}.</span>
+            {fuentes && <span class="etiqueta-mono"> Fuentes: {fuentes.dolar}; {fuentes.metales}.</span>}
+          </p>
+        </>
+      ) : (
+        <p class="metales__nota">{metales.sinDatos}</p>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .metales {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .metales__grilla {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .metales__intro {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+    align-content: start;
+  }
+
+  .metales__panel {
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .tabla {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .tabla th,
+  .tabla td {
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+    vertical-align: baseline;
+  }
+
+  .tabla thead th {
+    padding-top: 0;
+    font-size: var(--text-meta);
+    font-weight: 400;
+    color: var(--color-text-muted);
+  }
+
+  .tabla tbody th {
+    font-weight: 500;
+  }
+
+  .tabla .num {
+    text-align: right;
+    padding-left: var(--space-3);
+  }
+
+  .tabla__unidad {
+    display: block;
+    font-size: var(--text-meta);
+    font-weight: 400;
+    color: var(--color-text-muted);
+  }
+
+  .tabla__valor {
+    font-family: var(--font-mono);
+    font-size: var(--text-lead);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .tabla__variacion {
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    color: var(--color-text-muted);
+  }
+
+  .tabla__variacion.sube {
+    color: var(--color-up);
+  }
+
+  .tabla__variacion.baja {
+    color: var(--color-down);
+  }
+
+  .metales__nota {
+    margin-top: var(--space-5);
+    font-size: var(--text-small);
+    color: var(--color-text-muted);
+  }
+
+  .metales__nota .etiqueta-mono {
+    font-size: var(--text-meta);
+  }
+
+  @media (min-width: 768px) {
+    .metales__panel {
+      padding: var(--space-6);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .metales__grilla {
+      grid-template-columns: 5fr 7fr;
+      gap: var(--space-8);
+    }
+  }
+</style>

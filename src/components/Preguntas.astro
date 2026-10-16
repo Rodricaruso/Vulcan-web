@@ -1,0 +1,154 @@
+---
+import { preguntas } from '../content';
+---
+
+<section id="preguntas" class="seccion" aria-labelledby="preguntas-titulo">
+  <div class="contenedor preguntas">
+    <h2 id="preguntas-titulo">{preguntas.titulo}</h2>
+    <div class="acordeon" data-acordeon>
+      {preguntas.items.map((item, i) => (
+        <div class="acordeon__item">
+          <h3 class="acordeon__titulo">
+            <button
+              type="button"
+              class="acordeon__boton"
+              id={`pregunta-${i}`}
+              aria-expanded="false"
+              aria-controls={`respuesta-${i}`}
+            >
+              <span>{item.pregunta}</span>
+              <svg class="acordeon__chevron" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+            </button>
+          </h3>
+          <div class="acordeon__panel" id={`respuesta-${i}`} role="region" aria-labelledby={`pregunta-${i}`} hidden>
+            {item.respuesta.map((parrafo) => <p>{parrafo}</p>)}
+            {item.formula && (
+              <ol class="formula" aria-label="Cómo se arma el precio">
+                {item.formula.map((parte) => <li>{parte}</li>)}
+              </ol>
+            )}
+            {item.link && <p><a href={item.link.href}>{item.link.texto}</a></p>}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .preguntas {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .acordeon {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .acordeon__item {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .acordeon__titulo {
+    font-size: var(--text-lead);
+  }
+
+  .acordeon__boton {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    width: 100%;
+    min-height: 64px;
+    padding: var(--space-4) 0;
+    background: none;
+    border: 0;
+    color: var(--color-text);
+    font: inherit;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .acordeon__boton:hover {
+    color: var(--color-accent);
+  }
+
+  .acordeon__chevron {
+    flex-shrink: 0;
+    color: var(--color-accent);
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+
+  .acordeon__boton[aria-expanded='true'] .acordeon__chevron {
+    transform: rotate(180deg);
+  }
+
+  .acordeon__panel {
+    display: grid;
+    gap: var(--space-4);
+    padding-bottom: var(--space-6);
+    color: var(--color-text-muted);
+  }
+
+  /* La fórmula del precio: cada término se suma al anterior. */
+  .formula {
+    list-style: none;
+    padding: var(--space-4) var(--space-5);
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--medida);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-text);
+    font-size: var(--text-small);
+  }
+
+  .formula li {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .formula li::before {
+    content: '+';
+    width: 1ch;
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+  }
+
+  .formula li:first-child::before {
+    content: '';
+  }
+
+  @media (min-width: 1024px) {
+    .preguntas {
+      grid-template-columns: 4fr 8fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+  }
+</style>
+
+<script>
+  // Una sola pregunta abierta a la vez. El <button> nativo ya responde a Enter y Espacio.
+  document.querySelectorAll<HTMLElement>('[data-acordeon]').forEach((acordeon) => {
+    const botones = Array.from(acordeon.querySelectorAll<HTMLButtonElement>('.acordeon__boton'));
+
+    const fijar = (boton: HTMLButtonElement, abierto: boolean) => {
+      boton.setAttribute('aria-expanded', String(abierto));
+      const panel = document.getElementById(boton.getAttribute('aria-controls') ?? '');
+      if (panel) panel.hidden = !abierto;
+    };
+
+    botones.forEach((boton) => {
+      boton.addEventListener('click', () => {
+        const abrir = boton.getAttribute('aria-expanded') !== 'true';
+        botones.forEach((otro) => fijar(otro, false));
+        if (abrir) fijar(boton, true);
+      });
+    });
+  });
+</script>

@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import Pasos from '../components/Pasos.astro';
+import Cinta from '../components/Cinta.astro';
+import Trabajos from '../components/Trabajos.astro';
+import Proceso from '../components/Proceso.astro';
+import Servicios from '../components/Servicios.astro';
+import Metales from '../components/Metales.astro';
+import Preguntas from '../components/Preguntas.astro';
+import CtaFinal from '../components/CtaFinal.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base conDatosEstructurados>
+  <Navbar />
+  <main id="contenido" tabindex="-1">
+    <Hero />
+    <Pasos />
+    <Cinta />
+    <Trabajos />
+    <Proceso />
+    <Servicios />
+    <Metales />
+    <Preguntas />
+    <CtaFinal />
+  </main>
+  <Footer />
+</Base>

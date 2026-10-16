@@ -1,0 +1,82 @@
+---
+import '../styles/global.css';
+import { sitio, preguntas } from '../content';
+
+interface Props {
+  title?: string;
+  description?: string;
+  conDatosEstructurados?: boolean;
+}
+
+const { title = sitio.title, description = sitio.description, conDatosEstructurados = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+const negocio = {
+  '@context': 'https://schema.org',
+  '@type': 'JewelryStore',
+  name: sitio.nombre,
+  url: Astro.site?.href,
+  telephone: sitio.telefonoVisible,
+  description: sitio.description,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Ciudad Autónoma de Buenos Aires',
+    addressRegion: 'CABA',
+    addressCountry: 'AR',
+  },
+  areaServed: 'AR',
+  ...(sitio.instagram ? { sameAs: [sitio.instagram] } : {}),
+};
+
+// Solo preguntas con respuesta real: las que tienen [pendientes] no se publican en el schema.
+const faq = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: preguntas.items
+    .filter((p) => !p.respuesta.join(' ').includes('['))
+    .map((p) => ({
+      '@type': 'Question',
+      name: p.pregunta,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: [...p.respuesta, ...(p.formula ?? [])].join(' '),
+      },
+    })),
+};
+---
+
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#1d0605" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:site_name" content={sitio.nombre} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <!-- TODO: og:image de 1200×630 cuando esté el asset -->
+    {conDatosEstructurados && <script is:inline type="application/ld+json" set:html={JSON.stringify(negocio)} />}
+    {conDatosEstructurados && <script is:inline type="application/ld+json" set:html={JSON.stringify(faq)} />}
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<script>
+  // Evento de analytics por cada CTA, con el mismo código que va en el mensaje.
+  document.addEventListener('click', (e) => {
+    const cta = (e.target as Element).closest<HTMLElement>('[data-ref]');
+    if (!cta) return;
+    const w = window as unknown as { gtag?: (...args: unknown[]) => void; dataLayer?: unknown[] };
+    w.gtag?.('event', 'contacto_whatsapp', { ref: cta.dataset.ref });
+    w.dataLayer?.push({ event: 'contacto_whatsapp', ref: cta.dataset.ref });
+  });
+</script>

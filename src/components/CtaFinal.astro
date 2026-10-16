@@ -1,0 +1,70 @@
+---
+import { ctaFinal } from '../content';
+import Foto from './Foto.astro';
+import BotonContacto from './BotonContacto.astro';
+---
+
+<section class="seccion" aria-labelledby="cta-titulo">
+  <div class="contenedor">
+    <div class="cta">
+      <div class="cta__texto">
+        <h2 id="cta-titulo">{ctaFinal.titulo}</h2>
+        <p class="bajada">{ctaFinal.texto}</p>
+        <BotonContacto origen="web-final" />
+      </div>
+      <div class="cta__collage">
+        {ctaFinal.fotos.map((foto) => <Foto foto={foto} proporcion="3 / 4" sizes="(min-width: 768px) 15vw, 50vw" />)}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    display: grid;
+    gap: var(--space-7);
+    padding: var(--space-6) var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .cta__texto {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+    align-content: center;
+  }
+
+  .cta__collage {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 768px) {
+    .cta {
+      padding: var(--space-8);
+    }
+
+    .cta__collage {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .cta {
+      grid-template-columns: 5fr 7fr;
+      gap: var(--space-8);
+    }
+
+    /* Collage escalonado: las fotos pares bajan medio paso. */
+    .cta__collage > :global(:nth-child(even)) {
+      transform: translateY(var(--space-6));
+    }
+
+    .cta__collage {
+      padding-bottom: var(--space-6);
+    }
+  }
+</style>

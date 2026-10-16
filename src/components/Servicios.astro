@@ -1,0 +1,76 @@
+---
+import { servicios } from '../content';
+import BotonContacto from './BotonContacto.astro';
+---
+
+<section id="servicios" class="seccion" aria-labelledby="servicios-titulo">
+  <div class="contenedor">
+    <div class="servicios__cabecera">
+      <h2 id="servicios-titulo">{servicios.titulo}</h2>
+      <p class="bajada">{servicios.bajada}</p>
+    </div>
+    <ul class="servicios__grilla">
+      {servicios.tarjetas.map((tarjeta) => (
+        <li class="tarjeta">
+          <h3>{tarjeta.titulo}</h3>
+          <p>{tarjeta.texto}</p>
+          <ul class="lista tarjeta__items">
+            {tarjeta.items.map((item) => <li>{item}</li>)}
+          </ul>
+          <BotonContacto origen={tarjeta.ref} tipo={tarjeta.tipo} variante="secundario" class="tarjeta__cta" />
+        </li>
+      ))}
+    </ul>
+    <p class="servicios__pie">{servicios.pie}</p>
+  </div>
+</section>
+
+<style>
+  .servicios__cabecera {
+    display: grid;
+    gap: var(--space-4);
+    margin-bottom: var(--space-7);
+  }
+
+  .servicios__grilla {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .tarjeta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6) var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .tarjeta__items {
+    color: var(--color-text-muted);
+    font-size: var(--text-small);
+  }
+
+  .tarjeta :global(.tarjeta__cta) {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+
+  .tarjeta__items {
+    margin-bottom: var(--space-3);
+  }
+
+  .servicios__pie {
+    margin-top: var(--space-6);
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 1024px) {
+    .servicios__grilla {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

@@ -1,0 +1,146 @@
+---
+import { hero, acciones } from '../content';
+import Foto from './Foto.astro';
+import BotonContacto from './BotonContacto.astro';
+---
+
+<section class="hero" aria-labelledby="hero-titulo">
+  <div class="contenedor">
+    <div class="hero__texto">
+      <h1 id="hero-titulo" class="hero__titulo">{hero.titulo}</h1>
+      <div class="hero__lateral">
+        <p class="bajada">{hero.bajada}</p>
+        <div class="hero__acciones">
+          <BotonContacto origen="web-hero" />
+          <a class="boton boton--secundario" href="#proceso">{acciones.secundaria}</a>
+        </div>
+      </div>
+    </div>
+
+    <figure class="hero__etapas">
+      <figcaption class="sr-only">{hero.etapasTitulo}</figcaption>
+      <ol class="etapas">
+        {hero.etapas.map((etapa, i) => (
+          <li class="etapa" style={`--i: ${i}`}>
+            <Foto foto={etapa.foto} proporcion="3 / 4" carga="eager" sizes="(min-width: 768px) 25vw, 50vw" />
+            <p class="etapa__nombre">
+              <span class="etapa__numero">{i + 1}</span>
+              {etapa.nombre}
+            </p>
+          </li>
+        ))}
+      </ol>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: var(--space-7) var(--seccion);
+  }
+
+  .hero__texto {
+    display: grid;
+    gap: var(--space-5);
+    margin-bottom: var(--space-7);
+  }
+
+  .hero__titulo {
+    max-width: 18ch;
+  }
+
+  .hero__lateral {
+    display: grid;
+    gap: var(--space-5);
+    align-content: end;
+  }
+
+  .hero__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .etapas {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5) var(--space-3);
+  }
+
+  .etapa__nombre {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+    color: var(--color-text);
+  }
+
+  /* Cada etapa tiene su tramo de línea: juntas dibujan el recorrido de la pieza. */
+  .etapa__nombre::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: var(--color-accent);
+    transform-origin: left center;
+  }
+
+  .etapa__numero {
+    color: var(--color-accent);
+  }
+
+  @media (min-width: 768px) {
+    .etapas {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero {
+      padding-top: var(--space-8);
+    }
+
+    .hero__texto {
+      grid-template-columns: 7fr 5fr;
+      gap: var(--space-8);
+      align-items: end;
+    }
+  }
+
+  /* El único momento orquestado del sitio: la pieza aparece etapa por etapa. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__texto {
+      animation: aparecer var(--dur-4) var(--ease-out) both;
+    }
+
+    .etapa {
+      animation: aparecer var(--dur-4) var(--ease-out) both;
+      animation-delay: calc(150ms + var(--i) * 100ms);
+    }
+
+    .etapa__nombre::before {
+      animation: trazar var(--dur-4) var(--ease-out) both;
+      animation-delay: calc(250ms + var(--i) * 100ms);
+    }
+  }
+
+  @keyframes aparecer {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @keyframes trazar {
+    from {
+      transform: scaleX(0);
+    }
+  }
+</style>

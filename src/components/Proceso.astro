@@ -1,0 +1,308 @@
+---
+import { proceso, textosUI } from '../content';
+import { conNegritas } from '../lib/texto';
+import Foto from './Foto.astro';
+import Icono from './Icono.astro';
+
+const n = proceso.etapas.length;
+---
+
+<!--
+  Recorrido fijado: la sección es más alta que la pantalla y su panel queda "sticky".
+  Mientras se scrollea, la etapa activa gana peso y la foto se funde con la siguiente.
+  Todo el texto está en el HTML; el JS solo marca la etapa activa y la opacidad de las fotos.
+-->
+<section id="tecnologia" class="proceso tema-claro" style={`--n: ${n}`} aria-labelledby="proceso-titulo" data-proceso>
+  <div class="proceso__panel">
+    <div class="contenedor proceso__grilla">
+      <h2 id="proceso-titulo" class="proceso__titulo">{proceso.titulo}</h2>
+
+      <div class="proceso__visor">
+        {proceso.etapas.map((etapa, i) => (
+          <div class="proceso__capa" style={i === 0 ? 'opacity: 1' : 'opacity: 0'} data-capa>
+            <Foto foto={etapa.foto} proporcion="4 / 5" />
+          </div>
+        ))}
+      </div>
+
+      <div class="proceso__puntos" aria-hidden="true">
+        {proceso.etapas.map((_, i) => <span class:list={{ activo: i === 0 }} data-punto></span>)}
+      </div>
+
+      <ol class="proceso__etapas">
+        {proceso.etapas.map((etapa, i) => (
+          <li class="etapa-p" aria-current={i === 0 ? 'step' : undefined} data-etapa>
+            <span class="etapa-p__icono">
+              <Icono nombre={etapa.icono} tamano={24} />
+            </span>
+            <div class="etapa-p__texto">
+              <h3>
+                <span class="etapa-p__numero">
+                  <span class="sr-only">{textosUI.paso}</span> {i + 1}
+                </span>
+                {etapa.titulo}
+              </h3>
+              <p set:html={conNegritas(etapa.texto)} />
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .proceso {
+    --alto-nav: 72px;
+    --tramo: 70svh; /* scroll que "dura" cada etapa */
+    position: relative;
+    height: calc(var(--n) * var(--tramo) + 100svh);
+    background: var(--fondo);
+    color: var(--texto);
+  }
+
+  .proceso__panel {
+    position: sticky;
+    top: var(--alto-nav);
+    height: calc(100svh - var(--alto-nav));
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  /* Mobile: título, foto, avance y solo la etapa activa (las demás quedan apiladas detrás). */
+  .proceso__grilla {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: center;
+  }
+
+  .proceso__titulo {
+    justify-self: start;
+    font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.75rem);
+  }
+
+  .proceso__visor {
+    position: relative;
+    height: 34svh;
+    aspect-ratio: 4 / 5;
+    max-width: 100%;
+  }
+
+  .proceso__capa {
+    position: absolute;
+    inset: 0;
+    will-change: opacity;
+  }
+
+  .proceso__capa :global(.foto) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .proceso__puntos {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .proceso__puntos span {
+    width: 24px;
+    height: 2px;
+    background: var(--borde);
+    transition: background-color var(--dur-3) var(--ease-out);
+  }
+
+  .proceso__puntos span.activo {
+    background: var(--acento);
+  }
+
+  .proceso__etapas {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    width: 100%;
+  }
+
+  .etapa-p {
+    display: grid;
+    grid-template-columns: var(--tactil) 1fr;
+    gap: var(--space-4);
+    align-items: start;
+    color: var(--texto-suave);
+    transition: color var(--dur-3) var(--ease-out), opacity var(--dur-3) var(--ease-out);
+  }
+
+  .etapa-p__icono {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: var(--tactil);
+    height: var(--tactil);
+    border: 1px solid var(--borde);
+    border-radius: 50%;
+    background: var(--fondo);
+    color: var(--texto-suave);
+    transition: background-color var(--dur-3) var(--ease-out), color var(--dur-3) var(--ease-out);
+  }
+
+  .etapa-p__texto {
+    display: grid;
+    gap: var(--space-1);
+    padding-top: 10px;
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+
+  .etapa-p h3 {
+    display: flex;
+    gap: var(--space-2);
+    align-items: baseline;
+  }
+
+  .etapa-p__numero {
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+    font-weight: 400;
+  }
+
+  .etapa-p p :global(strong) {
+    font-weight: 600;
+  }
+
+  .etapa-p[aria-current='step'] {
+    color: var(--texto);
+  }
+
+  .etapa-p[aria-current='step'] .etapa-p__icono {
+    background: var(--acento);
+    border-color: var(--acento);
+    color: var(--color-text);
+  }
+
+  .etapa-p[aria-current='step'] .etapa-p__numero {
+    color: var(--acento);
+  }
+
+  @media (max-width: 767px) {
+    .etapa-p {
+      grid-area: 1 / 1;
+    }
+
+    /* Solo opacidad: los lectores de pantalla siguen leyendo las 5 etapas. */
+    .etapa-p:not([aria-current='step']) {
+      opacity: 0;
+    }
+  }
+
+  /* Desktop: lista completa a la izquierda con línea de avance; foto a la derecha. */
+  @media (min-width: 768px) {
+    .proceso__grilla {
+      grid-template-columns: 7fr 5fr;
+      grid-template-rows: auto 1fr;
+      column-gap: var(--space-8);
+      row-gap: var(--space-6);
+      align-items: center;
+      justify-items: stretch;
+    }
+
+    .proceso__titulo {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .proceso__visor {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      justify-self: end;
+      height: min(calc(100svh - var(--alto-nav) - var(--space-9)), 640px);
+    }
+
+    .proceso__puntos {
+      display: none;
+    }
+
+    .proceso__etapas {
+      grid-column: 1;
+      grid-row: 2;
+      align-self: start;
+      position: relative;
+      gap: var(--space-5);
+    }
+
+    /* Línea vertical (riel) y su relleno, que avanza con el scroll. */
+    .proceso__etapas::before,
+    .proceso__etapas::after {
+      content: '';
+      position: absolute;
+      left: calc(var(--tactil) / 2);
+      top: calc(var(--tactil) / 2);
+      bottom: calc(var(--tactil) / 2);
+      width: 1px;
+      background: var(--borde);
+    }
+
+    .proceso__etapas::after {
+      background: var(--acento);
+      transform-origin: top;
+      transform: scaleY(var(--progreso, 0));
+    }
+
+    .etapa-p[aria-current='step'] .etapa-p__texto {
+      transform: translateX(var(--space-2));
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-proceso]').forEach((seccion) => {
+    const panel = seccion.querySelector<HTMLElement>('.proceso__panel')!;
+    const etapas = Array.from(seccion.querySelectorAll<HTMLElement>('[data-etapa]'));
+    const capas = Array.from(seccion.querySelectorAll<HTMLElement>('[data-capa]'));
+    const puntos = Array.from(seccion.querySelectorAll<HTMLElement>('[data-punto]'));
+    const reducido = matchMedia('(prefers-reduced-motion: reduce)');
+    const n = etapas.length;
+
+    // La foto se queda quieta al principio y al final de cada tramo y se funde en el medio.
+    const suave = (a: number, b: number, x: number) => {
+      const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
+      return t * t * (3 - 2 * t);
+    };
+
+    let activoPrevio = -1;
+    const actualizar = () => {
+      const top = parseFloat(getComputedStyle(panel).top) || 0;
+      const recorrido = seccion.offsetHeight - panel.offsetHeight;
+      const progreso = Math.min(Math.max((top - seccion.getBoundingClientRect().top) / recorrido, 0), 1);
+      const pos = progreso * (n - 1);
+      const base = Math.min(Math.floor(pos), n - 1);
+      const mezcla = suave(0.3, 0.7, pos - base);
+      const activo = mezcla > 0.5 ? base + 1 : base;
+
+      seccion.style.setProperty('--progreso', String(progreso));
+      capas.forEach((capa, i) => {
+        const opacidad = i <= base ? 1 : i === base + 1 ? (reducido.matches ? Math.round(mezcla) : mezcla) : 0;
+        capa.style.opacity = String(opacidad);
+      });
+
+      if (activo !== activoPrevio) {
+        etapas.forEach((etapa, i) => (i === activo ? etapa.setAttribute('aria-current', 'step') : etapa.removeAttribute('aria-current')));
+        puntos.forEach((punto, i) => punto.classList.toggle('activo', i <= activo));
+        activoPrevio = activo;
+      }
+    };
+
+    let pendiente = false;
+    const programar = () => {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(() => {
+        pendiente = false;
+        actualizar();
+      });
+    };
+
+    addEventListener('scroll', programar, { passive: true });
+    addEventListener('resize', programar);
+    actualizar();
+  });
+</script>

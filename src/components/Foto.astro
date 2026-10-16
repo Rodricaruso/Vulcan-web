@@ -1,0 +1,67 @@
+---
+// Busca la foto en /imagenes por su nombre (sin extensión). Si está, la optimiza
+// (WebP en varios tamaños); si no, muestra un placeholder con la proporción correcta.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import type { Foto } from '../content';
+
+interface Props {
+  foto: Foto;
+  proporcion: string; // ej. '3 / 4'
+  carga?: 'eager' | 'lazy';
+  sizes?: string;
+  class?: string;
+}
+
+const { foto, proporcion, carga = 'lazy', sizes = '(min-width: 768px) 40vw, 100vw', class: clase } = Astro.props;
+
+const archivos = import.meta.glob<{ default: ImageMetadata }>('/imagenes/**/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG}', { eager: true });
+const encontrada = Object.entries(archivos).find(([ruta]) => ruta.replace(/\.[^.]+$/, '') === `/imagenes/${foto.archivo}`);
+const imagen = encontrada?.[1].default;
+---
+
+{imagen ? (
+  <Image
+    class:list={['foto', clase]}
+    src={imagen}
+    alt={foto.alt}
+    widths={[480, 800, 1200]}
+    sizes={sizes}
+    format="webp"
+    quality={80}
+    loading={carga}
+    style={`aspect-ratio: ${proporcion}`}
+  />
+) : (
+  <div class:list={['foto foto--placeholder', clase]} style={`aspect-ratio: ${proporcion}`} role="img" aria-label={foto.alt}>
+    <span>{foto.etiqueta}<br />imagenes/{foto.archivo}</span>
+  </div>
+)}
+
+<style>
+  .foto {
+    width: 100%;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+
+  .foto--placeholder {
+    display: grid;
+    place-items: center;
+    padding: var(--space-4);
+    background:
+      linear-gradient(135deg, transparent 49.6%, var(--borde) 49.8%, var(--borde) 50.2%, transparent 50.4%),
+      color-mix(in srgb, var(--texto) 6%, var(--fondo));
+    border: 1px solid var(--borde);
+    color: var(--texto-suave);
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    text-align: center;
+  }
+
+  .foto--placeholder span {
+    background: var(--fondo);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius);
+  }
+</style>

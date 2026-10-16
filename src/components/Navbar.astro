@@ -1,0 +1,240 @@
+---
+import { menu, textosUI } from '../content';
+import Logo from './Logo.astro';
+import BotonContacto from './BotonContacto.astro';
+---
+
+<a class="saltar" href="#contenido">{textosUI.saltar}</a>
+
+<header class="navbar" data-navbar>
+  <div class="contenedor navbar__fila">
+    <Logo />
+
+    <nav class="navbar__menu" aria-label="Principal">
+      <ul>
+        {menu.map((item) => <li><a href={item.href}>{item.texto}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="navbar__acciones">
+      <BotonContacto origen="web-menu" class="navbar__cta" />
+      <button
+        class="navbar__toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="menu-movil"
+        aria-label={textosUI.abrirMenu}
+        data-abrir={textosUI.abrirMenu}
+        data-cerrar={textosUI.cerrarMenu}
+      >
+        <span class="navbar__barras" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+    </div>
+  </div>
+
+  <nav id="menu-movil" class="menu-movil" aria-label="Principal" hidden>
+    <ul class="contenedor">
+      {menu.map((item) => <li><a href={item.href}>{item.texto}</a></li>)}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .saltar {
+    position: absolute;
+    left: var(--space-4);
+    top: var(--space-2);
+    z-index: 100;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-accent);
+    color: var(--color-bg);
+    border-radius: var(--radius);
+    transform: translateY(-200%);
+  }
+
+  .saltar:focus-visible {
+    transform: none;
+  }
+
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .navbar__fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-height: 72px;
+  }
+
+  .navbar__menu {
+    display: none;
+  }
+
+  .navbar__menu ul,
+  .menu-movil ul {
+    list-style: none;
+    margin: 0;
+  }
+
+  .navbar__menu a,
+  .menu-movil a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tactil);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .navbar__menu a:hover,
+  .menu-movil a:hover {
+    color: var(--color-accent);
+  }
+
+  .navbar__acciones {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .navbar__acciones :global(.navbar__cta) {
+    min-height: var(--tactil);
+    padding-inline: var(--space-3);
+    font-size: var(--text-small);
+    white-space: nowrap;
+  }
+
+  .navbar__toggle {
+    display: grid;
+    place-items: center;
+    width: var(--tactil);
+    height: var(--tactil);
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius);
+    color: var(--color-text);
+    cursor: pointer;
+  }
+
+  .navbar__barras {
+    display: grid;
+    gap: 5px;
+    width: 20px;
+  }
+
+  .navbar__barras span {
+    display: block;
+    height: 1px;
+    background: currentColor;
+    transition: transform var(--dur-3) var(--ease-out), opacity var(--dur-2) var(--ease-out);
+  }
+
+  .navbar__toggle[aria-expanded='true'] .navbar__barras span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .navbar__toggle[aria-expanded='true'] .navbar__barras span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .navbar__toggle[aria-expanded='true'] .navbar__barras span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  .menu-movil {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .menu-movil ul {
+    display: grid;
+    padding-block: var(--space-3) var(--space-5);
+  }
+
+  .menu-movil a {
+    font-size: var(--text-lead);
+    border-bottom: 1px solid var(--color-border);
+    min-height: 52px;
+  }
+
+  @media (min-width: 400px) {
+    .navbar__acciones :global(.navbar__cta) {
+      padding-inline: var(--space-4);
+      font-size: var(--text-body);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .navbar__menu {
+      display: block;
+    }
+
+    .navbar__menu ul {
+      display: flex;
+      gap: var(--space-6);
+      padding: 0;
+    }
+
+    .navbar__toggle,
+    .menu-movil {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-navbar]');
+  const toggle = header?.querySelector<HTMLButtonElement>('.navbar__toggle');
+  const panel = header?.querySelector<HTMLElement>('#menu-movil');
+
+  if (header && toggle && panel) {
+    const enlaces = () => Array.from(panel.querySelectorAll<HTMLAnchorElement>('a'));
+
+    const abrir = () => {
+      panel.hidden = false;
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', toggle.dataset.cerrar ?? '');
+      enlaces()[0]?.focus();
+    };
+
+    const cerrar = (devolverFoco = true) => {
+      panel.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', toggle.dataset.abrir ?? '');
+      if (devolverFoco) toggle.focus();
+    };
+
+    const abierto = () => toggle.getAttribute('aria-expanded') === 'true';
+
+    toggle.addEventListener('click', () => (abierto() ? cerrar() : abrir()));
+    panel.addEventListener('click', (e) => {
+      if ((e.target as Element).closest('a')) cerrar(false);
+    });
+
+    // Esc cierra; Tab queda dentro del menú (botón + enlaces) mientras está abierto.
+    header.addEventListener('keydown', (e) => {
+      if (!abierto()) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        cerrar();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const ciclo = [toggle, ...enlaces()];
+      const i = ciclo.indexOf(document.activeElement as HTMLAnchorElement);
+      const siguiente = e.shiftKey ? (i <= 0 ? ciclo.length - 1 : i - 1) : i === ciclo.length - 1 || i === -1 ? 0 : i + 1;
+      e.preventDefault();
+      ciclo[siguiente].focus();
+    });
+
+    // Si se agranda la ventana con el menú abierto, se cierra sin robar el foco.
+    matchMedia('(min-width: 900px)').addEventListener('change', (m) => {
+      if (m.matches && abierto()) cerrar(false);
+    });
+  }
+</script>

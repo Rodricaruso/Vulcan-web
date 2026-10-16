@@ -1,0 +1,28 @@
+# Una vez por día actualiza las cotizaciones y las sube al repo.
+# El hosting (Cloudflare Pages / Netlify) reconstruye el sitio con cada push.
+name: Actualizar metales
+
+on:
+  schedule:
+    - cron: '30 19 * * 1-5' # 16:30 en Buenos Aires, después del cierre del BNA
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/actualizar-metales.mjs
+      - name: Guardar cambios
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/metales.json
+          git diff --cached --quiet || git commit -m "Metales: cotización del día"
+          git push
