@@ -4,3 +4,7 @@ dist/
 
 # Fotos originales sin procesar (las de la web son las copias con nombre en cada carpeta)
 imagenes/originales/
+
+# Capturas de verificación del skill scroll-craft
+scrollcraft/lab/
+scrollcraft/builds/*/lab/

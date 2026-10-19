@@ -6,9 +6,10 @@ interface Props {
   title?: string;
   description?: string;
   conDatosEstructurados?: boolean;
+  conPreguntas?: boolean; // schema FAQPage: solo en la página que muestra las preguntas
 }
 
-const { title = sitio.title, description = sitio.description, conDatosEstructurados = false } = Astro.props;
+const { title = sitio.title, description = sitio.description, conDatosEstructurados = false, conPreguntas = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 
 const negocio = {
@@ -63,7 +64,8 @@ const faq = {
     <meta property="og:url" content={canonical} />
     <!-- TODO: og:image de 1200×630 cuando esté el asset -->
     {conDatosEstructurados && <script is:inline type="application/ld+json" set:html={JSON.stringify(negocio)} />}
-    {conDatosEstructurados && <script is:inline type="application/ld+json" set:html={JSON.stringify(faq)} />}
+    {conPreguntas && <script is:inline type="application/ld+json" set:html={JSON.stringify(faq)} />}
+    <slot name="head" />
   </head>
   <body>
     <slot />

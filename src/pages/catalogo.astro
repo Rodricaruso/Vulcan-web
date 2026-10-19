@@ -1,0 +1,237 @@
+---
+// Catálogo: grilla de piezas con la misma ficha para todas, filtro por tipo y guía de talles.
+import Base from '../layouts/Base.astro';
+import Navbar from '../components/Navbar.astro';
+import TarjetaPieza from '../components/TarjetaPieza.astro';
+import CtaFinal from '../components/CtaFinal.astro';
+import Footer from '../components/Footer.astro';
+import { catalogo } from '../content';
+import { productos, tipos, talles, cadenas, type TipoPieza } from '../data/productos';
+
+const presentes = Object.keys(tipos).filter((t) => productos.some((p) => p.tipo === t)) as TipoPieza[];
+const { talles: guia } = catalogo;
+---
+
+<Base title={catalogo.meta.title} description={catalogo.meta.description}>
+  <Navbar />
+  <main id="contenido" tabindex="-1">
+    <section class="contenedor catalogo" aria-labelledby="catalogo-titulo">
+      <header class="catalogo__cabecera">
+        <h1 id="catalogo-titulo">{catalogo.titulo}</h1>
+        <p class="bajada">{catalogo.bajada}</p>
+      </header>
+
+      <div class="filtro" role="group" aria-label="Filtrar por tipo de pieza" data-filtro>
+        <button type="button" class="filtro__boton" aria-pressed="true" data-tipo="todas">{catalogo.filtroTodas}</button>
+        {presentes.map((t) => (
+          <button type="button" class="filtro__boton" aria-pressed="false" data-tipo={t}>{tipos[t].plural}</button>
+        ))}
+      </div>
+
+      <ul class="catalogo__grilla" data-grilla>
+        {productos.map((pieza) => (
+          <li data-tipo={pieza.tipo}>
+            <TarjetaPieza pieza={pieza} completa />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section id="talles" class="seccion tema-claro talles" aria-labelledby="talles-titulo">
+      <div class="contenedor talles__grilla">
+        <div class="talles__texto">
+          <h2 id="talles-titulo">{guia.titulo}</h2>
+          <p class="bajada">{guia.bajada}</p>
+          <ol class="talles__metodos">
+            {guia.metodos.map((m) => (
+              <li>
+                <h3>{m.titulo}</h3>
+                <p>{m.texto}</p>
+              </li>
+            ))}
+          </ol>
+          <p class="talles__nota">{guia.nota}</p>
+        </div>
+
+        <div class="talles__tablas">
+          <div class="tabla">
+            <table>
+              <caption class="sr-only">{guia.titulo}: anillos</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{guia.columnas.diametro}</th>
+                  <th scope="col">{guia.columnas.circunferencia}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {talles.map((t) => (
+                  <tr>
+                    <td>{t.diametro} mm</td>
+                    <td>{t.circunferencia} mm</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="talles__subtitulo">{guia.cadenasTitulo}</h3>
+          <div class="tabla">
+            <table>
+              <caption class="sr-only">{guia.cadenasTitulo}</caption>
+              <tbody>
+                {cadenas.map((c) => (
+                  <tr>
+                    <th scope="row">{c.largo}</th>
+                    <td>{c.donde}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p class="talles__nota">{guia.aros}</p>
+        </div>
+      </div>
+    </section>
+
+    <CtaFinal />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .catalogo {
+    padding-block: var(--space-8) var(--seccion);
+  }
+
+  .catalogo__cabecera {
+    display: grid;
+    gap: var(--space-4);
+    margin-bottom: var(--space-7);
+  }
+
+  .filtro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-7);
+  }
+
+  .filtro__boton {
+    min-height: var(--tactil);
+    padding-inline: var(--space-5);
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius);
+    font: inherit;
+    cursor: pointer;
+    transition: background-color var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out);
+  }
+
+  .filtro__boton:hover {
+    border-color: var(--color-accent);
+  }
+
+  .filtro__boton[aria-pressed='true'] {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  .catalogo__grilla {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: var(--space-7) var(--space-5);
+  }
+
+  .talles__grilla {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .talles__texto {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+
+  .talles__metodos {
+    padding-left: var(--space-5);
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-2);
+  }
+
+  .talles__metodos h3 {
+    margin-bottom: var(--space-1);
+  }
+
+  .talles__metodos li::marker {
+    font-family: var(--font-mono);
+    color: var(--acento);
+  }
+
+  .talles__nota {
+    font-size: var(--text-small);
+    color: var(--texto-suave);
+  }
+
+  .talles__subtitulo {
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-3);
+  }
+
+  .tabla {
+    overflow-x: auto;
+  }
+
+  .tabla table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tabla th,
+  .tabla td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--borde);
+    text-align: left;
+  }
+
+  .tabla thead th {
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+    font-weight: 500;
+    color: var(--texto-suave);
+  }
+
+  .tabla tbody th {
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .talles__tablas > .talles__nota {
+    margin-top: var(--space-4);
+  }
+
+  @media (min-width: 1024px) {
+    .talles__grilla {
+      grid-template-columns: 5fr 6fr;
+      gap: var(--space-9);
+    }
+  }
+</style>
+
+<script>
+  const filtro = document.querySelector<HTMLElement>('[data-filtro]');
+  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-grilla] > li'));
+  filtro?.addEventListener('click', (e) => {
+    const boton = (e.target as Element).closest<HTMLButtonElement>('button[data-tipo]');
+    if (!boton) return;
+    const tipo = boton.dataset.tipo;
+    filtro.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === boton)));
+    items.forEach((li) => (li.hidden = tipo !== 'todas' && li.dataset.tipo !== tipo));
+  });
+</script>

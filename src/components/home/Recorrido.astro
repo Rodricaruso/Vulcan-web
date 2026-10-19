@@ -1,0 +1,654 @@
+---
+// Acto 3: el proceso. Seis pasos sobre una sola línea de bronce (horizontal en escritorio,
+// vertical en celular). Al scrollear, cada ícono se cincela de un golpe seco: cae el cincel,
+// el ícono queda grabado de una vez, saltan esquirlas y el impacto sacude el título y hace
+// aparecer el texto. Cierra con el acuñado de la pieza terminada.
+// Animación con GSAP (ScrollTrigger, DrawSVG, SplitText). Sin movimiento reducido: todo quieto y visible.
+import { recorrido } from '../../content';
+import Foto from '../Foto.astro';
+import Sello from '../Sello.astro';
+
+// Trazos de cada dibujo, en un lienzo de 64 × 64.
+const dibujos: Record<string, string[]> = {
+  lapiz: ['M14 50 L44 20 L50 26 L20 56 L12 58 Z', 'M40 24 L46 30', 'M30 52 C38 46 44 54 52 48'],
+  malla: ['M16 24 L32 14 L48 24 L48 44 L32 54 L16 44 Z', 'M16 24 L32 34 L48 24', 'M32 34 V54', 'M24 19 L40 29 M40 19 L24 29 M16 34 L32 44 L48 34'],
+  capas: ['M14 50 H50', 'M16 44 H48', 'M18 38 H46', 'M21 32 H43', 'M32 8 V22', 'M27 22 H37'],
+  molde: ['M12 18 H30 V50 H12 Z', 'M34 18 H52 V50 H34 Z', 'M30 28 C24 28 24 40 30 40', 'M34 28 C40 28 40 40 34 40', 'M32 8 V18'],
+  crisol: ['M12 16 L36 12 L40 34 C40 40 20 44 16 38 Z', 'M38 26 C44 28 48 34 48 40', 'M48 46 V48', 'M47 54 V56'],
+  lima: ['M10 46 L44 12 L50 18 L16 52 Z', 'M20 36 L26 42 M26 30 L32 36 M32 24 L38 30', 'M44 48 m-8 0 a8 6 0 1 0 16 0 a8 6 0 1 0 -16 0'],
+};
+const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+---
+
+<section id="proceso" class="recorrido" data-sc-act="flow" aria-labelledby="recorrido-titulo" data-recorrido>
+  <div class="contenedor">
+    <header class="recorrido__cabecera">
+      <h2 id="recorrido-titulo">{recorrido.titulo}</h2>
+      <div class="recorrido__lateral">
+        <p class="bajada">{recorrido.bajada}</p>
+        <a class="recorrido__enlace" href={recorrido.enlace.href}>{recorrido.enlace.texto}</a>
+      </div>
+    </header>
+
+    <ol class="recorrido__pasos" style={`--n: ${recorrido.pasos.length}`} data-pasos>
+      {recorrido.pasos.map((paso, i) => (
+        <li class="paso" data-paso>
+          <div class="paso__yunque" data-yunque>
+            <span class="paso__destello" aria-hidden="true" data-destello></span>
+            <svg class="paso__dibujo" viewBox="0 0 64 64" aria-hidden="true" data-dibujo>
+              <g class="paso__surco">{dibujos[paso.dibujo].map((d) => <path d={d} />)}</g>
+              <g class="paso__trazo">{dibujos[paso.dibujo].map((d) => <path d={d} data-trazo />)}</g>
+            </svg>
+            <svg class="paso__cincel" viewBox="0 0 20 72" aria-hidden="true" data-cincel>
+              <path d="M6 0 H14 V46 L10 70 L6 46 Z" />
+              <path class="paso__bisel" d="M10 46 V70" />
+            </svg>
+            <span class="paso__esquirlas" aria-hidden="true">
+              {Array.from({ length: 7 }, () => <i data-esquirla></i>)}
+            </span>
+          </div>
+          <div class="paso__texto">
+            <span class="paso__numero" aria-hidden="true" data-numero>{romanos[i]}</span>
+            <h3 data-titulo>{paso.titulo}</h3>
+            <p data-texto>{paso.texto}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <!--
+    El acuñado: la pieza terminada aparece de golpe, como una moneda que se abre a toda la
+    pantalla. Destello, chispas, la inscripción tallada letra por letra y el sello que cae.
+    Se dispara al entrar en pantalla (no depende de cuánto se scrollee).
+  -->
+  <figure class="factum" data-factum>
+    <div class="factum__imagen">
+      <Foto foto={recorrido.fotoFinal} proporcion="16 / 9" sizes="100vw" />
+      <span class="factum__destello" aria-hidden="true"></span>
+    </div>
+    <div class="factum__chispas" aria-hidden="true">
+      {Array.from({ length: 14 }, (_, i) => <span style={`--a: ${(i * 360) / 14 + (i % 3) * 9}deg; --d: ${0.7 + (i % 4) * 0.22}`}></span>)}
+    </div>
+    <p class="factum__inscripcion" aria-hidden="true">
+      {recorrido.inscripcion.split('').map((letra, i) => <span style={`--i: ${i}`}>{letra === ' ' ? ' ' : letra}</span>)}
+    </p>
+    <div class="factum__sello">
+      <Sello id="sello-factum" texto={recorrido.selloTexto} />
+    </div>
+    <figcaption class="sr-only">{recorrido.pieFoto}</figcaption>
+  </figure>
+</section>
+
+<style>
+  .recorrido {
+    /* Más aire que el resto: es una sección de lectura entre dos momentos fuertes. */
+    padding-block: calc(var(--seccion) * 1.5) var(--seccion);
+  }
+
+  /* ----------------------------------------------------------- cabecera -- */
+  .recorrido__cabecera {
+    display: grid;
+    gap: var(--space-4);
+    margin-bottom: clamp(3rem, 7vw, 7rem);
+  }
+
+  .recorrido__cabecera h2 {
+    font-size: clamp(2.25rem, 1.4rem + 3.2vw, 4.5rem);
+    line-height: 1;
+  }
+
+  .recorrido__lateral {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: start;
+  }
+
+  .recorrido__enlace {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tactil);
+    font-weight: 500;
+  }
+
+  /* -------------------------------------------------------------- pasos -- */
+  /* Celular y tablet: columna, con la línea vertical por el centro de los íconos. */
+  .recorrido__pasos {
+    --icono: 72px;
+    --avance: 1;
+    position: relative;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .recorrido__pasos::before,
+  .recorrido__pasos::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--icono) / 2);
+    top: calc(var(--icono) / 2);
+    bottom: var(--space-7);
+    width: 1px;
+    background: var(--color-border-strong);
+  }
+
+  .recorrido__pasos::after {
+    background: var(--color-accent);
+    transform-origin: top;
+    transform: scaleY(var(--avance));
+  }
+
+  .paso {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: var(--icono) 1fr;
+    gap: var(--space-5);
+    align-items: start;
+    /* Todo arriba: las columnas con menos texto no reparten el sobrante entre sus filas. */
+    align-content: start;
+  }
+
+  /* El yunque: la placa donde cae el golpe. Tapa la línea detrás del ícono. */
+  .paso__yunque {
+    position: relative;
+    width: var(--icono);
+    height: var(--icono);
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-bg);
+    box-shadow: inset 0 0 0 1px var(--color-border-strong);
+  }
+
+  .paso__dibujo {
+    width: 64%;
+    height: 64%;
+    overflow: visible;
+  }
+
+  .paso__dibujo path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Grabado: el surco oscuro corrido y el filo de bronce encima. */
+  .paso__surco path {
+    stroke: rgb(0 0 0 / 0.55);
+    stroke-width: 2.6;
+    transform: translate(0.9px, 1.1px);
+  }
+
+  .paso__trazo path {
+    stroke: var(--color-accent-hover);
+    stroke-width: 1.6;
+  }
+
+  .paso__destello {
+    position: absolute;
+    inset: -30%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(255 226 180 / 0.55), rgb(211 180 143 / 0.18) 45%, transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .paso__cincel {
+    position: absolute;
+    left: 58%;
+    bottom: 46%;
+    width: 16px;
+    height: 58px;
+    opacity: 0;
+    transform-origin: 50% 100%;
+    pointer-events: none;
+  }
+
+  .paso__cincel path {
+    fill: var(--color-accent);
+  }
+
+  .paso__cincel .paso__bisel {
+    fill: none;
+    stroke: var(--color-accent-hover);
+    stroke-width: 1;
+  }
+
+  .paso__esquirlas i {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 3px;
+    height: 3px;
+    background: var(--color-accent-hover);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .paso__texto {
+    display: grid;
+    align-content: start;
+    gap: var(--space-1);
+    padding-top: var(--space-1);
+  }
+
+  .paso__numero {
+    font-family: var(--font-display);
+    font-size: var(--text-lead);
+    line-height: 1;
+    color: var(--color-accent);
+  }
+
+  .paso h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
+  }
+
+  .paso p {
+    color: var(--color-text-muted);
+    max-width: 40ch;
+  }
+
+  /* Antes del golpe (solo con JS y movimiento): el paso espera, sin ícono ni texto. */
+  .golpes .paso__trazo,
+  .golpes .paso__surco,
+  .golpes .paso__texto > * {
+    visibility: hidden;
+  }
+
+  /* ---------------------------------------------------------- escritorio -- */
+  /* Seis columnas sobre una sola línea horizontal que pasa por el centro de los íconos. */
+  @media (min-width: 1024px) {
+    .recorrido__cabecera {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+      align-items: end;
+      column-gap: var(--space-8);
+    }
+
+    .recorrido__pasos {
+      --icono: 88px;
+      grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+
+    .recorrido__pasos::before,
+    .recorrido__pasos::after {
+      left: calc(var(--icono) / 2);
+      right: 0;
+      top: calc(var(--icono) / 2);
+      bottom: auto;
+      width: auto;
+      height: 1px;
+    }
+
+    .recorrido__pasos::after {
+      transform-origin: left;
+      transform: scaleX(var(--avance));
+    }
+
+    .paso {
+      grid-template-columns: none;
+      gap: var(--space-5);
+    }
+
+    .paso p {
+      font-size: var(--text-small);
+    }
+  }
+
+  /* ------------------------------------------------------------ acuñado -- */
+  .factum {
+    position: relative;
+    margin-top: clamp(5rem, 12vw, 11rem);
+    isolation: isolate;
+  }
+
+  .factum__imagen {
+    position: relative;
+    overflow: hidden;
+    clip-path: circle(14% at 50% 50%);
+    transition: clip-path 720ms cubic-bezier(0.7, 0, 0.2, 1);
+  }
+
+  .factum__imagen :global(.foto) {
+    border-radius: 0;
+    max-height: 92svh;
+    transform: scale(1.3);
+    transition: transform 1400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .factum__destello {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgb(255 230 190 / 0.95), rgb(211 180 143 / 0.5) 30%, transparent 65%);
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .factum__chispas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    pointer-events: none;
+  }
+
+  .factum__chispas span {
+    position: absolute;
+    width: 2px;
+    height: 14px;
+    border-radius: 2px;
+    background: var(--color-accent-hover);
+    box-shadow: 0 0 8px 1px rgb(255 214 160 / 0.7);
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(0);
+  }
+
+  .factum__inscripcion {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(1.5rem, 6vw, 4rem);
+    translate: -50% 0;
+    max-width: none;
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 0.8rem + 4.6vw, 5.5rem);
+    letter-spacing: 0.2em;
+    margin-right: -0.2em;
+    color: var(--color-text);
+    text-shadow: 0 1px 0 rgb(0 0 0 / 0.5), 0 0 30px rgb(29 6 5 / 0.8);
+  }
+
+  /* Cada letra se talla: entra desde arriba como un golpe de cincel. */
+  .factum__inscripcion span {
+    display: inline-block;
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(-0.12em);
+  }
+
+  .factum__sello {
+    position: absolute;
+    right: clamp(1rem, 5vw, 4rem);
+    top: clamp(1rem, 5vw, 4rem);
+    width: clamp(5.5rem, 13vw, 10rem);
+    padding: 0.6rem;
+    border-radius: 50%;
+    background: rgb(242 233 223 / 0.92);
+    opacity: 0;
+    transform: rotate(-12deg) scale(1.8);
+  }
+
+  /* --- el golpe --- */
+  .factum.acunado .factum__imagen {
+    clip-path: circle(75% at 50% 50%);
+  }
+
+  .factum.acunado .factum__imagen :global(.foto) {
+    transform: none;
+  }
+
+  .factum.acunado .factum__destello {
+    animation: destello 900ms ease-out 380ms;
+  }
+
+  .factum.acunado .factum__chispas span {
+    animation: chispa calc(var(--d) * 1s) cubic-bezier(0.1, 0.8, 0.3, 1) 420ms;
+  }
+
+  .factum.acunado {
+    animation: temblor 260ms ease-out 420ms;
+  }
+
+  .factum.acunado .factum__inscripcion span {
+    animation: tallar 260ms cubic-bezier(0.3, 1.6, 0.6, 1) forwards;
+    animation-delay: calc(700ms + var(--i) * 55ms);
+  }
+
+  .factum.acunado .factum__sello {
+    animation: estampar-factum 460ms cubic-bezier(0.3, 1.4, 0.5, 1) 1500ms forwards;
+  }
+
+  @keyframes destello {
+    0% {
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes chispa {
+    0% {
+      opacity: 1;
+      transform: rotate(var(--a)) translateY(0) scaleY(1);
+    }
+    100% {
+      opacity: 0;
+      transform: rotate(var(--a)) translateY(calc(var(--d) * -38vmin)) scaleY(0.3);
+    }
+  }
+
+  @keyframes temblor {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    30% {
+      translate: 0 5px;
+    }
+    60% {
+      translate: 0 -2px;
+    }
+  }
+
+  @keyframes tallar {
+    to {
+      clip-path: inset(0 0 -10% 0);
+      transform: none;
+    }
+  }
+
+  @keyframes estampar-factum {
+    0% {
+      opacity: 0;
+      transform: rotate(-20deg) scale(1.8);
+    }
+    60% {
+      opacity: 1;
+      transform: rotate(-12deg) scale(0.94);
+    }
+    100% {
+      opacity: 1;
+      transform: rotate(-12deg) scale(1);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .factum__imagen :global(.foto) {
+      aspect-ratio: 4 / 5;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .factum__imagen,
+    .factum.acunado .factum__imagen {
+      clip-path: none;
+    }
+
+    .factum__imagen :global(.foto) {
+      transform: none;
+    }
+
+    .factum__chispas {
+      display: none;
+    }
+
+    .factum.acunado {
+      animation: none;
+    }
+
+    .factum__inscripcion span {
+      clip-path: none;
+      transform: none;
+    }
+
+    .factum__sello {
+      opacity: 1;
+      transform: rotate(-12deg);
+    }
+
+    .factum.acunado .factum__sello {
+      animation: none;
+    }
+  }
+
+</style>
+
+<script>
+  // El acuñado se dispara una sola vez, cuando un tercio de la imagen está en pantalla.
+  const factum = document.querySelector<HTMLElement>('[data-factum]');
+  if (factum) {
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          factum.classList.add('acunado');
+          io.disconnect();
+        }
+      },
+      { threshold: 0.33 },
+    );
+    io.observe(factum);
+  }
+</script>
+
+<script>
+  // Golpes de cincel. Cada paso se cincela una vez, en orden, a medida que se scrollea.
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { SplitText } from 'gsap/SplitText';
+  import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
+
+  gsap.registerPlugin(ScrollTrigger, SplitText, DrawSVGPlugin);
+
+  const seccion = document.querySelector<HTMLElement>('[data-recorrido]');
+  const lista = seccion?.querySelector<HTMLElement>('[data-pasos]');
+  const pasos = Array.from(seccion?.querySelectorAll<HTMLElement>('[data-paso]') ?? []);
+
+  // Arma la línea de tiempo del golpe de un paso. Queda en pausa hasta que le toque.
+  const armarGolpe = (paso: HTMLElement) => {
+    const yunque = paso.querySelector<HTMLElement>('[data-yunque]')!;
+    const cincel = paso.querySelector<SVGElement>('[data-cincel]')!;
+    const destello = paso.querySelector<HTMLElement>('[data-destello]')!;
+    const trazos = paso.querySelectorAll<SVGPathElement>('[data-trazo]');
+    const dibujo = paso.querySelector<SVGElement>('[data-dibujo]')!;
+    const esquirlas = paso.querySelectorAll<HTMLElement>('[data-esquirla]');
+    const numero = paso.querySelector<HTMLElement>('[data-numero]')!;
+    const titulo = paso.querySelector<HTMLElement>('[data-titulo]')!;
+    const texto = paso.querySelector<HTMLElement>('[data-texto]')!;
+    // Palabras y letras: solo letras corta las palabras a mitad de línea.
+    const letras = SplitText.create(titulo, { type: 'words, chars' }).chars;
+
+    return gsap
+      // immediateRender: false: un fromTo dentro de una línea de tiempo aplica su estado
+      // inicial apenas se crea; sin esto el cincel y el destello se ven antes del golpe.
+      .timeline({ paused: true, defaults: { overwrite: 'auto', immediateRender: false } })
+      .set(paso.querySelectorAll('.paso__trazo, .paso__surco, .paso__texto > *'), { visibility: 'visible' })
+      .set([numero, titulo, texto], { autoAlpha: 0 })
+      .set(titulo, { autoAlpha: 1 })
+      .set(letras, { autoAlpha: 0 })
+      .set(dibujo, { autoAlpha: 0 })
+      // El cincel entra en diagonal y cae seco.
+      // El cincel aparece y se levanta despacio (la toma de impulso), se detiene y cae seco.
+      .fromTo(cincel, { autoAlpha: 0, x: 18, y: -20, rotation: 14 }, { autoAlpha: 1, x: 30, y: -46, rotation: 28, duration: 0.55, ease: 'power2.out' })
+      .to(cincel, { x: 0, y: 0, rotation: 8, duration: 0.14, ease: 'power4.in' }, '+=0.12')
+      .addLabel('impacto')
+      // De un golpe: el ícono queda grabado entero, con un rebote corto.
+      .set(dibujo, { autoAlpha: 1 }, 'impacto')
+      .fromTo(trazos, { drawSVG: '50% 50%' }, { drawSVG: '0% 100%', duration: 0.22, ease: 'power4.out' }, 'impacto')
+      .fromTo(dibujo, { scale: 1.3 }, { scale: 1, duration: 0.8, ease: 'back.out(2.4)' }, 'impacto')
+      .fromTo(destello, { autoAlpha: 1, scale: 0.6 }, { autoAlpha: 0, scale: 1.25, duration: 0.9, ease: 'power2.out' }, 'impacto')
+      .fromTo(yunque, { x: -4 }, { x: 0, duration: 0.5, ease: 'elastic.out(1.2, 0.3)' }, 'impacto')
+      .fromTo(
+        esquirlas,
+        { autoAlpha: 1, x: 0, y: 0, rotation: 0, scale: 1 },
+        {
+          autoAlpha: 0,
+          x: () => gsap.utils.random(-46, 46),
+          y: () => gsap.utils.random(-52, 6),
+          rotation: () => gsap.utils.random(-180, 180),
+          scale: () => gsap.utils.random(0.5, 1.4),
+          duration: 0.9,
+          ease: 'power3.out',
+        },
+        'impacto',
+      )
+      .to(cincel, { x: 16, y: -30, rotation: 18, autoAlpha: 0, duration: 0.5, ease: 'power2.out' }, 'impacto+=0.12')
+      // La onda del golpe llega al texto: el número se estampa, las letras saltan y se asientan.
+      .fromTo(numero, { autoAlpha: 0, scale: 1.8 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: 'power4.out' }, 'impacto+=0.06')
+      .fromTo(
+        letras,
+        { autoAlpha: 0, y: -16, rotation: () => gsap.utils.random(-14, 14) },
+        { autoAlpha: 1, y: 0, rotation: 0, duration: 0.8, ease: 'back.out(2.2)', stagger: 0.04 },
+        'impacto+=0.06',
+      )
+      .fromTo(texto, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 'impacto+=0.3');
+  };
+
+  if (seccion && lista && pasos.length) {
+    const mm = gsap.matchMedia();
+
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      seccion.classList.add('golpes');
+      const golpes = pasos.map(armarGolpe);
+      let dados = 0;
+      let cola = 0;
+      gsap.set(lista, { '--avance': 0 });
+
+      const golpearHasta = (k: number) => {
+        // En cola: si el scroll habilita varios golpes juntos, caen uno detrás de otro.
+        for (; dados < k; dados++) {
+          const i = dados;
+          const espera = Math.max(0, cola - gsap.ticker.time);
+          cola = gsap.ticker.time + espera + 0.7;
+          gsap.delayedCall(espera, () => {
+            golpes[i].play(0);
+            gsap.to(lista, { '--avance': Math.min(1, (i + 1) / pasos.length + 0.06), duration: 0.9, ease: 'power2.out', overwrite: true });
+          });
+        }
+      };
+
+      // Escritorio: la fila entera está a la vista, así que los golpes se reparten
+      // a lo largo de medio alto de pantalla de scroll. Celular: cada paso al entrar.
+      const fila = matchMedia('(min-width: 1024px)').matches;
+      if (fila) {
+        ScrollTrigger.create({
+          trigger: lista,
+          start: 'top 85%',
+          end: 'top 12%',
+          onUpdate: (st) => golpearHasta(Math.ceil(st.progress * pasos.length - 0.001)),
+          onLeave: () => golpearHasta(pasos.length),
+        });
+      } else {
+        pasos.forEach((paso, i) =>
+          ScrollTrigger.create({ trigger: paso, start: 'top 74%', once: true, onEnter: () => golpearHasta(i + 1) }),
+        );
+      }
+
+      return () => {
+        seccion.classList.remove('golpes');
+        golpes.forEach((g) => g.revert());
+      };
+    });
+
+    // El motor de scroll de la home recalcula alturas al cargar: después, ScrollTrigger también.
+    document.fonts.ready.then(() => ScrollTrigger.refresh());
+    addEventListener('load', () => ScrollTrigger.refresh());
+  }
+</script>

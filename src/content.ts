@@ -33,11 +33,116 @@ export const acciones = {
 };
 
 export const menu = [
-  { texto: 'Cómo lo hacemos', href: '#proceso' },
-  { texto: 'Trabajos', href: '#trabajos' },
-  { texto: 'Servicios', href: '#servicios' },
-  { texto: 'Preguntas', href: '#preguntas' },
+  { texto: 'Proceso', href: '/#proceso' },
+  { texto: 'Catálogo', href: '/catalogo' },
+  { texto: 'Trabajos', href: '/#trabajos' },
+  { texto: 'El taller', href: '/taller' },
 ];
+
+// ---------------------------------------------------------------- home --
+// La home cuenta una sola pieza (el anillo sello) de la idea al metal.
+// Las etapas usan las fotos de hero/.
+
+export const transformacion = {
+  titulo: 'Tu idea, forjada a medida',
+  bajada: 'La diseñamos con vos en 3D, la pasamos a metal y la terminamos a mano en nuestro taller de CABA.',
+  // Inscripción del canto de la moneda: los cuatro estados, en latín de inscripción.
+  inscripcion: 'IDEA · FORMA · CERA · METALLVM · IDEA · FORMA · CERA · METALLVM ·',
+  etapas: [
+    { nombre: 'Boceto', detalle: 'Tu idea, en papel', foto: { archivo: 'hero/1-boceto', alt: 'Boceto a mano del escudo para un anillo sello', etiqueta: 'Boceto' } },
+    { nombre: 'Modelo 3D', detalle: 'Cada medida, decidida con vos', foto: { archivo: 'hero/2-modelo-3d', alt: 'Modelo 3D del anillo sello con escudo en el programa de diseño', etiqueta: 'Modelo 3D' } },
+    { nombre: 'Resina', detalle: 'Impresa en alto detalle', foto: { archivo: 'hero/3-resina', alt: 'El anillo sello impreso en resina de alto detalle, sostenido en la mano', etiqueta: 'Resina' } },
+    { nombre: 'Metal', detalle: 'Fundida y pulida a mano', foto: { archivo: 'hero/4-metal', alt: 'El anillo sello terminado en metal, sostenido en la mano', etiqueta: 'Metal' } },
+  ] satisfies { nombre: string; detalle: string; foto: Foto }[],
+};
+
+export const frases = [
+  'Cada pieza empieza en una conversación.',
+  'La diseñamos con vos, decisión por decisión: forma, metal, terminación.',
+  'La impresora pone la precisión. Lo demás lo hacen las manos.',
+];
+
+export const recorrido = {
+  titulo: 'Del 3D al metal',
+  bajada: 'Es lo que más nos preguntan. Así pasa una pieza de la pantalla a tu mano.',
+  pasos: [
+    { titulo: 'Diseño', texto: 'Partimos de tu boceto, una foto o una frase. Definimos la pieza con vos.', dibujo: 'lapiz' },
+    { titulo: 'Modelado 3D', texto: 'La dibujamos en CAD pensando en cómo se fabrica: espesores, engarces y la contracción del metal.', dibujo: 'malla' },
+    { titulo: 'Impresión', texto: 'Un prototipo para probar tamaño y forma. Con tu OK, el modelo maestro en resina de alto detalle.', dibujo: 'capas' },
+    { titulo: 'Molde y cera', texto: 'Del modelo maestro sale un molde de silicona. En el molde se inyecta cera: una copia exacta.', dibujo: 'molde' },
+    { titulo: 'Fundición', texto: 'La cera se reemplaza por metal fundido: es la cera perdida, la técnica de siempre.', dibujo: 'crisol' },
+    { titulo: 'A mano', texto: 'Limado, engarce de piedras si lleva, y pulido en el banco hasta el brillo final.', dibujo: 'lima' },
+  ] as { titulo: string; texto: string; dibujo: 'lapiz' | 'malla' | 'capas' | 'molde' | 'crisol' | 'lima' }[],
+  fotoFinal: {
+    archivo: 'proceso/5-terminacion',
+    alt: 'Dos anillos sello con escudo terminados y pulidos a mano',
+    etiqueta: 'Pieza terminada',
+  } satisfies Foto,
+  pieFoto: 'La pieza terminada en el banco, a mano.',
+  // Latín de inscripción: "hecho a mano". Se talla letra por letra sobre la foto final.
+  inscripcion: 'FACTVM · MANV',
+  selloTexto: 'VULCAN · TALLER · CABA · HECHO A MANO ·',
+  enlace: { texto: 'Ver el proceso completo', href: '/taller' },
+};
+
+export const vitrina = {
+  titulo: 'Piezas de la casa',
+  bajada: 'Todas se hacen por encargo: elegís talle, metal y terminación.',
+  enlace: { texto: 'Ver el catálogo completo', href: '/catalogo' },
+};
+
+export const obra = {
+  titulo: 'Lo que ya hicimos',
+  bajada: 'Encargos reales, de la idea a la mano de quien lo pidió.',
+};
+
+export const taller = {
+  meta: {
+    title: 'El taller: cómo hacemos joyas con impresión 3D | Vulcan',
+    description: 'Del modelo 3D al metal: impresión en resina, molde, cera perdida y terminación a mano. Servicios para joyeros y marcas, y el precio de los metales hoy.',
+  },
+  titulo: 'El taller, por dentro',
+  bajada: 'Todo lo que pasa entre tu idea y la pieza en tu mano, con el detalle técnico.',
+};
+
+export const catalogo = {
+  meta: {
+    title: 'Catálogo de joyas a medida: anillos, dijes y aros | Vulcan',
+    description: 'Anillos, dijes y aros de Vulcan. Cada pieza se hace por encargo en plata u oro, con tu talle y la terminación que elijas. Guía de talles incluida.',
+  },
+  titulo: 'Catálogo',
+  bajada: 'Piezas de la casa. Todas se hacen por encargo: elegís talle, metal y terminación, y si querés la cambiamos a tu medida.',
+  filtroTodas: 'Todas',
+  talles: {
+    titulo: 'Guía de talles',
+    bajada: 'Para anillos, lo que importa es el diámetro interior. Medilo de una de estas dos formas:',
+    metodos: [
+      { titulo: 'Con un anillo que te quede bien', texto: 'Apoyalo sobre una regla y medí el diámetro interior, de borde a borde por dentro, en milímetros.' },
+      { titulo: 'Con una tira de papel', texto: 'Rodeá la base del dedo con una tira finita, marcá donde se cruza y medí el largo: es la circunferencia.' },
+    ],
+    columnas: { diametro: 'Diámetro interior', circunferencia: 'Circunferencia' },
+    nota: 'Medí a última hora del día, con el dedo templado: es cuando está más grande. Si estás entre dos medidas, elegí la más grande. Ante la duda, consultanos.',
+    cadenasTitulo: 'Largo de cadena para dijes',
+    aros: 'Para aros, las medidas de cada modelo están en su ficha.',
+  },
+};
+
+// La orden de trabajo del cierre: el visitante elige y el mensaje sale escrito.
+export const orden = {
+  titulo: 'Ahora, tu pieza',
+  bajada: 'Elegí lo que ya sepas. Lo que no, lo definimos juntos.',
+  ficha: 'Orden de trabajo',
+  campos: [
+    { id: 'pieza', etiqueta: 'Pieza', opciones: ['Anillo', 'Dije', 'Aros', 'Otra'] },
+    { id: 'metal', etiqueta: 'Metal', opciones: ['Plata 925', 'Oro 18k', 'Alpaca', 'Bronce', 'No sé'] },
+    { id: 'terminacion', etiqueta: 'Terminación', opciones: ['Pulido', 'Esmerilado', 'No sé'] },
+    { id: 'piedra', etiqueta: 'Piedra', opciones: ['Sí', 'No', 'No sé'] },
+  ],
+  idea: { etiqueta: 'Tu idea', ayuda: 'Una frase alcanza. Las fotos o el boceto los mandás por WhatsApp.' },
+  sellado: 'Sellada',
+  enviar: 'Contanos tu idea',
+  pie: 'Se abre WhatsApp con tu orden escrita. No se envía nada hasta que lo mandes vos.',
+};
 
 export const hero = {
   titulo: 'Hacemos lo que imaginaste: joyas a medida con impresión 3D',
@@ -282,7 +387,7 @@ export const ctaFinal = {
 };
 
 export const pie = {
-  menuExtra: { texto: 'Metales hoy', href: '#metales' },
+  menuExtra: { texto: 'Metales hoy', href: '/taller#metales' },
   privacidad: { texto: 'Política de privacidad', href: '/privacidad' },
 };
 

@@ -1,0 +1,335 @@
+---
+// Acto 6 (cierre y firma de la web): la orden de trabajo.
+// El visitante elige pieza, metal, terminación y piedra; cuando decidió las cuatro, el sello
+// de Vulcan se estampa sobre la orden (el anillo sello es la pieza que abre la página).
+// El botón es un enlace real a WhatsApp que se reescribe con cada elección.
+import { orden, sitio, mensajes } from '../../content';
+import { enlaceWhatsApp } from '../../lib/whatsapp';
+import Sello from '../Sello.astro';
+import Lamina from './Lamina.astro';
+
+const ref = 'web-orden';
+const saludo = mensajes.cliente.replace('{ref}', ref);
+---
+
+<section id="contacto" class="orden" data-sc-act="flow" aria-labelledby="orden-titulo">
+  <div class="contenedor orden__grilla">
+    <!-- Columna izquierda: el título y la lámina, que dibuja la pieza que se va pidiendo. -->
+    <div class="orden__lateral">
+      <header class="orden__cabecera" data-sc-in>
+        <h2 id="orden-titulo">{orden.titulo}</h2>
+        <p class="bajada">{orden.bajada}</p>
+      </header>
+      <div class="orden__lamina">
+        <Lamina />
+      </div>
+    </div>
+
+    <div class="orden__papel" data-sc-reveal="up" data-sc-reveal-at="0.12 0.42">
+      <form class="ficha" data-orden data-telefono={sitio.whatsapp} data-saludo={saludo}>
+        <div class="ficha__encabezado">
+          <p class="ficha__titulo">{orden.ficha}</p>
+          <p class="ficha__meta"><span>{sitio.nombre} · CABA · </span><time data-orden-fecha></time></p>
+        </div>
+
+        {orden.campos.map((campo) => (
+          <fieldset class="ficha__campo">
+            <legend>{campo.etiqueta}</legend>
+            <div class="ficha__opciones">
+              {campo.opciones.map((opcion) => (
+                <label class="ficha__opcion">
+                  <input type="radio" name={campo.id} value={opcion} data-etiqueta={campo.etiqueta} />
+                  <span>{opcion}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ))}
+
+        <div class="ficha__campo">
+          <label class="ficha__leyenda" for="orden-idea">{orden.idea.etiqueta}</label>
+          <textarea id="orden-idea" name="idea" rows="2" maxlength="280" aria-describedby="orden-idea-ayuda"></textarea>
+          <p id="orden-idea-ayuda" class="ficha__ayuda">{orden.idea.ayuda}</p>
+        </div>
+
+        <div class="ficha__pie">
+          <a class="boton boton--principal ficha__enviar" href={enlaceWhatsApp(ref)} target="_blank" rel="noopener" data-ref={ref} data-orden-enviar>
+            {orden.enviar}
+          </a>
+          <p class="ficha__aviso">{orden.pie}</p>
+        </div>
+
+        <div class="ficha__sello" data-orden-sello>
+          <Sello id="sello-orden" estado="relieve" texto={`VULCAN · TALLER · CABA · ${orden.sellado.toUpperCase()} ·`} />
+        </div>
+        <p class="sr-only" aria-live="polite" data-orden-estado></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<style>
+  .orden {
+    padding-block: calc(var(--seccion) * 1.6) calc(var(--seccion) * 1.4);
+  }
+
+  .orden__grilla {
+    display: grid;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  .orden__lateral {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .orden__lamina {
+    width: min(100%, 24rem);
+    justify-self: center;
+  }
+
+  .orden__cabecera {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .orden__cabecera h2 {
+    font-size: clamp(2.25rem, 1.4rem + 3.6vw, 4.5rem);
+    line-height: 1.04;
+  }
+
+  /* La orden es papel: cera sobre la forja, como una ficha de taller. */
+  .ficha {
+    position: relative;
+    display: grid;
+    gap: var(--space-5);
+    padding: clamp(1.25rem, 3vw, 2.5rem);
+    background: var(--color-text);
+    color: var(--color-bg);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 60px -20px rgb(0 0 0 / 0.7);
+    --texto-suave: #5e4a3f;
+    --foco: var(--color-accent-on-light);
+  }
+
+  .ficha__encabezado {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid rgb(29 6 5 / 0.3);
+  }
+
+  .ficha__titulo {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+  }
+
+  .ficha__meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    color: var(--texto-suave);
+  }
+
+  .ficha__campo {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .ficha__campo legend,
+  .ficha__leyenda {
+    padding: 0;
+    margin-bottom: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+    color: var(--texto-suave);
+  }
+
+  .ficha__opciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .ficha__opcion {
+    position: relative;
+  }
+
+  .ficha__opcion input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .ficha__opcion span {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tactil);
+    padding-inline: var(--space-4);
+    border: 1px solid rgb(29 6 5 / 0.24);
+    border-radius: var(--radius);
+    transition: background-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out);
+  }
+
+  .ficha__opcion:hover span {
+    border-color: var(--color-bg);
+  }
+
+  .ficha__opcion input:checked + span {
+    background: var(--color-bg);
+    border-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .ficha__opcion input:focus-visible + span {
+    outline: 2px solid var(--color-accent-on-light);
+    outline-offset: 2px;
+  }
+
+  .ficha textarea {
+    width: 100%;
+    min-height: 4.5rem;
+    padding: var(--space-3);
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgb(29 6 5 / 0.4);
+    border-radius: 0;
+    font: inherit;
+    color: inherit;
+    resize: vertical;
+  }
+
+  .ficha textarea:focus-visible {
+    outline: 2px solid var(--color-accent-on-light);
+    border-radius: var(--radius);
+  }
+
+  .ficha__ayuda,
+  .ficha__aviso {
+    font-size: var(--text-small);
+    color: var(--texto-suave);
+  }
+
+  .ficha__pie {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+    padding-top: var(--space-2);
+    max-width: calc(100% - 7rem);
+  }
+
+  .ficha__enviar {
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .ficha__enviar:hover {
+    background: var(--color-surface-2);
+  }
+
+  /* El sello: en relieve seco mientras la orden está abierta; se entinta cuando está decidida. */
+  .ficha__sello {
+    position: absolute;
+    right: clamp(0.75rem, 2.5vw, 2rem);
+    bottom: clamp(0.75rem, 2.5vw, 2rem);
+    width: clamp(6.5rem, 12vw, 9rem);
+    pointer-events: none;
+    transform: rotate(-9deg);
+    --sello-papel: var(--color-text);
+  }
+
+  .ficha__sello.sellado {
+    animation: estampar-orden 460ms cubic-bezier(0.3, 1.4, 0.5, 1) both;
+  }
+
+  @keyframes estampar-orden {
+    0% {
+      transform: rotate(-18deg) scale(1.7);
+      opacity: 0;
+    }
+    60% {
+      transform: rotate(-9deg) scale(0.94);
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(-9deg) scale(1);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .orden__grilla {
+      grid-template-columns: 5fr 7fr;
+      gap: var(--space-9);
+    }
+
+    .orden__lateral {
+      position: sticky;
+      top: calc(72px + var(--space-6));
+    }
+
+    /* La lámina entra entera en pantalla junto al título. */
+    .orden__lamina {
+      width: min(100%, calc((100svh - 72px - 15rem) * 0.8));
+    }
+  }
+</style>
+
+<script>
+  const ficha = document.querySelector<HTMLFormElement>('[data-orden]');
+  if (ficha) {
+    const enviar = ficha.querySelector<HTMLAnchorElement>('[data-orden-enviar]')!;
+    const sello = ficha.querySelector<HTMLElement>('[data-orden-sello]')!;
+    const marca = sello.querySelector<SVGElement>('[data-sello]')!;
+    const trazo = sello.querySelector<SVGGElement>('[data-sello-marca]')!;
+    const estado = ficha.querySelector<HTMLElement>('[data-orden-estado]')!;
+    const fecha = ficha.querySelector<HTMLTimeElement>('[data-orden-fecha]');
+    const campos = Array.from(new Set(Array.from(ficha.querySelectorAll<HTMLInputElement>('input[type=radio]')).map((r) => r.name)));
+    const { telefono = '', saludo = '' } = ficha.dataset;
+
+    if (fecha) {
+      const hoy = new Date();
+      fecha.dateTime = hoy.toISOString().slice(0, 10);
+      fecha.textContent = hoy.toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    const actualizar = () => {
+      const datos = new FormData(ficha);
+      const lineas: string[] = [];
+      for (const nombre of campos) {
+        const valor = datos.get(nombre);
+        if (!valor) continue;
+        const etiqueta = ficha.querySelector<HTMLInputElement>(`input[name="${nombre}"]`)?.dataset.etiqueta ?? nombre;
+        lineas.push(`${etiqueta}: ${valor}`);
+      }
+      const idea = String(datos.get('idea') ?? '').trim();
+      if (idea) lineas.push(`Idea: ${idea}`);
+      const texto = lineas.length ? `${saludo}\n${lineas.join('\n')}` : saludo;
+      enviar.href = `https://wa.me/${telefono}?text=${encodeURIComponent(texto)}`;
+
+      const decidida = campos.every((nombre) => datos.get(nombre));
+      if (decidida !== sello.classList.contains('sellado')) {
+        sello.classList.toggle('sellado', decidida);
+        // Relieve seco a tinta: cambia el estado del sello y le pone la textura de tinta.
+        marca.classList.toggle('sello--tinta', decidida);
+        marca.classList.toggle('sello--relieve', !decidida);
+        if (decidida) trazo.setAttribute('filter', trazo.dataset.filtro ?? '');
+        else trazo.removeAttribute('filter');
+        estado.textContent = decidida ? 'Orden sellada. Ya la podés mandar por WhatsApp.' : '';
+      }
+    };
+
+    ficha.addEventListener('change', actualizar);
+    ficha.addEventListener('input', actualizar);
+    ficha.addEventListener('submit', (e) => e.preventDefault());
+    actualizar();
+  }
+</script>

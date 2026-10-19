@@ -1,0 +1,216 @@
+---
+// Acto 5: prueba. Fondo cera, escenario fijo. Cada trabajo entra grande, en foco, con su
+// nombre; al llegar el siguiente se achica y se corre a una pila desfasada a un costado.
+// El acento siempre lo tiene el que acaba de aparecer.
+import { obra, trabajos } from '../../content';
+import Foto from '../Foto.astro';
+
+const numerales = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+---
+
+<section id="trabajos" class="obra tema-claro" data-sc-act="pin" data-sc-span={1.2 + trabajos.casos.length * 0.8} aria-labelledby="obra-titulo" data-obra>
+  <div class="obra__escenario" data-sc-stage>
+    <header class="contenedor obra__cabecera">
+      <h2 id="obra-titulo">{obra.titulo}</h2>
+      <p class="bajada">{obra.bajada}</p>
+    </header>
+
+    <ol class="obra__mesa">
+      {trabajos.casos.map((caso, i) => (
+        <li class="obra__trabajo" data-obra-trabajo>
+          <figure>
+            <div class="obra__foto">
+              <Foto foto={caso.foto} proporcion="3 / 4" carga="eager" sizes="(min-width: 1024px) 34vw, 70vw" />
+            </div>
+            <figcaption class="obra__pie">
+              <span class="obra__numeral" aria-hidden="true">{numerales[i]}</span>
+              <span class="obra__nombre">{caso.nombre}</span>
+              <span class="obra__contexto">{caso.contexto}</span>
+            </figcaption>
+          </figure>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .obra__escenario {
+    background: var(--color-text);
+    color: var(--color-bg);
+    padding-top: calc(72px + var(--space-6));
+    overflow: clip;
+  }
+
+  .obra__cabecera {
+    position: relative;
+    z-index: 10;
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .obra__cabecera h2 {
+    max-width: 12ch;
+  }
+
+  .obra__cabecera .bajada {
+    max-width: 30ch;
+  }
+
+  .obra__mesa {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Todas las fotos comparten la misma caja; el JS las ubica (foco, pila o por entrar). */
+  .obra__trabajo {
+    position: absolute;
+    left: 50%;
+    bottom: 6svh;
+    width: min(62vw, 46svh);
+    transform-origin: 50% 100%;
+    will-change: transform, opacity;
+  }
+
+  .obra__foto :global(.foto) {
+    box-shadow: 0 2px 4px rgb(29 6 5 / 0.14), 0 26px 50px -18px rgb(29 6 5 / 0.45);
+  }
+
+  .obra__pie {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--space-3);
+    margin-top: var(--space-3);
+    opacity: var(--foco, 0);
+    transition: opacity var(--dur-3) var(--ease-out);
+  }
+
+  .obra__numeral {
+    grid-row: span 2;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--color-accent-on-light);
+  }
+
+  .obra__nombre {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+
+  .obra__contexto {
+    font-size: var(--text-small);
+    color: var(--texto-suave);
+  }
+
+  @media (min-width: 1024px) {
+    .obra__trabajo {
+      left: 58%;
+      bottom: 8svh;
+      width: min(30vw, 54svh);
+    }
+
+    .obra__cabecera {
+      position: absolute;
+      top: calc(72px + var(--space-8));
+      left: 0;
+      right: 0;
+    }
+  }
+</style>
+
+<script>
+  const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const suave = (t: number) => t * t * (3 - 2 * t);
+
+  const seccion = document.querySelector<HTMLElement>('[data-obra]');
+  if (seccion) {
+    const trabajos = Array.from(seccion.querySelectorAll<HTMLElement>('[data-obra-trabajo]'));
+    const n = trabajos.length;
+    const reducido = matchMedia('(prefers-reduced-motion: reduce)');
+    const escritorio = matchMedia('(min-width: 1024px)');
+    let pendiente = false;
+    // Progreso suavizado: persigue al scroll en vez de saltar con cada paso de la rueda.
+    let suavizado = -1;
+
+    const objetivo = () => {
+      const r = seccion.getBoundingClientRect();
+      return clamp(-r.top / Math.max(1, r.height - innerHeight));
+    };
+
+    const pintar = () => {
+      pendiente = false;
+      const meta = objetivo();
+      if (suavizado < 0 || reducido.matches || Math.abs(meta - suavizado) > 0.5) suavizado = meta;
+      else suavizado += (meta - suavizado) * 0.12;
+      // Sigue animando hasta alcanzar el scroll.
+      if (Math.abs(meta - suavizado) > 0.0004) pedir();
+      else suavizado = meta;
+      const p = suavizado;
+      const w = innerWidth;
+      const h = innerHeight;
+
+      trabajos.forEach((el, i) => {
+        // f = 0: en foco. f < 0: por entrar. f > 0: ya pasó (1 = primer lugar de la pila).
+        const f = p * (n - 1) - i;
+        // Zona muerta alrededor del foco: la foto descansa antes de moverse.
+        const sentido = Math.sign(f);
+        const t = suave(clamp((Math.abs(f) - 0.12) / 0.76));
+        const avance = sentido * t + (Math.abs(f) > 1 ? f - sentido : 0);
+
+        let x = 0;
+        let y = 0;
+        let escala = 1;
+        let opacidad = 1;
+
+        if (avance < 0) {
+          // Entra desde abajo a la derecha.
+          const a = clamp(-avance);
+          x = a * w * 0.18;
+          y = a * h * 0.9;
+          opacidad = 1 - clamp(-avance - 0.6, 0, 1);
+        } else if (avance > 0) {
+          // Se achica y se va a la pila, cada una más chica y más desfasada que la anterior.
+          const lugar = Math.min(avance, 3.2);
+          escala = 1 - 0.5 * Math.min(avance, 1) - 0.08 * Math.max(0, lugar - 1);
+          const ida = Math.min(avance, 1);
+          // Lugares que ya bajó en la pila (0 mientras todavía está saliendo del foco).
+          const extra = Math.max(0, lugar - 1);
+          if (escritorio.matches) {
+            // Pila en diagonal hacia arriba a la izquierda, debajo del título.
+            x = -w * (0.2 * ida + 0.075 * extra);
+            y = -h * (0.04 * ida + 0.07 * extra);
+          } else {
+            x = -w * (0.3 * ida + 0.03 * extra);
+            y = -h * (0.03 * ida + 0.05 * extra);
+          }
+          opacidad = 1 - clamp(avance - 2.6, 0, 1);
+        }
+
+        if (reducido.matches) {
+          // Sin movimiento: solo se ve el trabajo en foco.
+          el.style.transform = 'translateX(-50%)';
+          el.style.opacity = Math.abs(f) < 0.5 ? '1' : '0';
+        } else {
+          el.style.transform = `translate3d(calc(-50% + ${x.toFixed(2)}px), ${y.toFixed(2)}px, 0) scale(${escala.toFixed(4)})`;
+          el.style.opacity = opacidad.toFixed(3);
+        }
+        // Orden fijo por índice: la foto que entra siempre pasa por encima de la que sale.
+        el.style.zIndex = String(10 + i);
+        el.style.setProperty('--foco', String(1 - clamp(Math.abs(f) / 0.4)));
+      });
+    };
+
+    const pedir = () => {
+      if (!pendiente) {
+        pendiente = true;
+        requestAnimationFrame(pintar);
+      }
+    };
+    addEventListener('scroll', pedir, { passive: true });
+    addEventListener('resize', pedir);
+    pintar();
+  }
+</script>

@@ -18,7 +18,8 @@
     "@iconify-json/ph": "^1.2.2",
     "@iconify-json/tabler": "^1.2.42",
     "@iconify/utils": "^3.1.7",
-    "astro": "^7.4.0"
+    "astro": "^7.4.0",
+    "gsap": "^3.13.0"
   },
   "devDependencies": {
     "playwright-core": "^1.64.1",

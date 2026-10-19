@@ -1,0 +1,124 @@
+---
+// Una pieza del catálogo. Versión corta en la Vitrina de la home; versión completa
+// (ficha y botón de consulta) en /catalogo. Todas usan la misma ficha: es una colección.
+import { tipos, type Producto } from '../data/productos';
+import { sitio } from '../content';
+import Foto from './Foto.astro';
+import DibujoPieza from './DibujoPieza.astro';
+
+interface Props {
+  pieza: Producto;
+  completa?: boolean;
+}
+
+const { pieza, completa = false } = Astro.props;
+const tipo = tipos[pieza.tipo].singular;
+const ref = `web-catalogo-${pieza.id}`;
+const mensaje = `Hola Vulcan, vengo de la web (ref: ${ref}). Me interesa ${tipo.toLowerCase() === 'aros' ? 'los aros' : `el ${tipo.toLowerCase()}`} ${pieza.nombre}. `;
+const consulta = `https://wa.me/${sitio.whatsapp}?text=${encodeURIComponent(mensaje)}`;
+---
+
+<article class:list={['pieza', { 'pieza--completa': completa }]} data-tipo={pieza.tipo}>
+  <div class="pieza__imagen">
+    {pieza.foto ? (
+      <Foto foto={pieza.foto} proporcion="4 / 5" carga={completa ? 'lazy' : 'eager'} sizes={completa ? '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw' : '(min-width: 768px) 22rem, 70vw'} />
+    ) : (
+      <DibujoPieza id={pieza.id} alt={`Dibujo técnico de ${tipo.toLowerCase()} ${pieza.nombre}`} />
+    )}
+  </div>
+
+  <div class="pieza__cuerpo">
+    <h3 class="pieza__nombre">{pieza.nombre}</h3>
+    <p class="pieza__tipo">{tipo} · {pieza.metal}</p>
+
+    {completa && (
+      <>
+        <p class="pieza__descripcion">{pieza.descripcion}</p>
+        <dl class="pieza__ficha">
+          <div><dt>Metal</dt><dd>{pieza.metal}</dd></div>
+          <div><dt>Terminación</dt><dd>{pieza.terminacion}</dd></div>
+          <div><dt>Piedra</dt><dd>{pieza.piedra}</dd></div>
+          <div><dt>Peso aprox.</dt><dd>{pieza.peso}</dd></div>
+          <div><dt>Medidas</dt><dd>{pieza.medidas}</dd></div>
+          <div><dt>Precio</dt><dd>Consultanos</dd></div>
+        </dl>
+        <a class="boton boton--secundario pieza__consulta" href={consulta} target="_blank" rel="noopener" data-ref={ref}>
+          Consultar por {pieza.nombre}
+        </a>
+      </>
+    )}
+
+    {!completa && <p class="pieza__terminacion">{pieza.terminacion}</p>}
+  </div>
+</article>
+
+<style>
+  .pieza {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+
+  .pieza__imagen {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+  }
+
+  .pieza__imagen :global(.foto) {
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .pieza__cuerpo {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .pieza__nombre {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.5rem;
+  }
+
+  .pieza__tipo,
+  .pieza__terminacion {
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+    color: var(--color-text-muted);
+  }
+
+  .pieza__descripcion {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .pieza__ficha {
+    margin: var(--space-4) 0 0;
+    display: grid;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .pieza__ficha div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--text-small);
+  }
+
+  .pieza__ficha dt {
+    color: var(--color-text-muted);
+  }
+
+  .pieza__ficha dd {
+    margin: 0;
+    text-align: right;
+  }
+
+  .pieza__consulta {
+    margin-top: var(--space-4);
+  }
+</style>

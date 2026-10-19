@@ -1,30 +1,54 @@
 ---
+// Home: la bitácora de una pieza. Seis actos, ver scrollcraft/builds/vulcan/BRIEF.md.
+// El motor de scroll (public/scrollcraft/) no se edita: se tematiza con los tokens de abajo.
 import Base from '../layouts/Base.astro';
 import Navbar from '../components/Navbar.astro';
-import Hero from '../components/Hero.astro';
-import Pasos from '../components/Pasos.astro';
-import Cinta from '../components/Cinta.astro';
-import Trabajos from '../components/Trabajos.astro';
-import Proceso from '../components/Proceso.astro';
-import Servicios from '../components/Servicios.astro';
-import Metales from '../components/Metales.astro';
-import Preguntas from '../components/Preguntas.astro';
-import CtaFinal from '../components/CtaFinal.astro';
+import Transformacion from '../components/home/Transformacion.astro';
+import Frases from '../components/home/Frases.astro';
+import Recorrido from '../components/home/Recorrido.astro';
+import Vitrina from '../components/home/Vitrina.astro';
+import Obra from '../components/home/Obra.astro';
+import Orden from '../components/home/Orden.astro';
 import Footer from '../components/Footer.astro';
 ---
 
 <Base conDatosEstructurados>
+  <link slot="head" rel="stylesheet" href="/scrollcraft/scrollcraft.css" />
+
   <Navbar />
   <main id="contenido" tabindex="-1">
-    <Hero />
-    <Pasos />
-    <Cinta />
-    <Trabajos />
-    <Proceso />
-    <Servicios />
-    <Metales />
-    <Preguntas />
-    <CtaFinal />
+    <Transformacion />
+    <Frases />
+    <Recorrido />
+    <Vitrina />
+    <Obra />
+    <Orden />
   </main>
   <Footer />
+
+  <script is:inline src="/scrollcraft/scrollcraft.js"></script>
+  <script is:inline>ScrollCraft.mount(document.body);</script>
 </Base>
+
+<style is:global>
+  /* Los seis colores y las dos letras del motor, con la paleta de Vulcan. */
+  :root {
+    --sc-canvas: #1d0605;
+    --sc-surface: #2a100c;
+    --sc-ink: #f2e9df;
+    --sc-ink-soft: #b8a595;
+    --sc-accent: #bf9b74;
+    --sc-accent-ink: #1d0605;
+    --sc-font-display: 'Marcellus', 'Times New Roman', serif;
+    --sc-font-text: 'IBM Plex Sans', system-ui, sans-serif;
+    --sc-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+
+  /* El motor pinta el body liso; acá vuelve la textura de piedra y la letra del sitio. */
+  html body {
+    background: var(--color-bg) url('/texturas/forja.webp') 0 0 / 100% auto repeat-y;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    letter-spacing: normal;
+  }
+</style>

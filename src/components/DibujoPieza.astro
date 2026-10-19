@@ -1,0 +1,87 @@
+---
+// Dibujo técnico de línea para las piezas que todavía no tienen foto.
+// Es intencional, no un placeholder: el lado CAD de la marca. Cuando haya foto, se reemplaza solo.
+interface Props {
+  id: string;
+  alt: string;
+}
+
+const { id, alt } = Astro.props;
+
+// Lienzo 200 × 250. Cada pieza: trazos principales y ejes de construcción.
+const piezas: Record<string, { trazos: string[]; ejes: string[] }> = {
+  egida: {
+    trazos: ['M60 150 C60 210 140 210 140 150', 'M70 150 C70 198 130 198 130 150', 'M62 80 H138 V118 C138 140 100 156 100 156 C100 156 62 140 62 118 Z', 'M100 86 V150', 'M108 92 L132 120 M108 108 L130 134'],
+    ejes: ['M100 50 V225', 'M40 118 H160'],
+  },
+  yunque: {
+    trazos: ['M60 150 C60 210 140 210 140 150', 'M70 150 C70 198 130 198 130 150', 'M66 90 H134 V142 H66 Z', 'M72 96 H128 V136 H72 Z'],
+    ejes: ['M100 60 V225', 'M40 116 H160'],
+  },
+  brasa: {
+    trazos: ['M58 150 C58 214 142 214 142 150 C142 96 58 96 58 150 Z', 'M64 150 C64 206 136 206 136 150 C136 104 64 104 64 150 Z', 'M84 82 L100 62 L116 82 L100 100 Z', 'M88 82 H112', 'M86 96 L82 104 M114 96 L118 104'],
+    ejes: ['M100 40 V225', 'M40 150 H160'],
+  },
+  colada: {
+    trazos: ['M54 150 C54 216 146 216 146 150 C146 84 54 84 54 150 Z', 'M72 150 C72 196 128 196 128 150 C128 104 72 104 72 150 Z', 'M60 120 C66 126 62 134 68 138', 'M132 112 C126 120 134 128 128 134', 'M96 92 C100 98 106 94 108 100'],
+    ejes: ['M100 70 V230', 'M40 150 H160'],
+  },
+  denario: {
+    trazos: ['M100 40 V70', 'M100 70 m-46 60 a46 46 0 1 0 92 0 a46 46 0 1 0 -92 0', 'M100 70 m-38 60 a38 38 0 1 0 76 0 a38 38 0 1 0 -76 0', 'M88 112 C96 104 112 108 112 122 C112 136 102 140 98 150 L92 150', 'M94 70 H106'],
+    ejes: ['M100 30 V200', 'M40 130 H160'],
+  },
+  chispa: {
+    trazos: ['M100 36 V66', 'M100 66 C124 96 132 126 132 144 C132 166 118 180 100 180 C82 180 68 166 68 144 C68 126 76 96 100 66 Z', 'M100 66 L100 180 M68 144 H132 M80 104 L120 104', 'M100 134 m-10 0 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0'],
+    ejes: ['M100 26 V200', 'M50 144 H150'],
+  },
+  escoria: {
+    trazos: ['M64 140 m-34 0 a34 34 0 1 0 68 0 a34 34 0 1 0 -68 0', 'M64 140 m-28 0 a28 28 0 1 0 56 0 a28 28 0 1 0 -56 0', 'M140 140 m-34 0 a34 34 0 1 0 68 0 a34 34 0 1 0 -68 0', 'M140 140 m-28 0 a28 28 0 1 0 56 0 a28 28 0 1 0 -56 0', 'M44 120 L48 124 M84 156 L80 160 M120 116 L124 120 M160 158 L156 162'],
+    ejes: ['M64 90 V190 M140 90 V190', 'M20 140 H184'],
+  },
+  crisol: {
+    trazos: ['M66 70 C58 70 58 84 66 84', 'M66 84 V96', 'M66 96 C82 120 84 136 84 146 C84 158 76 166 66 166 C56 166 48 158 48 146 C48 136 50 120 66 96 Z', 'M134 70 C126 70 126 84 134 84', 'M134 84 V96', 'M134 96 C150 120 152 136 152 146 C152 158 144 166 134 166 C124 166 116 158 116 146 C116 136 118 120 134 96 Z', 'M66 140 m-5 0 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0', 'M134 140 m-5 0 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0'],
+    ejes: ['M66 56 V190 M134 56 V190', 'M30 146 H170'],
+  },
+};
+
+const pieza = piezas[id] ?? piezas.yunque;
+---
+
+<svg class="dibujo-pieza" viewBox="0 0 200 250" role="img" aria-label={alt}>
+  <g class="dibujo-pieza__ejes">
+    {pieza.ejes.map((d) => <path d={d} />)}
+  </g>
+  <g class="dibujo-pieza__trazos">
+    {pieza.trazos.map((d) => <path d={d} />)}
+  </g>
+</svg>
+
+<style>
+  .dibujo-pieza {
+    width: 100%;
+    height: 100%;
+    background:
+      linear-gradient(var(--color-border) 1px, transparent 1px) 0 0 / 20px 20px,
+      linear-gradient(90deg, var(--color-border) 1px, transparent 1px) 0 0 / 20px 20px,
+      var(--color-surface);
+  }
+
+  .dibujo-pieza path {
+    fill: none;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .dibujo-pieza__trazos path {
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+  }
+
+  .dibujo-pieza__ejes path {
+    stroke: var(--color-text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 6 4 1 4;
+    opacity: 0.45;
+  }
+</style>

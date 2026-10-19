@@ -1,0 +1,551 @@
+---
+// La lámina: la pieza que el visitante está pidiendo, dibujada como un grabado antiguo de
+// joyería (referencias: láminas de anillos y gemas del siglo XIX). Reacciona a la orden:
+//   pieza        → se borra el dibujo y se traza a pluma la pieza nueva
+//   metal        → lavado de acuarela con el color del metal (grabado coloreado a mano)
+//   terminación  → pulido: brillo que barre y destellos; esmerilado: grano mate
+//   piedra       → esmeralda de talla rectangular; "no sé": engarce vacío punteado
+// Escucha el formulario [data-orden]. Animación con GSAP (DrawSVG).
+
+// Cada pieza: cuerpo (relleno de metal y recorte), trama (sombreado), líneas (tinta),
+// dónde va la piedra y dónde brilla.
+type Pieza = {
+  id: 'anillo' | 'dije' | 'aros' | 'pin';
+  lamina: string;
+  cuerpo: string[];
+  trama: string[];
+  lineas: string[];
+  finas?: string[];
+  perlas?: string;
+  cadena?: string[];
+  frente?: string[]; // líneas que van delante de la piedra (garras)
+  gema: 'esmeralda' | 'oval' | 'gota'; // talla de la piedra
+  piedra: string; // transform de la piedra
+  monograma?: [number, number, number]; // x, y, tamaño de la V cuando no hay piedra
+  destellos: [number, number][];
+};
+
+const piezas: Pieza[] = [
+  {
+    // Solitario: canasta que baja hasta la banda, hombros que la abrazan y cuatro garras.
+    id: 'anillo',
+    lamina: 'I',
+    cuerpo: [
+      'M88 278 a112 118 0 1 0 224 0 a112 118 0 1 0 -224 0 Z M112 278 a88 94 0 1 1 176 0 a88 94 0 1 1 -176 0 Z',
+      'M176 146 L188 168 Q200 172 212 168 L224 146 Z',
+    ],
+    trama: ['M200 160 A112 118 0 0 1 200 396 L200 372 A88 94 0 0 0 200 184 Z', 'M200 146 H224 L212 168 Q206 170 200 170 Z'],
+    lineas: [
+      'M88 278 a112 118 0 1 0 224 0 a112 118 0 1 0 -224 0',
+      'M112 278 a88 94 0 1 1 176 0 a88 94 0 1 1 -176 0',
+      'M176 146 L188 168 Q200 172 212 168 L224 146 Z',
+      'M142 190 Q156 164 188 164',
+      'M258 190 Q244 164 212 164',
+    ],
+    finas: ['M100 278 a100 106 0 1 0 200 0 a100 106 0 1 0 -200 0', 'M184 155 H216', 'M191 146 V118 M209 146 V118'],
+    // Garras delanteras: van después de la piedra para que la sujeten por delante.
+    frente: ['M180 146 C170 134 170 118 176 106 L183 109', 'M220 146 C230 134 230 118 224 106 L217 109'],
+    gema: 'esmeralda',
+    piedra: 'translate(200 127) rotate(90) scale(1.08)',
+    destellos: [[124, 236], [242, 116], [296, 306]],
+  },
+  {
+    // Medalla ovalada: la piedra es un oval facetado grande, en el centro.
+    id: 'dije',
+    lamina: 'II',
+    cuerpo: ['M98 274 a102 132 0 1 0 204 0 a102 132 0 1 0 -204 0 Z', 'M188 98 h24 v24 q0 14 -12 14 q-12 0 -12 -14 Z'],
+    trama: ['M200 142 A102 132 0 0 1 200 406 L200 386 A84 112 0 0 0 200 162 Z'],
+    lineas: [
+      'M98 274 a102 132 0 1 0 204 0 a102 132 0 1 0 -204 0',
+      'M116 274 a84 112 0 1 0 168 0 a84 112 0 1 0 -168 0',
+      'M188 98 h24 v24 q0 14 -12 14 q-12 0 -12 -14 Z',
+      'M200 136 V142',
+    ],
+    cadena: ['M92 64 Q142 90 190 104', 'M308 64 Q258 90 210 104'],
+    perlas: 'M107 274 a93 122 0 1 0 186 0 a93 122 0 1 0 -186 0',
+    gema: 'oval',
+    piedra: 'translate(200 274) scale(1.9)',
+    monograma: [200, 306, 96],
+    destellos: [[146, 196], [262, 338], [208, 108]],
+  },
+  {
+    // Gota: la piedra es una talla pera, abajo, siguiendo la forma del aro.
+    id: 'aros',
+    lamina: 'III',
+    cuerpo: [
+      'M200 184 C246 240 266 292 266 334 C266 378 236 408 200 408 C164 408 134 378 134 334 C134 292 154 240 200 184 Z',
+      'M186 162 a14 14 0 1 0 28 0 a14 14 0 1 0 -28 0 Z M192 162 a8 8 0 1 1 16 0 a8 8 0 1 1 -16 0 Z',
+    ],
+    trama: ['M200 184 C246 240 266 292 266 334 C266 378 236 408 200 408 L200 392 C228 392 250 366 250 334 C250 298 232 256 200 212 Z'],
+    lineas: [
+      'M200 184 C246 240 266 292 266 334 C266 378 236 408 200 408 C164 408 134 378 134 334 C134 292 154 240 200 184 Z',
+      'M200 212 C232 256 250 298 250 334 C250 366 228 392 200 392 C172 392 150 366 150 334 C150 298 168 256 200 212 Z',
+      'M186 162 a14 14 0 1 0 28 0 a14 14 0 1 0 -28 0',
+      'M200 148 C198 112 226 92 244 106 C258 118 254 142 240 156',
+    ],
+    finas: ['M192 162 a8 8 0 1 1 16 0 a8 8 0 1 1 -16 0', 'M200 176 V184', 'M200 232 V300'],
+    gema: 'gota',
+    piedra: 'translate(200 350) scale(1.05)',
+    monograma: [200, 352, 64],
+    destellos: [[166, 272], [234, 384], [216, 206]],
+  },
+  {
+    // Prendedor de barra: puntas de lanza, cartucho oval con perlitas, volutas y la aguja detrás.
+    id: 'pin',
+    lamina: 'IV',
+    cuerpo: ['M66 250 L106 237 H294 L334 250 L294 263 H106 Z', 'M150 250 a50 40 0 1 0 100 0 a50 40 0 1 0 -100 0 Z'],
+    trama: ['M200 250 H334 L294 263 H200 Z', 'M200 210 A50 40 0 0 1 200 290 L200 279 A38 29 0 0 0 200 221 Z'],
+    lineas: [
+      'M66 250 L106 237 H294 L334 250 L294 263 H106 Z',
+      'M150 250 a50 40 0 1 0 100 0 a50 40 0 1 0 -100 0',
+      'M162 250 a38 29 0 1 0 76 0 a38 29 0 1 0 -76 0',
+      'M146 237 C134 228 120 236 124 247 C127 255 138 253 136 245',
+      'M254 237 C266 228 280 236 276 247 C273 255 262 253 264 245',
+      'M70 276 L158 276 M242 276 L344 276 L354 273',
+    ],
+    finas: [
+      'M100 250 H140 M260 250 H300',
+      'M66 250 L86 250 M314 250 L334 250',
+      'M52 276 a6 9 0 1 0 12 0 a6 9 0 1 0 -12 0 M60 276 a6 9 0 1 0 12 0 a6 9 0 1 0 -12 0',
+      'M330 264 V282 Q330 290 338 288',
+    ],
+    perlas: 'M156 250 a44 34.5 0 1 0 88 0 a44 34.5 0 1 0 -88 0',
+    gema: 'esmeralda',
+    piedra: 'translate(200 250) rotate(90) scale(1)',
+    monograma: [200, 266, 44],
+    destellos: [[118, 244], [216, 222], [302, 252]],
+  },
+];
+
+---
+
+<figure class="lamina" data-lamina>
+  <svg viewBox="0 0 400 500" role="img" aria-label="Lámina: anillo" data-lamina-svg>
+    <defs>
+      <!-- Trama de grabado: líneas finas inclinadas. -->
+      <pattern id="lam-trama" width="4.2" height="4.2" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+        <line x1="0" y1="0" x2="0" y2="4.2" class="lam-trama-linea" />
+      </pattern>
+      <!-- Metal: bandas de luz y sombra; los colores vienen de variables que cambia el script. -->
+      <linearGradient id="lam-metal" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" style="stop-color: var(--m-luz)" />
+        <stop offset="0.32" style="stop-color: var(--m-medio)" />
+        <stop offset="0.58" style="stop-color: var(--m-sombra)" />
+        <stop offset="0.8" style="stop-color: var(--m-medio)" />
+        <stop offset="1" style="stop-color: var(--m-luz)" />
+      </linearGradient>
+      <linearGradient id="lam-luz" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#fff" stop-opacity="0" />
+        <stop offset="0.5" stop-color="#fffaf0" stop-opacity="0.85" />
+        <stop offset="1" stop-color="#fff" stop-opacity="0" />
+      </linearGradient>
+      <linearGradient id="lam-verde" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#2fb878" />
+        <stop offset="0.45" stop-color="#0f6a43" />
+        <stop offset="1" stop-color="#063a24" />
+      </linearGradient>
+      <!-- Borde de acuarela del lavado y grano del esmerilado. -->
+      <filter id="lam-acuarela" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="4" />
+        <feDisplacementMap in="SourceGraphic" scale="34" />
+      </filter>
+      <filter id="lam-grano" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="9" />
+        <feColorMatrix type="matrix" values="0 0 0 0 0.2  0 0 0 0 0.15  0 0 0 0 0.1  0 0 0 -2.2 1.3" />
+      </filter>
+      <mask id="lam-lavado" maskUnits="userSpaceOnUse" x="0" y="0" width="400" height="500">
+        <circle cx="200" cy="270" r="0" fill="#fff" filter="url(#lam-acuarela)" data-lavado />
+      </mask>
+      <!-- Esmeralda, talla rectangular con facetas. -->
+      <symbol id="lam-esmeralda" viewBox="-20 -26 40 52" overflow="visible">
+        <path d="M-11 -24 H11 L18 -17 V17 L11 24 H-11 L-18 17 V-17 Z" class="lam-gema-borde" />
+        <path d="M-6 -14 H6 L10 -10 V10 L6 14 H-6 L-10 10 V-10 Z" class="lam-gema-mesa" />
+        <path d="M-11 -24 L-6 -14 M11 -24 L6 -14 M18 -17 L10 -10 M18 17 L10 10 M11 24 L6 14 M-11 24 L-6 14 M-18 17 L-10 10 M-18 -17 L-10 -10" class="lam-gema-facetas" />
+      </symbol>
+      <!-- Oval facetado (dije). -->
+      <symbol id="lam-oval" viewBox="-20 -26 40 52" overflow="visible">
+        <ellipse rx="18" ry="24" class="lam-gema-borde" />
+        <ellipse rx="9.5" ry="13" class="lam-gema-mesa" />
+        <path d="M0 -24 L0 -13 M0 24 L0 13 M18 0 L9.5 0 M-18 0 L-9.5 0 M12.7 -17 L6.7 -9.2 M-12.7 -17 L-6.7 -9.2 M12.7 17 L6.7 9.2 M-12.7 17 L-6.7 9.2" class="lam-gema-facetas" />
+      </symbol>
+      <!-- Talla pera (aros). -->
+      <symbol id="lam-gota" viewBox="-20 -26 40 52" overflow="visible">
+        <path d="M0 -24 C10 -10 16 2 16 10 C16 19 9 24 0 24 C-9 24 -16 19 -16 10 C-16 2 -10 -10 0 -24 Z" class="lam-gema-borde" />
+        <path d="M0 -8 C5 -1 8 5 8 10 C8 14 4 17 0 17 C-4 17 -8 14 -8 10 C-8 5 -5 -1 0 -8 Z" class="lam-gema-mesa" />
+        <path d="M0 -24 L0 -8 M16 10 L8 10 M-16 10 L-8 10 M0 24 L0 17 M10 -6 L5 0 M-10 -6 L-5 0 M11 21 L5.6 15 M-11 21 L-5.6 15" class="lam-gema-facetas" />
+      </symbol>
+      {piezas.map((p) => (
+        <clipPath id={`lam-recorte-${p.id}`}>
+          {p.cuerpo.map((d) => <path d={d} clip-rule="evenodd" />)}
+        </clipPath>
+      ))}
+    </defs>
+
+    <!-- El papel de la lámina. -->
+    <rect x="0" y="0" width="400" height="500" class="lam-papel" />
+    <rect x="14" y="14" width="372" height="472" class="lam-filete" />
+    <rect x="21" y="21" width="358" height="458" class="lam-filete lam-filete--fino" />
+    <text x="36" y="48" class="lam-rotulo" data-lamina-numero>LÁM. I</text>
+    <text x="364" y="48" class="lam-rotulo" text-anchor="end">VULCAN · TALLER</text>
+
+    {piezas.map((p) => (
+      <g class="lam-pieza" data-pieza={p.id} style={p.id === 'anillo' ? '' : 'display: none'}>
+        <g mask="url(#lam-lavado)">
+          {p.cuerpo.map((d) => <path d={d} class="lam-cuerpo" fill-rule="evenodd" />)}
+        </g>
+        <g clip-path={`url(#lam-recorte-${p.id})`} mask="url(#lam-lavado)">
+          <rect x="0" y="0" width="400" height="500" filter="url(#lam-grano)" class="lam-grano" data-grano />
+          <rect x="-160" y="0" width="140" height="500" fill="url(#lam-luz)" class="lam-barrido" transform="skewX(-18)" data-barrido />
+        </g>
+        {p.trama.map((d) => <path d={d} class="lam-sombra" data-trama />)}
+        <g class="lam-lineas">
+          {p.lineas.map((d) => <path d={d} data-linea />)}
+          {p.finas?.map((d) => <path d={d} class="lam-fina" data-linea />)}
+          {/* Punteados (perlas, cadena): aparecen por fundido; el trazado les borraría el punteado. */}
+          {p.perlas && <path d={p.perlas} class="lam-perlas" data-fundido />}
+          {p.cadena?.map((d) => <path d={d} class="lam-cadena" data-fundido />)}
+        </g>
+        {p.monograma && (
+          <text x={p.monograma[0]} y={p.monograma[1]} font-size={p.monograma[2]} text-anchor="middle" class="lam-monograma" data-monograma>V</text>
+        )}
+        <g transform={p.piedra}>
+          <use href={`#lam-${p.gema}`} x="-20" y="-26" width="40" height="52" class="lam-gema" data-gema />
+        </g>
+        {p.frente && (
+          <g class="lam-lineas">
+            {p.frente.map((d) => <path d={d} data-linea />)}
+          </g>
+        )}
+        <g class="lam-destellos">
+          {p.destellos.map(([x, y]) => (
+            <path transform={`translate(${x} ${y})`} d="M0 -11 L2 -2 L11 0 L2 2 L0 11 L-2 2 L-11 0 L-2 -2 Z" class="lam-destello" data-destello />
+          ))}
+        </g>
+      </g>
+    ))}
+
+    <text x="200" y="440" text-anchor="middle" class="lam-nombre" data-lamina-nombre>Anillo</text>
+    <text x="200" y="462" text-anchor="middle" class="lam-detalle" data-lamina-detalle>Elegí tu pieza</text>
+  </svg>
+  <figcaption class="sr-only" aria-live="polite" data-lamina-texto></figcaption>
+</figure>
+
+<script>
+  import gsap from 'gsap';
+  import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
+
+  gsap.registerPlugin(DrawSVGPlugin);
+
+  // Valor del formulario → pieza dibujada.
+  const PIEZAS: Record<string, { id: string; nombre: string; lamina: string }> = {
+    Anillo: { id: 'anillo', nombre: 'Anillo', lamina: 'I' },
+    Dije: { id: 'dije', nombre: 'Dije', lamina: 'II' },
+    Aros: { id: 'aros', nombre: 'Aros', lamina: 'III' },
+    Otra: { id: 'pin', nombre: 'Pin', lamina: 'IV' },
+  };
+  // Paletas [luz, medio, sombra]: pulido con contraste alto, esmerilado aplanado.
+  const METALES: Record<string, { pulido: string[]; mate: string[] }> = {
+    'Plata 925': { pulido: ['#f6f8f9', '#c3cad0', '#7f8891'], mate: ['#dfe3e6', '#c6ccd1', '#a7aeb5'] },
+    'Oro 18k': { pulido: ['#fff0b8', '#e2b54c', '#9c6c18'], mate: ['#efd38a', '#ddb862', '#bf9440'] },
+    Alpaca: { pulido: ['#f1f2ec', '#b9bdb2', '#7b8075'], mate: ['#d9dbd3', '#bfc2b8', '#a2a69b'] },
+    Bronce: { pulido: ['#f6cf9c', '#c47e45', '#7c4520'], mate: ['#dfae7b', '#c58a57', '#a46a3c'] },
+  };
+
+  const figura = document.querySelector<HTMLElement>('[data-lamina]');
+  const ficha = document.querySelector<HTMLFormElement>('[data-orden]');
+
+  if (figura && ficha) {
+    const svg = figura.querySelector<SVGSVGElement>('[data-lamina-svg]')!;
+    const lavado = svg.querySelector<SVGCircleElement>('[data-lavado]')!;
+    const numero = svg.querySelector<SVGTextElement>('[data-lamina-numero]')!;
+    const nombre = svg.querySelector<SVGTextElement>('[data-lamina-nombre]')!;
+    const detalle = svg.querySelector<SVGTextElement>('[data-lamina-detalle]')!;
+    const texto = figura.querySelector<HTMLElement>('[data-lamina-texto]')!;
+    const grupos = Object.fromEntries(
+      Array.from(svg.querySelectorAll<SVGGElement>('[data-pieza]')).map((g) => [g.dataset.pieza!, g]),
+    );
+    const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const d = (s: number) => (reducido ? 0 : s);
+
+    let actual = 'anillo';
+    let pulido: gsap.core.Timeline | null = null;
+    const estado = { pieza: '', metal: '', terminacion: '', piedra: '' };
+
+    const parte = (sel: string) => grupos[actual].querySelectorAll<SVGElement>(sel);
+
+    // ---------------------------------------------------------------- metal --
+    const pintarMetal = (lento = false) => {
+      const m = METALES[estado.metal];
+      // Un lavado pendiente (con demora, del cambio de pieza) no puede pisar la elección nueva.
+      gsap.killTweensOf(lavado);
+      if (!m) {
+        gsap.to(lavado, { attr: { r: 0 }, duration: d(0.6), ease: 'power2.in' });
+        return;
+      }
+      const [luz, medio, sombra] = estado.terminacion === 'Esmerilado' ? m.mate : m.pulido;
+      gsap.to(svg, { '--m-luz': luz, '--m-medio': medio, '--m-sombra': sombra, duration: d(0.7), ease: 'power2.out' });
+      // Lavado de acuarela: se expande desde el centro de la pieza.
+      if (Number(lavado.getAttribute('r')) < 300 || lento) {
+        gsap.fromTo(lavado, { attr: { r: 0 } }, { attr: { r: 340 }, duration: d(1.3), ease: 'power2.out', delay: d(lento ? 0.9 : 0) });
+      }
+    };
+
+    // ---------------------------------------------------------- terminación --
+    const pintarTerminacion = () => {
+      pulido?.kill();
+      pulido = null;
+      const conMetal = Boolean(METALES[estado.metal]);
+      const destellos = parte('[data-destello]');
+      const barrido = parte('[data-barrido]');
+      gsap.to(parte('[data-grano]'), { opacity: conMetal && estado.terminacion === 'Esmerilado' ? 0.55 : 0, duration: d(0.6) });
+      if (conMetal && estado.terminacion === 'Pulido' && !reducido) {
+        // Pulido: un brillo que barre la pieza cada tanto y destellos que titilan.
+        pulido = gsap
+          .timeline({ repeat: -1, repeatDelay: 1.4 })
+          .fromTo(barrido, { opacity: 1, x: -40 }, { x: 560, duration: 1.4, ease: 'power2.inOut' })
+          .fromTo(destellos, { opacity: 0, scale: 0.2, rotation: 0 }, { opacity: 1, scale: 1, rotation: 45, duration: 0.35, stagger: 0.18, ease: 'back.out(3)' }, 0.5)
+          .to(destellos, { opacity: 0, scale: 0.3, duration: 0.4, stagger: 0.18 }, 1.1);
+      } else {
+        gsap.to([...destellos, ...barrido], { opacity: 0, duration: d(0.3) });
+      }
+    };
+
+    // --------------------------------------------------------------- piedra --
+    const pintarPiedra = () => {
+      const gema = parte('[data-gema]')[0];
+      const mono = parte('[data-monograma]');
+      if (!gema) return;
+      gema.classList.toggle('dudosa', estado.piedra === 'No sé');
+      if (estado.piedra === 'Sí' || estado.piedra === 'No sé') {
+        gsap.fromTo(gema, { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: d(0.6), ease: 'back.out(2.4)' });
+        gsap.to(mono, { opacity: 0, duration: d(0.3) });
+      } else {
+        gsap.to(gema, { opacity: 0, scale: 0.4, duration: d(0.3), ease: 'power2.in' });
+        gsap.to(mono, { opacity: 1, duration: d(0.5), delay: d(0.2) });
+      }
+    };
+
+    // ---------------------------------------------------------------- pieza --
+    const trazar = (id: string) => {
+      const saliente = grupos[actual];
+      const entrante = grupos[id];
+      const tl = gsap.timeline();
+      if (saliente !== entrante) {
+        tl.to(saliente.querySelectorAll('[data-linea]'), { drawSVG: '100% 100%', duration: d(0.4), stagger: d(0.03), ease: 'power2.in' })
+          .to(saliente, { opacity: 0, duration: d(0.25) }, '<0.15')
+          .set(saliente, { display: 'none' })
+          .set(entrante, { display: 'inline', opacity: 1 });
+        gsap.set(lavado, { attr: { r: 0 } });
+      }
+      actual = id;
+      // La pieza nueva se dibuja a pluma, línea por línea; después la trama y el metal.
+      tl.fromTo(entrante.querySelectorAll('[data-linea]'), { drawSVG: '0% 0%' }, { drawSVG: '0% 100%', duration: d(1.1), stagger: d(0.09), ease: 'power2.inOut' })
+        .fromTo(entrante.querySelectorAll('[data-trama]'), { opacity: 0 }, { opacity: 0.55, duration: d(0.6) }, '-=0.5')
+        .fromTo(entrante.querySelectorAll('[data-fundido]'), { opacity: 0 }, { opacity: 1, duration: d(0.6) }, '<');
+      // El monograma lo decide solo pintarPiedra: así no se pisan dos animaciones.
+      gsap.set(entrante.querySelectorAll('[data-monograma]'), { opacity: 0 });
+      pintarMetal(true);
+      pintarTerminacion();
+      gsap.delayedCall(d(1.2), pintarPiedra);
+    };
+
+    // --------------------------------------------------------------- textos --
+    const rotular = () => {
+      const p = PIEZAS[estado.pieza] ?? PIEZAS.Anillo;
+      numero.textContent = `LÁM. ${p.lamina}`;
+      nombre.textContent = estado.pieza ? p.nombre : 'Tu pieza';
+      const partes = [
+        estado.metal && (estado.metal === 'No sé' ? 'metal a definir' : estado.metal),
+        estado.terminacion && estado.terminacion !== 'No sé' ? estado.terminacion.toLowerCase() : '',
+        estado.piedra === 'Sí' ? 'con esmeralda' : estado.piedra === 'No' ? 'sin piedra' : estado.piedra === 'No sé' ? 'piedra a definir' : '',
+      ].filter(Boolean);
+      detalle.textContent = partes.length ? partes.join(' · ') : 'Elegí tu pieza';
+      const descripcion = `Lámina: ${nombre.textContent}${partes.length ? ', ' + partes.join(', ') : ''}`;
+      svg.setAttribute('aria-label', descripcion);
+      texto.textContent = descripcion;
+    };
+
+    const leer = () => {
+      const datos = new FormData(ficha);
+      const nuevo = {
+        pieza: String(datos.get('pieza') ?? ''),
+        metal: String(datos.get('metal') ?? ''),
+        terminacion: String(datos.get('terminacion') ?? ''),
+        piedra: String(datos.get('piedra') ?? ''),
+      };
+      const cambio = (k: keyof typeof estado) => nuevo[k] !== estado[k];
+      const cambioPieza = cambio('pieza');
+      const cambioMetal = cambio('metal');
+      const cambioTerminacion = cambio('terminacion');
+      const cambioPiedra = cambio('piedra');
+      Object.assign(estado, nuevo);
+      rotular();
+      if (cambioPieza) return trazar((PIEZAS[estado.pieza] ?? PIEZAS.Anillo).id);
+      if (cambioMetal || cambioTerminacion) {
+        pintarMetal();
+        pintarTerminacion();
+      }
+      if (cambioPiedra) pintarPiedra();
+    };
+
+    ficha.addEventListener('change', leer);
+
+    // Primera vez que la lámina entra en pantalla: el anillo se dibuja a pluma.
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        trazar(actual);
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(figura);
+    rotular();
+  }
+</script>
+
+<style>
+  .lamina {
+    margin: 0;
+  }
+
+  .lamina svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: none;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 60px -20px rgb(0 0 0 / 0.7);
+    /* Metal por defecto (plata); el script lo cambia según la orden. */
+    --m-luz: #f2f4f5;
+    --m-medio: #c3cad0;
+    --m-sombra: #8d969e;
+  }
+
+  .lam-papel {
+    fill: #efe4d3;
+  }
+
+  .lam-filete {
+    fill: none;
+    stroke: #3b2417;
+    stroke-width: 1.3;
+  }
+
+  .lam-filete--fino {
+    stroke-width: 0.5;
+  }
+
+  .lam-rotulo {
+    fill: #3b2417;
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+  }
+
+  .lam-nombre {
+    fill: #3b2417;
+    font-family: var(--font-display);
+    font-size: 21px;
+    letter-spacing: 0.08em;
+  }
+
+  .lam-detalle {
+    fill: #6b4a2c;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+  }
+
+  .lam-cuerpo {
+    fill: url(#lam-metal);
+  }
+
+  .lam-trama-linea {
+    stroke: #3b2417;
+    stroke-width: 0.9;
+  }
+
+  .lam-sombra {
+    fill: url(#lam-trama);
+    opacity: 0.55;
+    mix-blend-mode: multiply;
+  }
+
+  .lam-lineas path {
+    fill: none;
+    stroke: #3b2417;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .lam-lineas .lam-fina {
+    stroke-width: 0.8;
+  }
+
+  /* Cadena del dije y borde de perlitas: trazos punteados redondos. */
+  .lam-lineas .lam-perlas {
+    stroke-width: 4.2;
+    stroke-dasharray: 0.1 8.6;
+  }
+
+  .lam-lineas .lam-cadena {
+    stroke-dasharray: 7 4;
+    stroke-width: 2.6;
+  }
+
+  .lam-monograma {
+    fill: none;
+    stroke: #3b2417;
+    stroke-width: 1.2;
+    font-family: var(--font-display);
+  }
+
+  .lam-grano {
+    opacity: 0;
+    mix-blend-mode: multiply;
+  }
+
+  .lam-barrido {
+    opacity: 0;
+    mix-blend-mode: screen;
+  }
+
+  .lam-gema {
+    fill: url(#lam-verde);
+    stroke: #0b2a1c;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .lam-gema-borde {
+    stroke-width: 1.2;
+  }
+
+  .lam-gema-mesa {
+    fill: rgb(170 255 210 / 0.28);
+    stroke-width: 0.7;
+  }
+
+  .lam-gema-facetas {
+    fill: none;
+    stroke-width: 0.7;
+  }
+
+  /* Piedra a definir: engarce vacío, punteado. */
+  .lam-gema.dudosa {
+    fill: none;
+    stroke: #3b2417;
+    stroke-dasharray: 2 2.5;
+  }
+
+  .lam-destello {
+    fill: #fffaf0;
+    stroke: #6b4a2c;
+    stroke-width: 0.6;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+</style>

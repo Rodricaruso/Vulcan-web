@@ -1,0 +1,83 @@
+---
+// El sello de Vulcan: recurso gráfico de la marca (el anillo sello firmaba y cerraba en Roma).
+// Dos estados: 'tinta' (estampado, con textura de tinta) y 'relieve' (relieve seco: grabado
+// en el papel sin tinta). Se pasa de uno a otro con la clase .sello--tinta.
+interface Props {
+  id: string; // único en la página: lo usan el texto curvo y el filtro de tinta
+  texto?: string;
+  estado?: 'tinta' | 'relieve';
+  class?: string;
+}
+
+const { id, texto = 'VULCAN · TALLER · CABA · HECHO A MANO ·', estado = 'tinta', class: clase } = Astro.props;
+---
+
+<svg class:list={['sello', `sello--${estado}`, clase]} viewBox="0 0 120 120" aria-hidden="true" data-sello>
+  <defs>
+    <path id={`${id}-giro`} d="M60 60 m-39 0 a39 39 0 1 1 78 0 a39 39 0 1 1 -78 0" />
+    <filter id={`${id}-tinta`} x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="7" result="ruido" />
+      <feDisplacementMap in="SourceGraphic" in2="ruido" scale="2.2" result="corrido" />
+      <feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="1" seed="3" result="poros" />
+      <feColorMatrix in="poros" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.6 2.1" result="huecos" />
+      <feComposite in="corrido" in2="huecos" operator="in" />
+    </filter>
+  </defs>
+  <g class="sello__marca" filter={estado === 'tinta' ? `url(#${id}-tinta)` : undefined} data-sello-marca data-filtro={`url(#${id}-tinta)`}>
+    <circle cx="60" cy="60" r="55" class="sello__borde" />
+    <circle cx="60" cy="60" r="50.5" class="sello__linea" />
+    <circle cx="60" cy="60" r="29" class="sello__linea" />
+    <text class="sello__anillo"><textPath href={`#${id}-giro`} textLength="238">{texto}</textPath></text>
+    <text class="sello__letra" x="60" y="72.5" text-anchor="middle">V</text>
+  </g>
+</svg>
+
+<style>
+  .sello {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    overflow: visible;
+  }
+
+  .sello__borde {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+  }
+
+  .sello__linea {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.3;
+  }
+
+  .sello text {
+    fill: currentColor;
+  }
+
+  .sello__anillo {
+    font-family: var(--font-display);
+    font-size: 8.6px;
+    letter-spacing: 0.06em;
+  }
+
+  .sello__letra {
+    font-family: var(--font-display);
+    font-size: 36px;
+  }
+
+  /* Tinta: bronce profundo que se mezcla con el papel. */
+  .sello--tinta {
+    color: var(--color-accent-on-light);
+    mix-blend-mode: multiply;
+    opacity: 0.92;
+  }
+
+  /* Relieve seco: del color del papel, con luz arriba y sombra abajo. */
+  .sello--relieve {
+    color: var(--sello-papel, var(--color-text));
+    filter: drop-shadow(-0.6px -0.6px 0 rgb(255 255 255 / 0.85)) drop-shadow(0.8px 1px 0.6px rgb(29 6 5 / 0.28));
+  }
+</style>

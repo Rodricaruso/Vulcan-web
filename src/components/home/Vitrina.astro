@@ -1,0 +1,90 @@
+---
+// Acto 4: variedad. El scroll vertical lleva el riel de costado: ocho piezas,
+// más rápido que el resto de la página. Abre con el título y cierra en el catálogo.
+import { vitrina } from '../../content';
+import { productos } from '../../data/productos';
+import TarjetaPieza from '../TarjetaPieza.astro';
+---
+
+<section class="vitrina" data-sc-act="pan" data-sc-span="4.6" aria-labelledby="vitrina-titulo">
+  <div class="vitrina__escenario" data-sc-stage>
+    <div class="vitrina__riel" data-sc-pan="0.04">
+      <header class="vitrina__cabecera">
+        <h2 id="vitrina-titulo">{vitrina.titulo}</h2>
+        <p class="bajada">{vitrina.bajada}</p>
+      </header>
+
+      {productos.map((pieza, i) => (
+        <div class="vitrina__item" style={`--i: ${i}`}>
+          <TarjetaPieza pieza={pieza} />
+        </div>
+      ))}
+
+      <a class="vitrina__cierre" href={vitrina.enlace.href}>
+        <span>{vitrina.enlace.texto}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .vitrina__escenario {
+    display: flex;
+    align-items: center;
+    background: var(--color-surface);
+    border-block: 1px solid var(--color-border);
+    padding-top: 72px;
+  }
+
+  .vitrina__riel {
+    align-items: center;
+    gap: clamp(1.25rem, 3vw, 3rem);
+    padding-inline: var(--gutter);
+  }
+
+  .vitrina__cabecera {
+    flex: 0 0 min(80vw, 24rem);
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .vitrina__item {
+    flex: 0 0 clamp(13rem, 21vw, 19rem);
+  }
+
+  /* Cada pieza se asienta en orden a medida que el riel avanza. */
+  @media (prefers-reduced-motion: no-preference) {
+    .vitrina__item {
+      --llegada: clamp(0, calc(var(--sc-p, 1) * 9 - var(--i) + 1.5), 1);
+      opacity: calc(0.55 + 0.45 * var(--llegada));
+      transform: translateY(calc((1 - var(--llegada)) * 18px));
+    }
+  }
+
+  .vitrina__cierre {
+    flex: 0 0 clamp(13rem, 21vw, 19rem);
+    aspect-ratio: 4 / 5;
+    display: grid;
+    place-items: center;
+    padding: var(--space-5);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: background-color var(--dur-3) var(--ease-out);
+  }
+
+  .vitrina__cierre:hover {
+    background: var(--color-surface-2);
+  }
+
+  @media (max-height: 760px) {
+    .vitrina__item,
+    .vitrina__cierre {
+      flex-basis: clamp(12rem, 17vw, 15rem);
+    }
+  }
+</style>
