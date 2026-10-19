@@ -10,7 +10,7 @@
 // Cada pieza: cuerpo (relleno de metal y recorte), trama (sombreado), líneas (tinta),
 // dónde va la piedra y dónde brilla.
 type Pieza = {
-  id: 'anillo' | 'dije' | 'aros' | 'pin';
+  id: 'anillo' | 'sello' | 'dije' | 'aros' | 'pin';
   lamina: string;
   cuerpo: string[];
   trama: string[];
@@ -19,8 +19,8 @@ type Pieza = {
   perlas?: string;
   cadena?: string[];
   frente?: string[]; // garras que van delante de la piedra (formas cerradas, tapan la piedra)
-  gema: 'esmeralda' | 'esmeralda-perfil' | 'oval' | 'gota'; // talla de la piedra
-  piedra: string; // transform de la piedra
+  gema?: 'esmeralda' | 'esmeralda-perfil' | 'oval' | 'gota'; // talla de la piedra (sin gema: no lleva)
+  piedra?: string; // transform de la piedra
   monograma?: [number, number, number]; // x, y, tamaño de la V cuando no hay piedra
   destellos: [number, number][];
 };
@@ -62,6 +62,32 @@ const piezas: Pieza[] = [
     gema: 'esmeralda-perfil',
     piedra: 'translate(200 118) scale(2.4)',
     destellos: [[124, 236], [226, 104], [296, 306]],
+  },
+  {
+    // Anillo sello (el anillo cuando no lleva piedra): visto de tres cuartos desde arriba,
+    // la cara plana ovalada, el canto de la cabeza y los hombros que se abren hacia la banda.
+    // Una V grabada en la cara.
+    id: 'sello',
+    lamina: 'I',
+    // Banda y cabeza en un solo trazado: con dos, cada uno tendría su degradé y se vería el corte.
+    cuerpo: [
+      'M93 262 A110 120 0 1 0 307 262 L278 262 A84 98 0 0 1 200 396 A84 98 0 0 1 122 262 Z M93 262 C96 220 112 190 124 170 L124 148 A76 24 0 0 1 276 148 L276 170 C288 190 304 220 307 262 L278 262 A84 98 0 0 0 122 262 Z',
+    ],
+    trama: [
+      'M200 410 A110 120 0 0 0 307 262 L278 262 A84 98 0 0 1 200 396 Z',
+      'M276 170 C288 190 304 220 307 262 L284 262 C280 222 270 196 258 182 Z',
+    ],
+    lineas: [
+      'M93 262 A110 120 0 1 0 307 262',
+      'M116 298 a84 98 0 1 0 168 0 a84 98 0 1 0 -168 0',
+      'M93 262 C96 220 112 190 124 170 L124 148',
+      'M307 262 C304 220 288 190 276 170 L276 148',
+      'M124 148 a76 24 0 1 0 152 0 a76 24 0 1 0 -152 0',
+      'M124 170 A76 24 0 0 0 276 170',
+    ],
+    finas: ['M136 148 a64 19 0 1 0 128 0 a64 19 0 1 0 -128 0', 'M104.5 275 A97 108 0 1 0 295.5 275'],
+    monograma: [200, 159, 30],
+    destellos: [[152, 140], [298, 304], [118, 330]],
   },
   {
     // Medalla ovalada: la piedra es un oval facetado grande, en el centro.
@@ -210,7 +236,7 @@ const piezas: Pieza[] = [
     <text x="364" y="48" class="lam-rotulo" text-anchor="end">VULCAN · TALLER</text>
 
     {piezas.map((p) => (
-      <g class="lam-pieza" data-pieza={p.id} style={p.id === 'anillo' ? '' : 'display: none'}>
+      <g class="lam-pieza" data-pieza={p.id} style={p.id === 'sello' ? '' : 'display: none'}>
         <g mask="url(#lam-lavado)">
           {p.cuerpo.map((d) => <path d={d} class="lam-cuerpo" fill-rule="evenodd" />)}
         </g>
@@ -229,9 +255,11 @@ const piezas: Pieza[] = [
         {p.monograma && (
           <text x={p.monograma[0]} y={p.monograma[1]} font-size={p.monograma[2]} text-anchor="middle" class="lam-monograma" data-monograma>V</text>
         )}
-        <g transform={p.piedra}>
-          <use href={`#lam-${p.gema}`} x="-20" y="-26" width="40" height="52" class="lam-gema" data-gema />
-        </g>
+        {p.gema && (
+          <g transform={p.piedra}>
+            <use href={`#lam-${p.gema}`} x="-20" y="-26" width="40" height="52" class="lam-gema" data-gema />
+          </g>
+        )}
         {p.frente && (
           <g>
             {/* Papel debajo (tapa la piedra aunque no haya metal), metal encima y la tinta. */}
@@ -291,11 +319,19 @@ const piezas: Pieza[] = [
     const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const d = (s: number) => (reducido ? 0 : s);
 
-    let actual = 'anillo';
+    let actual = 'sello';
     let pulido: gsap.core.Timeline | null = null;
     const estado = { pieza: '', metal: '', terminacion: '', piedra: '' };
 
     const parte = (sel: string) => grupos[actual].querySelectorAll<SVGElement>(sel);
+
+    // El anillo se dibuja como solitario si lleva piedra (o está a definir); si no, como
+    // anillo sello, que es un anillo completo por sí mismo y no un engarce vacío.
+    const piezaDibujada = () => {
+      const id = (PIEZAS[estado.pieza] ?? PIEZAS.Anillo).id;
+      if (id !== 'anillo') return id;
+      return estado.piedra === 'Sí' || estado.piedra === 'No sé' ? 'anillo' : 'sello';
+    };
 
     // ---------------------------------------------------------------- metal --
     const pintarMetal = (lento = false) => {
@@ -338,7 +374,11 @@ const piezas: Pieza[] = [
     const pintarPiedra = () => {
       const gema = parte('[data-gema]')[0];
       const mono = parte('[data-monograma]');
-      if (!gema) return;
+      // Pieza sin piedra (el sello): la V grabada siempre a la vista.
+      if (!gema) {
+        gsap.to(mono, { opacity: 1, duration: d(0.5) });
+        return;
+      }
       gema.classList.toggle('dudosa', estado.piedra === 'No sé');
       if (estado.piedra === 'Sí' || estado.piedra === 'No sé') {
         gsap.fromTo(gema, { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: d(0.6), ease: 'back.out(2.4)' });
@@ -377,7 +417,7 @@ const piezas: Pieza[] = [
     const rotular = () => {
       const p = PIEZAS[estado.pieza] ?? PIEZAS.Anillo;
       numero.textContent = `LÁM. ${p.lamina}`;
-      nombre.textContent = estado.pieza ? p.nombre : 'Tu pieza';
+      nombre.textContent = !estado.pieza ? 'Tu pieza' : piezaDibujada() === 'sello' ? 'Anillo sello' : p.nombre;
       const partes = [
         estado.metal && (estado.metal === 'No sé' ? 'metal a definir' : estado.metal),
         estado.terminacion && estado.terminacion !== 'No sé' ? estado.terminacion.toLowerCase() : '',
@@ -404,7 +444,8 @@ const piezas: Pieza[] = [
       const cambioPiedra = cambio('piedra');
       Object.assign(estado, nuevo);
       rotular();
-      if (cambioPieza) return trazar((PIEZAS[estado.pieza] ?? PIEZAS.Anillo).id);
+      // Cambio de pieza, o el anillo que pasa de sello a solitario (o al revés) con la piedra.
+      if (cambioPieza || piezaDibujada() !== actual) return trazar(piezaDibujada());
       if (cambioMetal || cambioTerminacion) {
         pintarMetal();
         pintarTerminacion();

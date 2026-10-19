@@ -151,6 +151,10 @@ const numerales = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
       const p = suavizado;
       const w = innerWidth;
       const h = innerHeight;
+      // Alto del pie (nombre y texto) del que está en foco: la pila sube al menos eso para
+      // que ninguna foto quede detrás del texto.
+      const pie = trabajos[0].querySelector<HTMLElement>('.obra__pie');
+      const altoPie = pie ? pie.offsetHeight + parseFloat(getComputedStyle(pie).marginTop) : 0;
 
       trabajos.forEach((el, i) => {
         // f = 0: en foco. f < 0: por entrar. f > 0: ya pasó (1 = primer lugar de la pila).
@@ -179,12 +183,13 @@ const numerales = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
           // Lugares que ya bajó en la pila (0 mientras todavía está saliendo del foco).
           const extra = Math.max(0, lugar - 1);
           if (escritorio.matches) {
-            // Pila en diagonal hacia arriba a la izquierda, debajo del título.
-            x = -w * (0.2 * ida + 0.075 * extra);
-            y = -h * (0.04 * ida + 0.07 * extra);
+            // Pila en diagonal hacia arriba a la izquierda, debajo del título, separada de la
+            // foto en foco (antes su borde quedaba detrás del pie).
+            x = -w * (0.25 * ida + 0.075 * extra);
+            y = -h * (0.04 * ida + 0.07 * extra) - altoPie * ida;
           } else {
             x = -w * (0.3 * ida + 0.03 * extra);
-            y = -h * (0.03 * ida + 0.05 * extra);
+            y = -h * (0.03 * ida + 0.05 * extra) - altoPie * ida;
           }
           opacidad = 1 - clamp(avance - 2.6, 0, 1);
         }

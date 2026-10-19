@@ -1,5 +1,5 @@
 # Una vez por día actualiza las cotizaciones y las sube al repo.
-# El hosting (Cloudflare Pages / Netlify) reconstruye el sitio con cada push.
+# El hosting (Vercel) reconstruye el sitio con cada push.
 name: Actualizar metales
 
 on:

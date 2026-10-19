@@ -17,6 +17,11 @@ Joyería a medida con impresión 3D, CABA. Sitio estático en [Astro](https://as
 | `npm run metales` | Solo actualiza la cotización del día |
 | `npm run textura` | Solo regenera la textura de fondo |
 
+## Ramas y publicación
+
+- `main` es el sitio publicado. El hosting es **Vercel**, conectado a este repo: cada push a `main` publica el sitio y cada push a otra rama genera una vista previa con su propio link.
+- Los cambios se trabajan en una rama (por ejemplo `rediseno`) y pasan a `main` cuando están listos.
+
 ## Metales del día
 
-`.github/workflows/metales.yml` actualiza `src/data/metales.json` de lunes a viernes a las 16:30 (Buenos Aires) y lo sube al repo. Si el hosting (Cloudflare Pages o Netlify) está conectado, cada subida vuelve a publicar el sitio.
+`.github/workflows/metales.yml` actualiza `src/data/metales.json` de lunes a viernes a las 16:30 (Buenos Aires) y lo sube a `main`. Con Vercel conectado, cada subida vuelve a publicar el sitio.

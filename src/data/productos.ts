@@ -55,8 +55,8 @@ export const productos: Producto[] = [
     foto: { archivo: 'catalogo/faro', alt: 'Anillo solitario con circonia cuadrada, apoyado en el taco del banco de joyero', etiqueta: 'Faro' },
   },
   {
-    id: 'escoria',
-    nombre: 'Escoria',
+    id: 'fragua',
+    nombre: 'Fragua',
     tipo: 'anillo',
     descripcion: 'Alianza martillada a mano y oxidada: el negro queda en los golpes y el borde brilla.',
     metal: 'Plata 925',
@@ -64,7 +64,7 @@ export const productos: Producto[] = [
     piedra: 'Sin piedra',
     peso: aConfirmar,
     medidas: aConfirmar,
-    foto: { archivo: 'catalogo/escoria', alt: 'Alianza de plata martillada y oxidada sobre madera', etiqueta: 'Escoria' },
+    foto: { archivo: 'catalogo/fragua', alt: 'Alianza de plata martillada y oxidada sobre madera', etiqueta: 'Fragua' },
   },
   {
     id: 'corteza',

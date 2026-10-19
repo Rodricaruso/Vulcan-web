@@ -53,7 +53,7 @@ Las elegidas se copian acá enderezadas y con el lado largo a 2000 px.
 
 ## catalogo/ — una foto por pieza (4:5, vertical)
 
-Con el `id` de la pieza en `src/data/productos.ts`: `faro`, `escoria`, `corteza`, `ceniza`, `golpe`, `rocio`, `umbral`, `umbral-dorado`. Égida usa `trabajos/trabajo-1`.
+Con el `id` de la pieza en `src/data/productos.ts`: `faro`, `fragua`, `corteza`, `ceniza`, `golpe`, `rocio`, `umbral`, `umbral-dorado`. Égida usa `trabajos/trabajo-1`.
 
 ## textura/
 
