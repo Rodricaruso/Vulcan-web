@@ -17,10 +17,22 @@ const dibujos: Record<string, string[]> = {
   crisol: ['M12 16 L36 12 L40 34 C40 40 20 44 16 38 Z', 'M38 26 C44 28 48 34 48 40', 'M48 46 V48', 'M47 54 V56'],
   lima: ['M10 46 L44 12 L50 18 L16 52 Z', 'M20 36 L26 42 M26 30 L32 36 M32 24 L38 30', 'M44 48 m-8 0 a8 6 0 1 0 16 0 a8 6 0 1 0 -16 0'],
 };
-const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+// Corrimiento de cada dibujo para que su caja quede centrada en el lienzo (y en el círculo).
+const centrado: Record<string, string> = {
+  lapiz: 'translate(0 -7)',
+  malla: 'translate(0 -2)',
+  capas: 'translate(0 3)',
+  molde: 'translate(0 3)',
+  crisol: 'translate(2 -2)',
+  lima: 'translate(1 -1)',
+};
+const romanos =['I', 'II', 'III', 'IV', 'V', 'VI'];
 ---
 
 <section id="proceso" class="recorrido" data-sc-act="flow" aria-labelledby="recorrido-titulo" data-recorrido>
+  <!-- La pista da el recorrido de scroll; el escenario queda fijo encima hasta el sexto golpe. -->
+  <div class="recorrido__pista" data-pista>
+  <div class="recorrido__escenario">
   <div class="contenedor">
     <header class="recorrido__cabecera">
       <h2 id="recorrido-titulo">{recorrido.titulo}</h2>
@@ -36,12 +48,10 @@ const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
           <div class="paso__yunque" data-yunque>
             <span class="paso__destello" aria-hidden="true" data-destello></span>
             <svg class="paso__dibujo" viewBox="0 0 64 64" aria-hidden="true" data-dibujo>
-              <g class="paso__surco">{dibujos[paso.dibujo].map((d) => <path d={d} />)}</g>
-              <g class="paso__trazo">{dibujos[paso.dibujo].map((d) => <path d={d} data-trazo />)}</g>
-            </svg>
-            <svg class="paso__cincel" viewBox="0 0 20 72" aria-hidden="true" data-cincel>
-              <path d="M6 0 H14 V46 L10 70 L6 46 Z" />
-              <path class="paso__bisel" d="M10 46 V70" />
+              <g transform={centrado[paso.dibujo]}>
+                <g class="paso__surco">{dibujos[paso.dibujo].map((d) => <path d={d} />)}</g>
+                <g class="paso__trazo">{dibujos[paso.dibujo].map((d) => <path d={d} data-trazo />)}</g>
+              </g>
             </svg>
             <span class="paso__esquirlas" aria-hidden="true">
               {Array.from({ length: 7 }, () => <i data-esquirla></i>)}
@@ -55,6 +65,8 @@ const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
         </li>
       ))}
     </ol>
+  </div>
+  </div>
   </div>
 
   <!--
@@ -196,27 +208,6 @@ const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
     pointer-events: none;
   }
 
-  .paso__cincel {
-    position: absolute;
-    left: 58%;
-    bottom: 46%;
-    width: 16px;
-    height: 58px;
-    opacity: 0;
-    transform-origin: 50% 100%;
-    pointer-events: none;
-  }
-
-  .paso__cincel path {
-    fill: var(--color-accent);
-  }
-
-  .paso__cincel .paso__bisel {
-    fill: none;
-    stroke: var(--color-accent-hover);
-    stroke-width: 1;
-  }
-
   .paso__esquirlas i {
     position: absolute;
     left: 50%;
@@ -295,8 +286,28 @@ const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
       gap: var(--space-5);
     }
 
+    /* Títulos en una sola línea, para que todas las columnas arranquen el texto a la misma altura. */
+    .paso h3 {
+      white-space: nowrap;
+      font-size: clamp(1.25rem, 0.7rem + 0.9vw, 1.75rem);
+    }
+
     .paso p {
       font-size: var(--text-small);
+    }
+
+    /* Con los golpes activos, la sección queda fija mientras se scrollea la pista:
+       el escenario es sticky y la pista le da 35 % de pantalla de recorrido a cada golpe. */
+    .golpes .recorrido__pista {
+      height: calc(100svh + 6 * 35vh);
+    }
+
+    .golpes .recorrido__escenario {
+      position: sticky;
+      top: 0;
+      min-height: 100svh;
+      display: grid;
+      align-content: center;
     }
   }
 
@@ -544,7 +555,6 @@ const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
   // Arma la línea de tiempo del golpe de un paso. Queda en pausa hasta que le toque.
   const armarGolpe = (paso: HTMLElement) => {
     const yunque = paso.querySelector<HTMLElement>('[data-yunque]')!;
-    const cincel = paso.querySelector<SVGElement>('[data-cincel]')!;
     const destello = paso.querySelector<HTMLElement>('[data-destello]')!;
     const trazos = paso.querySelectorAll<SVGPathElement>('[data-trazo]');
     const dibujo = paso.querySelector<SVGElement>('[data-dibujo]')!;
@@ -557,17 +567,15 @@ const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
 
     return gsap
       // immediateRender: false: un fromTo dentro de una línea de tiempo aplica su estado
-      // inicial apenas se crea; sin esto el cincel y el destello se ven antes del golpe.
+      // inicial apenas se crea; sin esto el destello se ve antes del golpe.
+      // timeScale < 1: todo el golpe un poco más lento.
       .timeline({ paused: true, defaults: { overwrite: 'auto', immediateRender: false } })
+      .timeScale(0.7)
       .set(paso.querySelectorAll('.paso__trazo, .paso__surco, .paso__texto > *'), { visibility: 'visible' })
       .set([numero, titulo, texto], { autoAlpha: 0 })
       .set(titulo, { autoAlpha: 1 })
       .set(letras, { autoAlpha: 0 })
       .set(dibujo, { autoAlpha: 0 })
-      // El cincel entra en diagonal y cae seco.
-      // El cincel aparece y se levanta despacio (la toma de impulso), se detiene y cae seco.
-      .fromTo(cincel, { autoAlpha: 0, x: 18, y: -20, rotation: 14 }, { autoAlpha: 1, x: 30, y: -46, rotation: 28, duration: 0.55, ease: 'power2.out' })
-      .to(cincel, { x: 0, y: 0, rotation: 8, duration: 0.14, ease: 'power4.in' }, '+=0.12')
       .addLabel('impacto')
       // De un golpe: el ícono queda grabado entero, con un rebote corto.
       .set(dibujo, { autoAlpha: 1 }, 'impacto')
@@ -589,7 +597,6 @@ const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
         },
         'impacto',
       )
-      .to(cincel, { x: 16, y: -30, rotation: 18, autoAlpha: 0, duration: 0.5, ease: 'power2.out' }, 'impacto+=0.12')
       // La onda del golpe llega al texto: el número se estampa, las letras saltan y se asientan.
       .fromTo(numero, { autoAlpha: 0, scale: 1.8 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: 'power4.out' }, 'impacto+=0.06')
       .fromTo(
@@ -606,6 +613,8 @@ const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       seccion.classList.add('golpes');
+      // La pista cambia el alto de la página: el motor de scroll vuelve a medir.
+      dispatchEvent(new Event('resize'));
       const golpes = pasos.map(armarGolpe);
       let dados = 0;
       let cola = 0;
@@ -616,7 +625,7 @@ const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
         for (; dados < k; dados++) {
           const i = dados;
           const espera = Math.max(0, cola - gsap.ticker.time);
-          cola = gsap.ticker.time + espera + 0.7;
+          cola = gsap.ticker.time + espera + 1;
           gsap.delayedCall(espera, () => {
             golpes[i].play(0);
             gsap.to(lista, { '--avance': Math.min(1, (i + 1) / pasos.length + 0.06), duration: 0.9, ease: 'power2.out', overwrite: true });
@@ -624,15 +633,17 @@ const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI'];
         }
       };
 
-      // Escritorio: la fila entera está a la vista, así que los golpes se reparten
-      // a lo largo de medio alto de pantalla de scroll. Celular: cada paso al entrar.
+      // Escritorio: la sección queda fija (sticky) mientras se recorre la pista, y los
+      // golpes se reparten en ese tramo. El sexto cae al 85 %, así termina antes de soltarse.
+      // Celular: cada paso al entrar.
       const fila = matchMedia('(min-width: 1024px)').matches;
-      if (fila) {
+      const pista = seccion.querySelector<HTMLElement>('[data-pista]');
+      if (fila && pista) {
         ScrollTrigger.create({
-          trigger: lista,
-          start: 'top 85%',
-          end: 'top 12%',
-          onUpdate: (st) => golpearHasta(Math.ceil(st.progress * pasos.length - 0.001)),
+          trigger: pista,
+          start: 'top top',
+          end: 'bottom bottom',
+          onUpdate: (st) => golpearHasta(Math.min(pasos.length, Math.ceil((st.progress / 0.85) * pasos.length))),
           onLeave: () => golpearHasta(pasos.length),
         });
       } else {

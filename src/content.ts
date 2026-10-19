@@ -67,9 +67,9 @@ export const recorrido = {
   bajada: 'Es lo que más nos preguntan. Así pasa una pieza de la pantalla a tu mano.',
   pasos: [
     { titulo: 'Diseño', texto: 'Partimos de tu boceto, una foto o una frase. Definimos la pieza con vos.', dibujo: 'lapiz' },
-    { titulo: 'Modelado 3D', texto: 'La dibujamos en CAD pensando en cómo se fabrica: espesores, engarces y la contracción del metal.', dibujo: 'malla' },
+    { titulo: 'Modelo 3D', texto: 'La dibujamos en CAD pensando en cómo se fabrica: espesores, engarces y la contracción del metal.', dibujo: 'malla' },
     { titulo: 'Impresión', texto: 'Un prototipo para probar tamaño y forma. Con tu OK, el modelo maestro en resina de alto detalle.', dibujo: 'capas' },
-    { titulo: 'Molde y cera', texto: 'Del modelo maestro sale un molde de silicona. En el molde se inyecta cera: una copia exacta.', dibujo: 'molde' },
+    { titulo: 'Molde', texto: 'Del modelo maestro sale un molde de silicona. En el molde se inyecta cera: una copia exacta.', dibujo: 'molde' },
     { titulo: 'Fundición', texto: 'La cera se reemplaza por metal fundido: es la cera perdida, la técnica de siempre.', dibujo: 'crisol' },
     { titulo: 'A mano', texto: 'Limado, engarce de piedras si lleva, y pulido en el banco hasta el brillo final.', dibujo: 'lima' },
   ] as { titulo: string; texto: string; dibujo: 'lapiz' | 'malla' | 'capas' | 'molde' | 'crisol' | 'lima' }[],
@@ -133,12 +133,13 @@ export const orden = {
   bajada: 'Elegí lo que ya sepas. Lo que no, lo definimos juntos.',
   ficha: 'Orden de trabajo',
   campos: [
-    { id: 'pieza', etiqueta: 'Pieza', opciones: ['Anillo', 'Dije', 'Aros', 'Otra'] },
-    { id: 'metal', etiqueta: 'Metal', opciones: ['Plata 925', 'Oro 18k', 'Alpaca', 'Bronce', 'No sé'] },
-    { id: 'terminacion', etiqueta: 'Terminación', opciones: ['Pulido', 'Esmerilado', 'No sé'] },
-    { id: 'piedra', etiqueta: 'Piedra', opciones: ['Sí', 'No', 'No sé'] },
+    // pregunta: lo que se lee en celular, donde la orden se completa de a un paso.
+    { id: 'pieza', etiqueta: 'Pieza', pregunta: '¿Qué pieza querés?', opciones: ['Anillo', 'Dije', 'Aros', 'Otra'] },
+    { id: 'metal', etiqueta: 'Metal', pregunta: '¿En qué metal?', opciones: ['Plata 925', 'Oro 18k', 'Alpaca', 'Bronce', 'No sé'] },
+    { id: 'terminacion', etiqueta: 'Terminación', pregunta: '¿Qué terminación?', opciones: ['Pulido', 'Esmerilado', 'No sé'] },
+    { id: 'piedra', etiqueta: 'Piedra', pregunta: '¿Lleva piedra?', opciones: ['Sí', 'No', 'No sé'] },
   ],
-  idea: { etiqueta: 'Tu idea', ayuda: 'Una frase alcanza. Las fotos o el boceto los mandás por WhatsApp.' },
+  idea: { etiqueta: 'Tu idea', pregunta: 'Último paso: tu idea', ayuda: 'Una frase alcanza. Las fotos o el boceto los mandás por WhatsApp.' },
   sellado: 'Sellada',
   enviar: 'Contanos tu idea',
   pie: 'Se abre WhatsApp con tu orden escrita. No se envía nada hasta que lo mandes vos.',
@@ -204,10 +205,10 @@ export const trabajos = {
   titulo: 'Lo que ya hicimos',
   // TODO: reemplazar por los 4 casos reales. No inventar clientes ni frases.
   casos: [
-    { nombre: 'Anillo sello con escudo', contexto: 'Del boceto a mano al anillo en metal. [Completar: metal y qué se pidió]', foto: { archivo: 'trabajos/trabajo-1', alt: 'Dos anillos sello con escudo terminados, sobre una mesa de madera', etiqueta: 'Trabajo 1 · 3:4' } },
-    { nombre: 'Encargo a medida', contexto: '[Foto provisoria: reemplazar por otro trabajo]', foto: { archivo: 'trabajos/trabajo-2', alt: 'Anillo sello con escudo puesto en la mano', etiqueta: 'Trabajo 2 · 3:4' } },
-    { nombre: 'Encargo a medida', contexto: '[Foto provisoria: reemplazar por otro trabajo]', foto: { archivo: 'trabajos/trabajo-3', alt: 'Anillo sello con escudo en tono dorado, sostenido en la mano', etiqueta: 'Trabajo 3 · 3:4' } },
-    { nombre: 'Encargo a medida', contexto: '[Foto provisoria: reemplazar por otro trabajo]', foto: { archivo: 'trabajos/trabajo-4', alt: 'Anillo sello con escudo en metal claro, sostenido en la mano', etiqueta: 'Trabajo 4 · 3:4' } },
+    { nombre: 'Anillo sello con escudo', contexto: 'Plata 925. Del boceto a mano al anillo en metal, con el escudo en relieve.', foto: { archivo: 'trabajos/trabajo-1', alt: 'Dos anillos sello con escudo terminados, sobre una mesa de madera', etiqueta: 'Trabajo 1 · 3:4' } },
+    { nombre: 'Aros rectangulares de plata', contexto: 'Plata 925. Hechos a mano en el banco: chapa cortada, plegada y soldada.', foto: { archivo: 'trabajos/aros-plata', alt: 'Par de aros rectangulares de plata pulida, parados sobre una base de madera', etiqueta: 'Trabajo 2 · 3:4' } },
+    { nombre: 'Aros rectangulares dorados', contexto: 'El mismo diseño, con enchapado de oro.', foto: { archivo: 'trabajos/aros-dorados', alt: 'Par de aros rectangulares enchapados en oro, sobre papel de seda', etiqueta: 'Trabajo 3 · 3:4' } },
+    { nombre: 'Solitario', contexto: 'Plata 925 con una circonia cúbica cuadrada, engarzada a garras en el banco.', foto: { archivo: 'trabajos/solitario', alt: 'Anillo solitario de plata con una circonia cuadrada engarzada, sostenido en la mano sobre el banco de joyero', etiqueta: 'Trabajo 4 · 3:4' } },
   ] satisfies { nombre: string; contexto: string; foto: Foto }[],
 };
 
@@ -380,9 +381,9 @@ export const ctaFinal = {
   texto: 'Mandanos tu idea, aunque sea un garabato. Te respondemos con cómo hacerla realidad.',
   fotos: [
     { archivo: 'cta-final/1', alt: 'Dos anillos sello con escudo terminados', etiqueta: 'Collage 1 · 3:4' },
-    { archivo: 'cta-final/2', alt: 'Anillo sello con escudo en tono dorado', etiqueta: 'Collage 2 · 3:4' },
-    { archivo: 'cta-final/3', alt: 'Anillo sello impreso en resina', etiqueta: 'Collage 3 · 3:4' },
-    { archivo: 'cta-final/4', alt: 'Anillo sello con escudo puesto en la mano', etiqueta: 'Collage 4 · 3:4' },
+    { archivo: 'cta-final/aros-plata-banco', alt: 'Aro rectangular de plata sobre el taco de madera del banco', etiqueta: 'Collage 2 · 3:4' },
+    { archivo: 'cta-final/aros-dorados', alt: 'Par de aros rectangulares dorados sobre papel de seda', etiqueta: 'Collage 3 · 3:4' },
+    { archivo: 'cta-final/solitario', alt: 'Anillo solitario con piedra blanca, sostenido en la mano', etiqueta: 'Collage 4 · 3:4' },
   ] satisfies Foto[],
 };
 

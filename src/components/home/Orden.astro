@@ -32,9 +32,19 @@ const saludo = mensajes.cliente.replace('{ref}', ref);
           <p class="ficha__meta"><span>{sitio.nombre} · CABA · </span><time data-orden-fecha></time></p>
         </div>
 
+        <!-- Solo en celular: el avance de la orden, un punto por paso. Se puede volver tocándolos. -->
+        <div class="ficha__avance" data-avance hidden>
+          <span class="ficha__contador" aria-hidden="true" data-contador></span>
+          <div class="ficha__puntos">
+            {[...orden.campos.map((c) => c.etiqueta), orden.idea.etiqueta].map((etiqueta, i) => (
+              <button type="button" class="ficha__punto" aria-label={`Paso ${i + 1}: ${etiqueta}`} data-punto={i}></button>
+            ))}
+          </div>
+        </div>
+
         {orden.campos.map((campo) => (
-          <fieldset class="ficha__campo">
-            <legend>{campo.etiqueta}</legend>
+          <fieldset class="ficha__campo" data-paso>
+            <legend><span class="ficha__etiqueta">{campo.etiqueta}</span><span class="ficha__pregunta">{campo.pregunta}</span></legend>
             <div class="ficha__opciones">
               {campo.opciones.map((opcion) => (
                 <label class="ficha__opcion">
@@ -46,17 +56,19 @@ const saludo = mensajes.cliente.replace('{ref}', ref);
           </fieldset>
         ))}
 
-        <div class="ficha__campo">
-          <label class="ficha__leyenda" for="orden-idea">{orden.idea.etiqueta}</label>
-          <textarea id="orden-idea" name="idea" rows="2" maxlength="280" aria-describedby="orden-idea-ayuda"></textarea>
-          <p id="orden-idea-ayuda" class="ficha__ayuda">{orden.idea.ayuda}</p>
-        </div>
+        <div class="ficha__final" data-paso>
+          <div class="ficha__campo">
+            <label class="ficha__leyenda" for="orden-idea"><span class="ficha__etiqueta">{orden.idea.etiqueta}</span><span class="ficha__pregunta">{orden.idea.pregunta}</span></label>
+            <textarea id="orden-idea" name="idea" rows="2" maxlength="280" aria-describedby="orden-idea-ayuda"></textarea>
+            <p id="orden-idea-ayuda" class="ficha__ayuda">{orden.idea.ayuda}</p>
+          </div>
 
-        <div class="ficha__pie">
-          <a class="boton boton--principal ficha__enviar" href={enlaceWhatsApp(ref)} target="_blank" rel="noopener" data-ref={ref} data-orden-enviar>
-            {orden.enviar}
-          </a>
-          <p class="ficha__aviso">{orden.pie}</p>
+          <div class="ficha__pie">
+            <a class="boton boton--principal ficha__enviar" href={enlaceWhatsApp(ref)} target="_blank" rel="noopener" data-ref={ref} data-orden-enviar>
+              {orden.enviar}
+            </a>
+            <p class="ficha__aviso">{orden.pie}</p>
+          </div>
         </div>
 
         <div class="ficha__sello" data-orden-sello>
@@ -265,6 +277,229 @@ const saludo = mensajes.cliente.replace('{ref}', ref);
     }
   }
 
+  .ficha__final {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  /* La pregunta y el avance son del modo por pasos (celular); en el resto se lee la etiqueta. */
+  .ficha__pregunta {
+    display: none;
+  }
+
+  /* ---------------------------------------------- celular: la escena -- */
+  /* La lámina ocupa la pantalla (~70 %) y la orden queda abajo como un panel chico que se
+     completa de a un paso. Lámina y panel quedan fijos un tramo de scroll. Solo con JS
+     (clase .escena): sin JS, todo se apila y la orden se ve entera. */
+  @media (max-width: 1023px) {
+    .orden.escena {
+      --panel: 15rem;
+      --alto: calc(100svh - 72px);
+    }
+
+    /* El lateral se disuelve: título, lámina y panel quedan hermanos en la grilla,
+       así lámina y panel pueden quedar fijos juntos. */
+    .escena .orden__lateral {
+      display: contents;
+    }
+
+    .escena .orden__grilla {
+      gap: 0;
+    }
+
+    .escena .orden__cabecera {
+      margin-bottom: var(--space-6);
+    }
+
+    /* Un tramo extra para que la escena quede quieta un rato antes de seguir. */
+    .escena .orden__grilla::after {
+      content: '';
+      height: 40svh;
+    }
+
+    .escena .orden__lamina {
+      position: sticky;
+      top: 72px;
+      z-index: 2;
+      width: auto;
+      justify-self: stretch;
+      height: calc(var(--alto) - var(--panel));
+      padding-block: var(--space-3);
+      display: grid;
+      place-items: center;
+    }
+
+    .escena .orden__lamina :global(.lamina) {
+      height: 100%;
+    }
+
+    .escena .orden__lamina :global(.lamina svg) {
+      height: 100%;
+      width: auto;
+      max-width: 100%;
+      margin-inline: auto;
+    }
+
+    .escena .orden__papel {
+      position: sticky;
+      top: calc(100svh - var(--panel));
+      z-index: 3;
+      height: var(--panel);
+      /* Sin el barrido de entrada: su recorte escondería el sello, que cae fuera del panel. */
+      clip-path: none !important;
+    }
+
+    .escena .ficha {
+      height: 100%;
+      align-content: start;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4) var(--space-4);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .escena .ficha__encabezado {
+      display: none;
+    }
+
+    /* Avance: "2 / 5" y un punto por paso (lleno = respondido, con anillo = el actual). */
+    .escena .ficha__avance {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+
+    .ficha__contador {
+      font-family: var(--font-mono);
+      font-size: var(--text-meta);
+      color: var(--texto-suave);
+    }
+
+    .ficha__puntos {
+      display: flex;
+    }
+
+    /* El área táctil es de 44 px; el punto visible, chico. */
+    .ficha__punto {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 44px;
+      margin-block: -12px;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    .ficha__punto::before {
+      content: '';
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      border: 1px solid rgb(29 6 5 / 0.45);
+      transition: background-color var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
+    }
+
+    .ficha__punto.hecho::before {
+      background: var(--color-bg);
+      border-color: var(--color-bg);
+    }
+
+    .ficha__punto[aria-current='step']::before {
+      transform: scale(1.35);
+      box-shadow: 0 0 0 3px var(--color-text), 0 0 0 4px var(--color-bg);
+    }
+
+    .ficha__punto:focus-visible {
+      outline: 2px solid var(--color-accent-on-light);
+      outline-offset: -4px;
+      border-radius: var(--radius);
+    }
+
+    /* Un paso por vez. */
+    .escena [data-paso]:not(.activo) {
+      display: none;
+    }
+
+    .escena [data-paso].activo {
+      animation: paso-entra var(--dur-3, 260ms) var(--ease-out) both;
+    }
+
+    .escena .ficha__etiqueta {
+      display: none;
+    }
+
+    .escena .ficha__pregunta {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      line-height: 1.15;
+      color: var(--color-bg);
+    }
+
+    .escena .ficha__campo legend,
+    .escena .ficha__leyenda {
+      margin-bottom: var(--space-1);
+    }
+
+    .escena .ficha__opcion span {
+      padding-inline: var(--space-3);
+      font-size: 0.9375rem;
+    }
+
+    /* Último paso: idea y botón compactos. */
+    .escena .ficha__final {
+      gap: var(--space-3);
+    }
+
+    .escena .ficha textarea {
+      height: var(--tactil);
+      min-height: 0;
+      padding-block: var(--space-2);
+      resize: none;
+    }
+
+    .escena .ficha__ayuda {
+      display: none;
+    }
+
+    .escena .ficha__pie {
+      gap: var(--space-2);
+      padding-top: 0;
+      max-width: none;
+    }
+
+    .escena .ficha__aviso {
+      font-size: var(--text-meta);
+    }
+
+    /* El sello cae sobre la esquina de la lámina, justo arriba del panel. */
+    .escena .ficha__sello {
+      top: auto;
+      bottom: calc(100% + var(--space-2));
+      right: var(--space-3);
+      width: 5.5rem;
+    }
+
+    @keyframes paso-entra {
+      from {
+        opacity: 0;
+        transform: translateX(12px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  }
+
+  @media (max-width: 1023px) and (prefers-reduced-motion: reduce) {
+    .escena [data-paso].activo {
+      animation: none;
+    }
+  }
+
   @media (min-width: 1024px) {
     .orden__grilla {
       grid-template-columns: 5fr 7fr;
@@ -331,5 +566,44 @@ const saludo = mensajes.cliente.replace('{ref}', ref);
     ficha.addEventListener('input', actualizar);
     ficha.addEventListener('submit', (e) => e.preventDefault());
     actualizar();
+
+    // Celular: la escena. La orden se completa de a un paso; al elegir una opción pasa sola
+    // al siguiente, con una pausa para ver reaccionar la lámina.
+    const seccion = ficha.closest<HTMLElement>('.orden')!;
+    const avance = ficha.querySelector<HTMLElement>('[data-avance]')!;
+    const contador = ficha.querySelector<HTMLElement>('[data-contador]')!;
+    const pasos = Array.from(ficha.querySelectorAll<HTMLElement>('[data-paso]'));
+    const puntos = Array.from(ficha.querySelectorAll<HTMLButtonElement>('[data-punto]'));
+    const celular = matchMedia('(max-width: 1023px)');
+    let actual = 0;
+    let espera = 0;
+
+    const irA = (i: number) => {
+      clearTimeout(espera);
+      actual = i;
+      pasos.forEach((p, k) => p.classList.toggle('activo', k === i));
+      puntos.forEach((b, k) => {
+        if (k === i) b.setAttribute('aria-current', 'step');
+        else b.removeAttribute('aria-current');
+        const radio = pasos[k].querySelector('input[type=radio]');
+        b.classList.toggle('hecho', radio ? !!pasos[k].querySelector('input:checked') : false);
+      });
+      contador.textContent = `${i + 1} / ${pasos.length}`;
+    };
+
+    const modo = () => {
+      seccion.classList.toggle('escena', celular.matches);
+      avance.hidden = !celular.matches;
+      if (celular.matches) irA(actual);
+    };
+
+    puntos.forEach((b, k) => b.addEventListener('click', () => irA(k)));
+    ficha.addEventListener('change', (e) => {
+      if (!celular.matches || !(e.target instanceof HTMLInputElement) || e.target.type !== 'radio') return;
+      irA(actual);
+      if (actual < pasos.length - 1) espera = window.setTimeout(() => irA(actual + 1), 650);
+    });
+    celular.addEventListener('change', modo);
+    modo();
   }
 </script>

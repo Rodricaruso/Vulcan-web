@@ -39,12 +39,21 @@ Se funden una con otra al scrollear: **mismo encuadre y fondo** es lo más impor
 
 ## trabajos/ — 4 piezas terminadas (3:4, vertical)
 
-`trabajo-1` (el anillo con piedra), `trabajo-2`, `trabajo-3`, `trabajo-4`.
-Los nombres y el texto de cada uno se cambian en `src/content.ts`.
+`trabajo-1` (anillo sello), `aros-plata`, `aros-dorados`, `solitario`.
+Los nombres, el texto y qué archivo usa cada uno se cambian en `src/content.ts`.
 
 ## cta-final/ — collage del cierre (3:4, vertical)
 
-`1`, `2`, `3`, `4`. Pueden repetirse fotos de otras secciones.
+`1`, `aros-plata-banco`, `aros-dorados`, `solitario`. Pueden repetirse fotos de otras secciones.
+
+## Fotos crudas
+
+Las fotos originales bajadas de Drive están en `fotos-drive/` (fuera de esta carpeta y fuera de git).
+Las elegidas se copian acá enderezadas y con el lado largo a 2000 px.
+
+## catalogo/ — una foto por pieza (4:5, vertical)
+
+Con el `id` de la pieza en `src/data/productos.ts`: `faro`, `escoria`, `corteza`, `ceniza`, `golpe`, `rocio`, `umbral`, `umbral-dorado`. Égida usa `trabajos/trabajo-1`.
 
 ## textura/
 

@@ -8,3 +8,6 @@ imagenes/originales/
 # Capturas de verificación del skill scroll-craft
 scrollcraft/lab/
 scrollcraft/builds/*/lab/
+
+# Fotos crudas bajadas de Drive (las elegidas se copian procesadas a imagenes/)
+fotos-drive/

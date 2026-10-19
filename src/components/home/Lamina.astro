@@ -18,8 +18,8 @@ type Pieza = {
   finas?: string[];
   perlas?: string;
   cadena?: string[];
-  frente?: string[]; // líneas que van delante de la piedra (garras)
-  gema: 'esmeralda' | 'oval' | 'gota'; // talla de la piedra
+  frente?: string[]; // garras que van delante de la piedra (formas cerradas, tapan la piedra)
+  gema: 'esmeralda' | 'esmeralda-perfil' | 'oval' | 'gota'; // talla de la piedra
   piedra: string; // transform de la piedra
   monograma?: [number, number, number]; // x, y, tamaño de la V cuando no hay piedra
   destellos: [number, number][];
@@ -27,27 +27,41 @@ type Pieza = {
 
 const piezas: Pieza[] = [
   {
-    // Solitario: canasta que baja hasta la banda, hombros que la abrazan y cuatro garras.
+    // Solitario: la esmeralda de perfil (corona arriba, pabellón abajo) asentada sobre la
+    // banda, tomada por cuatro garras que suben desde los hombros y se cierran sobre la corona.
+    // Debajo, la galería: el riel que une las garras.
     id: 'anillo',
     lamina: 'I',
     cuerpo: [
       'M88 278 a112 118 0 1 0 224 0 a112 118 0 1 0 -224 0 Z M112 278 a88 94 0 1 1 176 0 a88 94 0 1 1 -176 0 Z',
-      'M176 146 L188 168 Q200 172 212 168 L224 146 Z',
+      // garras de atrás (izquierda y derecha), que abrazan el canto de la piedra
+      'M152 172 C148 150 144 128 146 112 C147 102 152 96 160 94 L163 99 C157 101 154 106 154 113 C153 128 156 150 161 168 Z',
+      'M248 172 C252 150 256 128 254 112 C253 102 248 96 240 94 L237 99 C243 101 246 106 246 113 C247 128 244 150 239 168 Z',
     ],
-    trama: ['M200 160 A112 118 0 0 1 200 396 L200 372 A88 94 0 0 0 200 184 Z', 'M200 146 H224 L212 168 Q206 170 200 170 Z'],
+    trama: [
+      'M200 160 A112 118 0 0 1 200 396 L200 372 A88 94 0 0 0 200 184 Z',
+      'M248 172 C252 150 256 128 254 112 C253 102 248 96 240 94 L237 99 C243 101 246 106 246 113 C247 128 244 150 239 168 Z',
+    ],
     lineas: [
       'M88 278 a112 118 0 1 0 224 0 a112 118 0 1 0 -224 0',
       'M112 278 a88 94 0 1 1 176 0 a88 94 0 1 1 -176 0',
-      'M176 146 L188 168 Q200 172 212 168 L224 146 Z',
-      'M142 190 Q156 164 188 164',
-      'M258 190 Q244 164 212 164',
+      'M152 172 C148 150 144 128 146 112 C147 102 152 96 160 94 L163 99 C157 101 154 106 154 113 C153 128 156 150 161 168 Z',
+      'M248 172 C252 150 256 128 254 112 C253 102 248 96 240 94 L237 99 C243 101 246 106 246 113 C247 128 244 150 239 168 Z',
+      // hombros: la banda sube y se funde con las garras
+      'M136 198 Q146 176 154 168',
+      'M264 198 Q254 176 246 168',
     ],
-    finas: ['M100 278 a100 106 0 1 0 200 0 a100 106 0 1 0 -200 0', 'M184 155 H216', 'M191 146 V118 M209 146 V118'],
-    // Garras delanteras: van después de la piedra para que la sujeten por delante.
-    frente: ['M180 146 C170 134 170 118 176 106 L183 109', 'M220 146 C230 134 230 118 224 106 L217 109'],
-    gema: 'esmeralda',
-    piedra: 'translate(200 127) rotate(90) scale(1.08)',
-    destellos: [[124, 236], [242, 116], [296, 306]],
+    finas: ['M100 278 a100 106 0 1 0 200 0 a100 106 0 1 0 -200 0'],
+    // Delante de la piedra (la tapan, así la sujetan): dos garras finas que nacen en la galería
+    // y se cierran sobre la mesa, y la galería, que cubre la punta del pabellón.
+    frente: [
+      'M182 140 C181 126 180 114 180.5 106 C181 100 183 97.5 187 96.5 L188 100 C186 101 185 103.5 185 107 C185 116 185.5 128 186 140 Z',
+      'M218 140 C219 126 220 114 219.5 106 C219 100 217 97.5 213 96.5 L212 100 C214 101 215 103.5 215 107 C215 116 214.5 128 214 140 Z',
+      'M156 138 H244 L240 147 H160 Z',
+    ],
+    gema: 'esmeralda-perfil',
+    piedra: 'translate(200 118) scale(2.4)',
+    destellos: [[124, 236], [226, 104], [296, 306]],
   },
   {
     // Medalla ovalada: la piedra es un oval facetado grande, en el centro.
@@ -162,6 +176,13 @@ const piezas: Pieza[] = [
         <path d="M-6 -14 H6 L10 -10 V10 L6 14 H-6 L-10 10 V-10 Z" class="lam-gema-mesa" />
         <path d="M-11 -24 L-6 -14 M11 -24 L6 -14 M18 -17 L10 -10 M18 17 L10 10 M11 24 L6 14 M-11 24 L-6 14 M-18 17 L-10 10 M-18 -17 L-10 -10" class="lam-gema-facetas" />
       </symbol>
+      <!-- Esmeralda de perfil (solitario): corona con la mesa arriba, filetín en y=0, pabellón
+           escalonado abajo. En las mismas unidades que las otras tallas (40 de ancho). -->
+      <symbol id="lam-esmeralda-perfil" viewBox="-20 -26 40 52" overflow="visible">
+        <path d="M-15.2 -8.8 H15.2 L20 0 L4.8 16 H-4.8 L-20 0 Z" class="lam-gema-borde" />
+        <path d="M-10.4 -8.8 H10.4 L8.8 -2.4 H-8.8 Z" class="lam-gema-mesa" />
+        <path d="M-20 0 H20 M-17.6 -4.4 H17.6 M-15.2 -8.8 L-10.4 0 M15.2 -8.8 L10.4 0 M-10.4 0 L-3.2 16 M10.4 0 L3.2 16 M-14.4 5.6 H14.4 M-8.8 11.2 H8.8" class="lam-gema-facetas" />
+      </symbol>
       <!-- Oval facetado (dije). -->
       <symbol id="lam-oval" viewBox="-20 -26 40 52" overflow="visible">
         <ellipse rx="18" ry="24" class="lam-gema-borde" />
@@ -212,8 +233,11 @@ const piezas: Pieza[] = [
           <use href={`#lam-${p.gema}`} x="-20" y="-26" width="40" height="52" class="lam-gema" data-gema />
         </g>
         {p.frente && (
-          <g class="lam-lineas">
-            {p.frente.map((d) => <path d={d} data-linea />)}
+          <g>
+            {/* Papel debajo (tapa la piedra aunque no haya metal), metal encima y la tinta. */}
+            {p.frente.map((d) => <path d={d} class="lam-papel" />)}
+            <g mask="url(#lam-lavado)">{p.frente.map((d) => <path d={d} class="lam-cuerpo" />)}</g>
+            <g class="lam-lineas">{p.frente.map((d) => <path d={d} data-linea />)}</g>
           </g>
         )}
         <g class="lam-destellos">

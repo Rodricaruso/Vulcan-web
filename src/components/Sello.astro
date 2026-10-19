@@ -15,12 +15,18 @@ const { id, texto = 'VULCAN · TALLER · CABA · HECHO A MANO ·', estado = 'tin
 <svg class:list={['sello', `sello--${estado}`, clase]} viewBox="0 0 120 120" aria-hidden="true" data-sello>
   <defs>
     <path id={`${id}-giro`} d="M60 60 m-39 0 a39 39 0 1 1 78 0 a39 39 0 1 1 -78 0" />
-    <filter id={`${id}-tinta`} x="-5%" y="-5%" width="110%" height="110%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="7" result="ruido" />
-      <feDisplacementMap in="SourceGraphic" in2="ruido" scale="2.2" result="corrido" />
-      <feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="1" seed="3" result="poros" />
-      <feColorMatrix in="poros" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.6 2.1" result="huecos" />
-      <feComposite in="corrido" in2="huecos" operator="in" />
+    <!-- Tinta de sello de pasaporte: borde corrido, la tinta que se abre un poco en el papel,
+         carga despareja (zonas cargadas y zonas lavadas) y poros donde no tomó. -->
+    <filter id={`${id}-tinta`} x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="ruido" />
+      <feDisplacementMap in="SourceGraphic" in2="ruido" scale="1.8" result="corrido" />
+      <feGaussianBlur in="corrido" stdDeviation="0.45" result="abierto" />
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="11" result="manchas" />
+      <feColorMatrix in="manchas" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  3 0 0 0 -0.85" result="carga" />
+      <feComposite in="abierto" in2="carga" operator="in" result="cargado" />
+      <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="1" seed="3" result="poros" />
+      <feColorMatrix in="poros" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3 2.5" result="huecos" />
+      <feComposite in="cargado" in2="huecos" operator="in" />
     </filter>
   </defs>
   <g class="sello__marca" filter={estado === 'tinta' ? `url(#${id}-tinta)` : undefined} data-sello-marca data-filtro={`url(#${id}-tinta)`}>
@@ -68,11 +74,11 @@ const { id, texto = 'VULCAN · TALLER · CABA · HECHO A MANO ·', estado = 'tin
     font-size: 36px;
   }
 
-  /* Tinta: bronce profundo que se mezcla con el papel. */
+  /* Tinta: bordó de sello de pasaporte, que se mezcla con el papel. */
   .sello--tinta {
-    color: var(--color-accent-on-light);
+    color: #8a1f2d;
     mix-blend-mode: multiply;
-    opacity: 0.92;
+    opacity: 0.88;
   }
 
   /* Relieve seco: del color del papel, con luz arriba y sombra abajo. */
