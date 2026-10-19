@@ -3,8 +3,10 @@
 name: Actualizar metales
 
 on:
-  schedule:
-    - cron: '30 19 * * 1-5' # 16:30 en Buenos Aires, después del cierre del BNA
+  # Horario automático pausado durante la evaluación del hackathon (las bases no permiten
+  # cambios en el repo después de la entrega). Para reactivarlo, descomentar estas dos líneas.
+  # schedule:
+  #   - cron: '30 19 * * 1-5' # 16:30 en Buenos Aires, después del cierre del BNA
   workflow_dispatch:
 
 permissions:

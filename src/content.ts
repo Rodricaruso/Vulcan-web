@@ -12,8 +12,9 @@ export type TipoMensaje = 'cliente' | 'modelado' | 'impresion' | 'marcas';
 export const sitio = {
   nombre: 'Vulcan',
   ciudad: 'CABA, Buenos Aires',
-  whatsapp: '5491131002597',
-  telefonoVisible: '+54 11 3100-2597',
+  // Número de prueba (no existe): las bases del hackathon no permiten datos reales.
+  whatsapp: '5491100000000',
+  telefonoVisible: '+54 11 0000-0000',
   instagram: '', // TODO: 'https://instagram.com/usuario'
   title: 'Joyas a medida con impresión 3D en Buenos Aires | Vulcan',
   description:

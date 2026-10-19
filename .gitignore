@@ -11,3 +11,6 @@ scrollcraft/builds/*/lab/
 
 # Fotos crudas bajadas de Drive (las elegidas se copian procesadas a imagenes/)
 fotos-drive/
+
+# Bases del hackathon (documento de la organización, no es parte del sitio)
+Bases-Hackaton-*.pdf

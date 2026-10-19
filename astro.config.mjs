@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 
-// TODO: reemplazar por el dominio real cuando esté.
+// Dirección publicada en Vercel. Cambiarla por el dominio propio cuando esté.
 export default defineConfig({
-  site: 'https://vulcan.com.ar',
+  site: 'https://vulcan-web.vercel.app',
 });
