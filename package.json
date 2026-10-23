@@ -8,6 +8,7 @@
     "dev": "astro dev",
     "prebuild": "node scripts/actualizar-metales.mjs && node scripts/hornear-textura.mjs",
     "textura": "node scripts/hornear-textura.mjs",
+    "tokens": "node scripts/exportar-tokens.mjs",
     "build": "astro build",
     "preview": "astro preview"
   },

@@ -19,7 +19,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 88px; /* alto del navbar fijo */
+  scroll-padding-top: var(--alto-navbar);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -105,7 +105,7 @@ a {
 
 .contenedor {
   width: 100%;
-  max-width: 1280px;
+  max-width: var(--ancho-max);
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
@@ -133,7 +133,7 @@ a {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 48px;
+  min-height: var(--boton-alto);
   padding: var(--space-3) var(--space-5);
   border: 1px solid transparent;
   border-radius: var(--radius);
@@ -147,31 +147,22 @@ a {
 }
 
 .boton--principal {
-  background: var(--color-accent);
-  color: var(--color-bg);
+  background: var(--boton-principal-fondo);
+  color: var(--boton-principal-texto);
 }
 
 .boton--principal:hover {
-  background: var(--color-accent-hover);
+  background: var(--boton-principal-hover);
 }
 
 .boton--secundario {
   background: transparent;
   color: var(--texto);
-  border-color: var(--color-border-strong);
+  border-color: var(--boton-secundario-borde);
 }
 
 .boton--secundario:hover {
   border-color: var(--acento);
-}
-
-.tema-claro .boton--principal {
-  background: var(--color-bg);
-  color: var(--color-text);
-}
-
-.tema-claro .boton--principal:hover {
-  background: var(--color-surface-2);
 }
 
 /* Listas con marca de bronce */
@@ -192,7 +183,7 @@ a {
   position: absolute;
   left: 0;
   top: 0.75em;
-  width: 12px;
+  width: var(--space-3);
   height: 1px;
   background: var(--acento);
 }

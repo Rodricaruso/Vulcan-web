@@ -33,7 +33,8 @@ const anclas = ['inicio', 'final', 'centro'];
     <div class="contenedor frases__lista">
       {frases.map((frase, i) => (
         <p class:list={['frases__frase', `frases__frase--${anclas[i]}`]} style={`--tinta: url(#tinta-${i})`} data-frase>
-          {frase}
+          {/* Una oración por línea en escritorio: se lee de un vistazo. */}
+          {frase.split(/(?<=\.)\s+/).map((oracion) => <span class="frases__oracion">{oracion} </span>)}
         </p>
       ))}
     </div>
@@ -82,12 +83,18 @@ const anclas = ['inicio', 'final', 'centro'];
     top: 50%;
     translate: 0 -50%;
     font-family: var(--font-display);
-    font-size: clamp(2rem, 1.1rem + 3.6vw, 4.5rem);
-    line-height: 1.1;
-    max-width: 17ch;
+    font-size: clamp(1.625rem, 0.9rem + 2.4vw, 3.25rem);
+    line-height: 1.15;
+    max-width: min(34ch, 100% - 2 * var(--gutter));
     text-wrap: balance;
     opacity: 0;
     visibility: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .frases__oracion {
+      display: block;
+    }
   }
 
   .frases__frase.activa {
@@ -102,14 +109,12 @@ const anclas = ['inicio', 'final', 'centro'];
   .frases__frase--final {
     right: var(--gutter);
     text-align: right;
-    max-width: 20ch;
   }
 
   .frases__frase--centro {
     left: 50%;
     translate: -50% -50%;
     text-align: center;
-    max-width: 19ch;
     width: max-content;
     color: var(--color-accent-on-light);
   }

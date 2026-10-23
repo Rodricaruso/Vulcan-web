@@ -58,3 +58,21 @@ Con el `id` de la pieza en `src/data/productos.ts`: `faro`, `fragua`, `corteza`,
 ## textura/
 
 `marmol.avif`: la textura de fondo. Si la cambiás, corré `npm run textura` (o `npm run build`) para volver a generarla mezclada con el color de fondo.
+
+## casos/ — una carpeta para las tres páginas de casos
+
+Cada caso tiene una portada y una foto por paso de la historia (`src/content.ts`, `casos`). Las portadas son 4:5; las de los pasos pueden tener otra proporción (se indica en `content.ts`).
+
+| Archivo | Qué va |
+|---|---|
+| `arqueria-portada` | El anillo de la escuela. Hoy es un render con fondo transparente, sobre degradé |
+| `arqueria-1-logo` … `arqueria-4-impresion` | Logo (simplificado y original), propuesta con IA, modelo 3D, impresión en resina |
+| `medalla-portada-mesa` | La medalla del casamiento, sobre la mesa de madera |
+| `medalla-1-referencia` … `medalla-4-medalla` | Imagen del cliente, modelo 3D, prueba impresa, medalla |
+| `medalla-recorte` | La medalla recortada en círculo, con fondo transparente (de reserva, no se usa) |
+
+El sello familiar usa las fotos de `hero/` y `trabajos/trabajo-1`.
+
+## originales/
+
+Las fotos tal como llegaron, antes de renombrarlas o recortarlas. La web no las usa; quedan de archivo. Las de los casos están en `originales/casos/`.

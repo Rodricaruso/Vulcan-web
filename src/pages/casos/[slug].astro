@@ -1,0 +1,450 @@
+---
+// Un caso: la historia de un encargo real, de la referencia a la pieza. Es la ficha que
+// se puede mandar por WhatsApp a quien pide algo parecido. Fondo claro: es el archivo.
+import Base from '../../layouts/Base.astro';
+import Navbar from '../../components/Navbar.astro';
+import Foto from '../../components/Foto.astro';
+import CtaFinal from '../../components/CtaFinal.astro';
+import Footer from '../../components/Footer.astro';
+import { casos, casoPagina, type Caso } from '../../content';
+
+export function getStaticPaths() {
+  return casos.map((caso, i) => ({ params: { slug: caso.slug }, props: { caso, i } }));
+}
+
+interface Props {
+  caso: Caso;
+  i: number;
+}
+
+const { caso, i } = Astro.props;
+const numerales = ['I', 'II', 'III'];
+const otros = casos.filter((c) => c.slug !== caso.slug);
+---
+
+<Base title={caso.meta.title} description={caso.meta.description}>
+  <Navbar />
+  <main id="contenido" tabindex="-1" class="caso tema-claro">
+    <header class="contenedor caso__cabecera">
+      <div class="caso__intro">
+        <a class="caso__volver" href="/#trabajos"><span aria-hidden="true">←</span> {casoPagina.volver}</a>
+        <p class="caso__rotulo">{casoPagina.numero} {numerales[i]} · {caso.estado}</p>
+        <h1>{caso.nombre}</h1>
+        <p class="bajada">{caso.intro}</p>
+        <dl class="caso__ficha">
+          {caso.ficha.map(([dato, valor]) => (
+            <div>
+              <dt>{dato}</dt>
+              <dd>{valor}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+      <figure class="caso__portada">
+        <div class:list={['caso__portada-marco', { 'con-fondo': caso.portadaFondo }]} style={caso.portadaEncuadre && `--encuadre: ${caso.portadaEncuadre}`}>
+          <Foto foto={caso.portada} proporcion="4 / 5" carga="eager" sizes="(min-width: 1024px) 40vw, 100vw" />
+        </div>
+        {caso.portadaNota && <figcaption class="caso__portada-nota">{caso.portadaNota}</figcaption>}
+      </figure>
+    </header>
+
+    <ol class="contenedor caso__historia">
+      {caso.historia.map((etapa, n) => (
+        <li class="caso__etapa">
+          <div class:list={['caso__etapa-foto', { 'caso__etapa-foto--ancha': etapa.proporcion && etapa.proporcion !== '4 / 5' }]}>
+            <Foto foto={etapa.foto} proporcion={etapa.proporcion ?? '4 / 5'} sizes="(min-width: 1024px) 40vw, 100vw" />
+          </div>
+          <div class="caso__etapa-texto">
+            <span class="caso__etapa-numero" aria-hidden="true">{n + 1}</span>
+            <p>{etapa.texto}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <div class="contenedor caso__cierre">
+      <p>{caso.cierre}</p>
+    </div>
+
+    <nav class="contenedor caso__otros" aria-labelledby="otros-titulo">
+      <h2 id="otros-titulo">{casoPagina.otros}</h2>
+      <ul>
+        {otros.map((otro) => (
+          <li>
+            <a href={`/casos/${otro.slug}`}>
+              <span class="caso__otro-nombre">{otro.nombre}</span>
+              <span class="caso__otro-resumen">{otro.resumen}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </main>
+  <CtaFinal />
+  <Footer />
+</Base>
+
+<style>
+  .caso {
+    background: var(--fondo);
+    color: var(--texto);
+    padding-bottom: var(--seccion);
+  }
+
+  /* ---------------------------------------------------------- cabecera -- */
+  .caso__cabecera {
+    display: grid;
+    gap: var(--space-7);
+    padding-block: var(--space-8);
+  }
+
+  .caso__intro {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+    justify-items: start;
+  }
+
+  .caso__volver {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tactil);
+    font-size: var(--text-small);
+    color: var(--texto-suave);
+    text-decoration: none;
+  }
+
+  .caso__volver:hover {
+    color: var(--color-accent-on-light);
+  }
+
+  .caso__rotulo {
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+    color: var(--texto-suave);
+  }
+
+  .caso__cabecera h1 {
+    max-width: 14ch;
+  }
+
+  .caso__ficha {
+    margin: var(--space-2) 0 0;
+    width: 100%;
+    max-width: 32rem;
+    display: grid;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .caso__ficha div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--text-small);
+  }
+
+  .caso__ficha dt {
+    color: var(--texto-suave);
+  }
+
+  .caso__ficha dd {
+    margin: 0;
+    text-align: right;
+  }
+
+  .caso__portada {
+    margin: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .caso__portada-marco :global(.foto) {
+    object-position: var(--encuadre, 50% 50%);
+  }
+
+  .caso__portada-marco {
+    border-radius: var(--radius);
+    box-shadow: 0 2px 4px rgb(29 6 5 / 0.12), 0 26px 50px -20px rgb(29 6 5 / 0.4);
+  }
+
+  /* Render sobre transparente: la pieza entera, con aire, sobre la luz tibia del taller. */
+  .con-fondo {
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 46%, color-mix(in srgb, var(--bronce) 34%, var(--escoria)) 0%, var(--fragua) 62%, var(--forja) 100%);
+  }
+
+  .con-fondo :global(img.foto) {
+    object-fit: contain;
+    padding: 12%;
+    filter: drop-shadow(0 24px 30px rgb(0 0 0 / 0.45));
+  }
+
+  .caso__portada-nota {
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    color: var(--texto-suave);
+  }
+
+  /* ---------------------------------------------------------- historia -- */
+  .caso__historia {
+    list-style: none;
+    margin-block: 0;
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .caso__etapa {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .caso__etapa-texto {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--space-4);
+    align-items: baseline;
+  }
+
+  .caso__etapa-numero {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    line-height: 1;
+    color: var(--color-accent-on-light);
+  }
+
+  .caso__etapa-texto p {
+    font-size: 1.125rem;
+    max-width: 36ch;
+  }
+
+  /* ------------------------------------------------------------ cierre -- */
+  .caso__cierre {
+    padding-block: var(--space-8);
+  }
+
+  /* Centrado, sobre el mismo eje que los pasos. */
+  .caso__cierre p {
+    margin-inline: auto;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem);
+    line-height: 1.25;
+    max-width: 30ch;
+  }
+
+  /* ------------------------------------------------------- otros casos -- */
+  .caso__otros {
+    display: grid;
+    gap: var(--space-4);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .caso__otros h2 {
+    font-size: var(--text-small);
+    font-family: var(--font-mono);
+    font-weight: 400;
+    color: var(--texto-suave);
+  }
+
+  .caso__otros ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .caso__otros a {
+    display: grid;
+    gap: var(--space-1);
+    padding-block: var(--space-3);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .caso__otro-nombre {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 0.25em;
+    transition: text-decoration-color var(--dur-3) var(--ease-out);
+  }
+
+  .caso__otros a:hover .caso__otro-nombre {
+    text-decoration-color: currentColor;
+  }
+
+  .caso__otro-resumen {
+    font-size: var(--text-small);
+    color: var(--texto-suave);
+  }
+
+  /* Hasta tablet: título, imagen y recién después la descripción y la ficha. El bloque de
+     texto se "disuelve" (display: contents) para poder meter la portada en el medio. */
+  @media (max-width: 1023px) {
+    .caso__cabecera {
+      gap: var(--space-3);
+    }
+
+    .caso__intro {
+      display: contents;
+    }
+
+    .caso__cabecera > :global(*),
+    .caso__intro > * {
+      justify-self: start;
+    }
+
+    .caso__volver { order: 1; }
+    .caso__rotulo { order: 2; }
+    .caso__cabecera h1 { order: 3; }
+
+    .caso__portada {
+      order: 4;
+      justify-self: stretch;
+      width: 100%;
+      max-width: 34rem;
+      margin-block: var(--space-4) var(--space-3);
+    }
+
+    .caso__portada :global(.foto) {
+      aspect-ratio: 1 / 1;
+    }
+
+    .caso__cabecera .bajada { order: 5; }
+
+    .caso__ficha {
+      order: 6;
+      justify-self: stretch;
+    }
+  }
+
+  /* Celular: la historia es un carrusel que se desliza de costado (se ve el borde de la
+     siguiente etapa, así se entiende que sigue). Todo un escalón más chico. */
+  @media (max-width: 767px) {
+    .caso__cabecera {
+      gap: var(--space-5);
+      padding-block: var(--space-5) var(--space-6);
+    }
+
+    .caso__cabecera h1 {
+      font-size: clamp(2rem, 8.5vw, 2.5rem);
+    }
+
+    .caso__cabecera .bajada {
+      font-size: 1rem;
+    }
+
+    .caso__portada :global(.foto) {
+      aspect-ratio: 1 / 1;
+    }
+
+    .caso__historia {
+      display: flex;
+      gap: var(--space-4);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--gutter);
+      scrollbar-width: none;
+    }
+
+    .caso__historia::-webkit-scrollbar {
+      display: none;
+    }
+
+    .caso__etapa {
+      flex: 0 0 78%;
+      align-content: start;
+      gap: var(--space-3);
+      scroll-snap-align: start;
+    }
+
+    /* Todas las fotos a la misma altura, para que la fila se lea pareja. La apaisada (el
+       logo) se ve entera sobre el fondo. */
+    .caso__etapa-foto :global(.foto) {
+      aspect-ratio: 1 / 1;
+    }
+
+    .caso__etapa-foto--ancha :global(img.foto) {
+      object-fit: contain;
+      background: var(--borde);
+    }
+
+    .caso__etapa-numero {
+      font-size: 1.75rem;
+    }
+
+    .caso__etapa-texto p {
+      font-size: var(--text-small);
+    }
+
+    .caso__cierre {
+      padding-block: var(--space-6);
+    }
+
+    .caso__cierre p {
+      font-size: 1.375rem;
+    }
+
+    .caso__otro-nombre {
+      font-size: 1.25rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    /* Dos columnas iguales; foto y texto se arriman al eje central, así cada par queda
+       centrado en la página aunque la foto sea más angosta que su columna. */
+    .caso__etapa {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: var(--space-7);
+      align-items: center;
+    }
+
+    .caso__etapa-foto {
+      width: 100%;
+      justify-self: end;
+    }
+
+    .caso__etapa-texto {
+      justify-self: start;
+    }
+
+    /* En zigzag: una foto a la izquierda, la siguiente a la derecha. */
+    .caso__etapa:nth-child(even) .caso__etapa-foto {
+      order: 2;
+      justify-self: start;
+    }
+
+    .caso__etapa:nth-child(even) .caso__etapa-texto {
+      justify-self: end;
+    }
+
+    .caso__otros ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-7);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .caso__cabecera {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      column-gap: var(--space-8);
+      align-items: center;
+    }
+
+    .caso__etapa-foto {
+      max-width: 26rem;
+    }
+
+    /* Las apaisadas o cuadradas necesitan más ancho para leerse. */
+    .caso__etapa-foto--ancha {
+      max-width: 36rem;
+    }
+  }
+</style>

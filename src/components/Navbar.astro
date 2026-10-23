@@ -2,6 +2,10 @@
 import { menu, textosUI } from '../content';
 import Logo from './Logo.astro';
 import BotonContacto from './BotonContacto.astro';
+
+// Marca la página en la que se está. Los enlaces a anclas de la home (/#...) no cuentan.
+const ruta = Astro.url.pathname.replace(/\/$/, '') || '/';
+const actual = (href: string) => (!href.includes('#') && href === ruta ? 'page' : undefined);
 ---
 
 <a class="saltar" href="#contenido">{textosUI.saltar}</a>
@@ -12,7 +16,7 @@ import BotonContacto from './BotonContacto.astro';
 
     <nav class="navbar__menu" aria-label="Principal">
       <ul>
-        {menu.map((item) => <li><a href={item.href}>{item.texto}</a></li>)}
+        {menu.map((item) => <li><a href={item.href} aria-current={actual(item.href)}>{item.texto}</a></li>)}
       </ul>
     </nav>
 
@@ -34,7 +38,7 @@ import BotonContacto from './BotonContacto.astro';
 
   <nav id="menu-movil" class="menu-movil" aria-label="Principal" hidden>
     <ul class="contenedor">
-      {menu.map((item) => <li><a href={item.href}>{item.texto}</a></li>)}
+      {menu.map((item) => <li><a href={item.href} aria-current={actual(item.href)}>{item.texto}</a></li>)}
     </ul>
   </nav>
 </header>
@@ -94,6 +98,17 @@ import BotonContacto from './BotonContacto.astro';
   .navbar__menu a:hover,
   .menu-movil a:hover {
     color: var(--color-accent);
+  }
+
+  .navbar__menu a[aria-current='page'],
+  .menu-movil a[aria-current='page'] {
+    color: var(--color-accent);
+  }
+
+  .navbar__menu a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
   }
 
   .navbar__acciones {

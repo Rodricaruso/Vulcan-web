@@ -30,7 +30,7 @@ const { talles: guia } = catalogo;
 
       <ul class="catalogo__grilla" data-grilla>
         {productos.map((pieza) => (
-          <li data-tipo={pieza.tipo}>
+          <li id={pieza.id} data-tipo={pieza.tipo}>
             <TarjetaPieza pieza={pieza} completa />
           </li>
         ))}
@@ -138,12 +138,39 @@ const { talles: guia } = catalogo;
     color: var(--color-bg);
   }
 
+  /* Flex en vez de grilla: la última fila, si queda incompleta, se centra. */
   .catalogo__grilla {
+    --columnas: 1;
+    --hueco: var(--space-5);
     list-style: none;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
-    gap: var(--space-7) var(--space-5);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-7) var(--hueco);
+  }
+
+  .catalogo__grilla > li {
+    flex: 0 0 calc((100% - (var(--columnas) - 1) * var(--hueco)) / var(--columnas));
+    min-width: 0;
+  }
+
+  @media (min-width: 560px) {
+    .catalogo__grilla {
+      --columnas: 2;
+    }
+  }
+
+  @media (min-width: 880px) {
+    .catalogo__grilla {
+      --columnas: 3;
+    }
+  }
+
+  @media (min-width: 1180px) {
+    .catalogo__grilla {
+      --columnas: 4;
+    }
   }
 
   .talles__grilla {

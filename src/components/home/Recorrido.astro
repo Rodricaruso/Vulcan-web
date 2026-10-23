@@ -1,12 +1,10 @@
 ---
-// Acto 3: el proceso. Seis pasos sobre una sola línea de bronce (horizontal en escritorio,
+// Acto 5: el proceso. Seis pasos sobre una sola línea de bronce (horizontal en escritorio,
 // vertical en celular). Al scrollear, cada ícono se cincela de un golpe seco: cae el cincel,
 // el ícono queda grabado de una vez, saltan esquirlas y el impacto sacude el título y hace
-// aparecer el texto. Cierra con el acuñado de la pieza terminada.
+// aparecer el texto.
 // Animación con GSAP (ScrollTrigger, DrawSVG, SplitText). Sin movimiento reducido: todo quieto y visible.
 import { recorrido } from '../../content';
-import Foto from '../Foto.astro';
-import Sello from '../Sello.astro';
 
 // Trazos de cada dibujo, en un lienzo de 64 × 64.
 const dibujos: Record<string, string[]> = {
@@ -68,28 +66,6 @@ const romanos =['I', 'II', 'III', 'IV', 'V', 'VI'];
   </div>
   </div>
   </div>
-
-  <!--
-    El acuñado: la pieza terminada aparece de golpe, como una moneda que se abre a toda la
-    pantalla. Destello, chispas, la inscripción tallada letra por letra y el sello que cae.
-    Se dispara al entrar en pantalla (no depende de cuánto se scrollee).
-  -->
-  <figure class="factum" data-factum>
-    <div class="factum__imagen">
-      <Foto foto={recorrido.fotoFinal} proporcion="16 / 9" sizes="100vw" />
-      <span class="factum__destello" aria-hidden="true"></span>
-    </div>
-    <div class="factum__chispas" aria-hidden="true">
-      {Array.from({ length: 14 }, (_, i) => <span style={`--a: ${(i * 360) / 14 + (i % 3) * 9}deg; --d: ${0.7 + (i % 4) * 0.22}`}></span>)}
-    </div>
-    <p class="factum__inscripcion" aria-hidden="true">
-      {recorrido.inscripcion.split('').map((letra, i) => <span style={`--i: ${i}`}>{letra === ' ' ? ' ' : letra}</span>)}
-    </p>
-    <div class="factum__sello">
-      <Sello id="sello-factum" texto={recorrido.selloTexto} />
-    </div>
-    <figcaption class="sr-only">{recorrido.pieFoto}</figcaption>
-  </figure>
 </section>
 
 <style>
@@ -297,9 +273,11 @@ const romanos =['I', 'II', 'III', 'IV', 'V', 'VI'];
     }
 
     /* Con los golpes activos, la sección queda fija mientras se scrollea la pista:
-       el escenario es sticky y la pista le da 35 % de pantalla de recorrido a cada golpe. */
+       el escenario es sticky y la pista le da 25 % de pantalla de recorrido a cada golpe.
+       El escenario lleva su propia textura: si no, la del body sigue corriendo por detrás
+       mientras todo lo demás está quieto, y marea. */
     .golpes .recorrido__pista {
-      height: calc(100svh + 6 * 35vh);
+      height: calc(100svh + 6 * 25vh);
     }
 
     .golpes .recorrido__escenario {
@@ -308,236 +286,12 @@ const romanos =['I', 'II', 'III', 'IV', 'V', 'VI'];
       min-height: 100svh;
       display: grid;
       align-content: center;
-    }
-  }
-
-  /* ------------------------------------------------------------ acuñado -- */
-  .factum {
-    position: relative;
-    margin-top: clamp(5rem, 12vw, 11rem);
-    isolation: isolate;
-  }
-
-  .factum__imagen {
-    position: relative;
-    overflow: hidden;
-    clip-path: circle(14% at 50% 50%);
-    transition: clip-path 720ms cubic-bezier(0.7, 0, 0.2, 1);
-  }
-
-  .factum__imagen :global(.foto) {
-    border-radius: 0;
-    max-height: 92svh;
-    transform: scale(1.3);
-    transition: transform 1400ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .factum__destello {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 50%, rgb(255 230 190 / 0.95), rgb(211 180 143 / 0.5) 30%, transparent 65%);
-    mix-blend-mode: screen;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .factum__chispas {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    pointer-events: none;
-  }
-
-  .factum__chispas span {
-    position: absolute;
-    width: 2px;
-    height: 14px;
-    border-radius: 2px;
-    background: var(--color-accent-hover);
-    box-shadow: 0 0 8px 1px rgb(255 214 160 / 0.7);
-    opacity: 0;
-    transform: rotate(var(--a)) translateY(0);
-  }
-
-  .factum__inscripcion {
-    position: absolute;
-    left: 50%;
-    bottom: clamp(1.5rem, 6vw, 4rem);
-    translate: -50% 0;
-    max-width: none;
-    white-space: nowrap;
-    font-family: var(--font-display);
-    font-size: clamp(1.75rem, 0.8rem + 4.6vw, 5.5rem);
-    letter-spacing: 0.2em;
-    margin-right: -0.2em;
-    color: var(--color-text);
-    text-shadow: 0 1px 0 rgb(0 0 0 / 0.5), 0 0 30px rgb(29 6 5 / 0.8);
-  }
-
-  /* Cada letra se talla: entra desde arriba como un golpe de cincel. */
-  .factum__inscripcion span {
-    display: inline-block;
-    clip-path: inset(0 0 100% 0);
-    transform: translateY(-0.12em);
-  }
-
-  .factum__sello {
-    position: absolute;
-    right: clamp(1rem, 5vw, 4rem);
-    top: clamp(1rem, 5vw, 4rem);
-    width: clamp(5.5rem, 13vw, 10rem);
-    padding: 0.6rem;
-    border-radius: 50%;
-    background: rgb(242 233 223 / 0.92);
-    opacity: 0;
-    transform: rotate(-12deg) scale(1.8);
-  }
-
-  /* --- el golpe --- */
-  .factum.acunado .factum__imagen {
-    clip-path: circle(75% at 50% 50%);
-  }
-
-  .factum.acunado .factum__imagen :global(.foto) {
-    transform: none;
-  }
-
-  .factum.acunado .factum__destello {
-    animation: destello 900ms ease-out 380ms;
-  }
-
-  .factum.acunado .factum__chispas span {
-    animation: chispa calc(var(--d) * 1s) cubic-bezier(0.1, 0.8, 0.3, 1) 420ms;
-  }
-
-  .factum.acunado {
-    animation: temblor 260ms ease-out 420ms;
-  }
-
-  .factum.acunado .factum__inscripcion span {
-    animation: tallar 260ms cubic-bezier(0.3, 1.6, 0.6, 1) forwards;
-    animation-delay: calc(700ms + var(--i) * 55ms);
-  }
-
-  .factum.acunado .factum__sello {
-    animation: estampar-factum 460ms cubic-bezier(0.3, 1.4, 0.5, 1) 1500ms forwards;
-  }
-
-  @keyframes destello {
-    0% {
-      opacity: 0;
-    }
-    15% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
-
-  @keyframes chispa {
-    0% {
-      opacity: 1;
-      transform: rotate(var(--a)) translateY(0) scaleY(1);
-    }
-    100% {
-      opacity: 0;
-      transform: rotate(var(--a)) translateY(calc(var(--d) * -38vmin)) scaleY(0.3);
-    }
-  }
-
-  @keyframes temblor {
-    0%,
-    100% {
-      translate: 0 0;
-    }
-    30% {
-      translate: 0 5px;
-    }
-    60% {
-      translate: 0 -2px;
-    }
-  }
-
-  @keyframes tallar {
-    to {
-      clip-path: inset(0 0 -10% 0);
-      transform: none;
-    }
-  }
-
-  @keyframes estampar-factum {
-    0% {
-      opacity: 0;
-      transform: rotate(-20deg) scale(1.8);
-    }
-    60% {
-      opacity: 1;
-      transform: rotate(-12deg) scale(0.94);
-    }
-    100% {
-      opacity: 1;
-      transform: rotate(-12deg) scale(1);
-    }
-  }
-
-  @media (max-width: 767px) {
-    .factum__imagen :global(.foto) {
-      aspect-ratio: 4 / 5;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .factum__imagen,
-    .factum.acunado .factum__imagen {
-      clip-path: none;
-    }
-
-    .factum__imagen :global(.foto) {
-      transform: none;
-    }
-
-    .factum__chispas {
-      display: none;
-    }
-
-    .factum.acunado {
-      animation: none;
-    }
-
-    .factum__inscripcion span {
-      clip-path: none;
-      transform: none;
-    }
-
-    .factum__sello {
-      opacity: 1;
-      transform: rotate(-12deg);
-    }
-
-    .factum.acunado .factum__sello {
-      animation: none;
+      background: var(--color-bg) url('/texturas/forja.webp') center / cover;
+      border-bottom: 1px solid var(--color-border);
     }
   }
 
 </style>
-
-<script>
-  // El acuñado se dispara una sola vez, cuando un tercio de la imagen está en pantalla.
-  const factum = document.querySelector<HTMLElement>('[data-factum]');
-  if (factum) {
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          factum.classList.add('acunado');
-          io.disconnect();
-        }
-      },
-      { threshold: 0.33 },
-    );
-    io.observe(factum);
-  }
-</script>
 
 <script>
   // Golpes de cincel. Cada paso se cincela una vez, en orden, a medida que se scrollea.
@@ -633,19 +387,24 @@ const romanos =['I', 'II', 'III', 'IV', 'V', 'VI'];
         }
       };
 
-      // Escritorio: la sección queda fija (sticky) mientras se recorre la pista, y los
-      // golpes se reparten en ese tramo. El sexto cae al 85 %, así termina antes de soltarse.
+      // Escritorio: la sección queda fija (sticky) mientras se recorre la pista, y los golpes
+      // van atados al scroll: cada uno avanza y retrocede con la rueda, en fila, y la línea
+      // de bronce crece con ellos. Termina un poco antes de que la sección se suelte.
       // Celular: cada paso al entrar.
       const fila = matchMedia('(min-width: 1024px)').matches;
       const pista = seccion.querySelector<HTMLElement>('[data-pista]');
       if (fila && pista) {
-        ScrollTrigger.create({
-          trigger: pista,
-          start: 'top top',
-          end: 'bottom bottom',
-          onUpdate: (st) => golpearHasta(Math.min(pasos.length, Math.ceil((st.progress / 0.85) * pasos.length))),
-          onLeave: () => golpearHasta(pasos.length),
+        const n = pasos.length;
+        const atado = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: { trigger: pista, start: 'top top', end: 'bottom bottom', scrub: 0.5 },
         });
+        golpes.forEach((g, i) => {
+          atado.add(g.paused(false), i);
+          atado.to(lista, { '--avance': Math.min(1, (i + 1) / n + 0.06), duration: 0.9, ease: 'power2.out' }, i);
+        });
+        // Aire al final: el último golpe se asienta antes de que la sección se suelte.
+        atado.to({}, { duration: 0.6 });
       } else {
         pasos.forEach((paso, i) =>
           ScrollTrigger.create({ trigger: paso, start: 'top 74%', once: true, onEnter: () => golpearHasta(i + 1) }),

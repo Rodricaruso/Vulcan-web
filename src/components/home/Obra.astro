@@ -1,122 +1,203 @@
 ---
-// Acto 5: prueba. Fondo cera, escenario fijo. Cada trabajo entra grande, en foco, con su
-// nombre; al llegar el siguiente se achica y se corre a una pila desfasada a un costado.
-// El acento siempre lo tiene el que acaba de aparecer.
-import { obra, trabajos } from '../../content';
+// Acto 4: prueba, después de la pieza terminada. Fondo cera. Tres casos reales, cada uno con su página.
+// Escritorio: la sección queda fija y las tres tarjetas, apiladas en el centro, se abren
+// con el scroll hasta quedar una al lado de la otra. Celular: una debajo de la otra.
+import { obra, casos } from '../../content';
 import Foto from '../Foto.astro';
 
-const numerales = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+const numerales = ['I', 'II', 'III'];
 ---
 
-<section id="trabajos" class="obra tema-claro" data-sc-act="pin" data-sc-span={1.2 + trabajos.casos.length * 0.8} aria-labelledby="obra-titulo" data-obra>
-  <div class="obra__escenario" data-sc-stage>
-    <header class="contenedor obra__cabecera">
-      <h2 id="obra-titulo">{obra.titulo}</h2>
-      <p class="bajada">{obra.bajada}</p>
-    </header>
+<section id="trabajos" class="obra tema-claro" aria-labelledby="obra-titulo" data-obra>
+  <div class="obra__pista">
+    <div class="obra__escenario">
+      <header class="contenedor obra__cabecera">
+        <h2 id="obra-titulo">{obra.titulo}</h2>
+        <p class="bajada">{obra.bajada}</p>
+      </header>
 
-    <ol class="obra__mesa">
-      {trabajos.casos.map((caso, i) => (
-        <li class="obra__trabajo" data-obra-trabajo>
-          <figure>
-            <div class="obra__foto">
-              <Foto foto={caso.foto} proporcion="3 / 4" carga="eager" sizes="(min-width: 1024px) 34vw, 70vw" />
-            </div>
-            <figcaption class="obra__pie">
-              <span class="obra__numeral" aria-hidden="true">{numerales[i]}</span>
-              <span class="obra__nombre">{caso.nombre}</span>
-              <span class="obra__contexto">{caso.contexto}</span>
-            </figcaption>
-          </figure>
-        </li>
-      ))}
-    </ol>
+      <ol class="contenedor obra__casos">
+        {casos.map((caso, i) => (
+          <li class="obra__caso" data-obra-caso>
+            <a class="obra__enlace" href={`/casos/${caso.slug}`}>
+              <div class:list={['obra__foto', { 'con-fondo': caso.portadaFondo }]} style={caso.portadaEncuadre && `--encuadre: ${caso.portadaEncuadre}`}>
+                <Foto foto={caso.portada} proporcion="4 / 5" carga="eager" sizes="(min-width: 1024px) 22rem, 90vw" />
+              </div>
+              <div class="obra__texto" data-obra-texto>
+                <p class="obra__rotulo">
+                  <span aria-hidden="true">{numerales[i]}</span> · {caso.estado}
+                </p>
+                <h3 class="obra__nombre">{caso.nombre}</h3>
+                <p class="obra__resumen">{caso.resumen}</p>
+                <span class="obra__ver">{obra.enlace} <span aria-hidden="true">→</span></span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
   </div>
 </section>
 
 <style>
-  .obra__escenario {
-    background: var(--color-text);
-    color: var(--color-bg);
-    padding-top: calc(72px + var(--space-6));
-    overflow: clip;
+  .obra {
+    background: var(--fondo);
+    color: var(--texto);
+    padding-block: var(--seccion);
+    /* El ancho de cada tarjeta sale del alto: las tres tienen que entrar con su texto. */
+    --ancho: min(22rem, calc((100svh - 25rem) * 0.8));
   }
 
   .obra__cabecera {
-    position: relative;
-    z-index: 10;
     display: grid;
     gap: var(--space-3);
+    margin-bottom: var(--space-6);
   }
 
-  .obra__cabecera h2 {
-    max-width: 12ch;
-  }
-
-  .obra__cabecera .bajada {
-    max-width: 30ch;
-  }
-
-  .obra__mesa {
+  .obra__casos {
     list-style: none;
-    margin: 0;
-    padding: 0;
+    margin-block: 0;
+    display: grid;
+    gap: var(--space-7);
   }
 
-  /* Todas las fotos comparten la misma caja; el JS las ubica (foco, pila o por entrar). */
-  .obra__trabajo {
-    position: absolute;
-    left: 50%;
-    bottom: 6svh;
-    width: min(62vw, 46svh);
-    transform-origin: 50% 100%;
-    will-change: transform, opacity;
+  .obra__enlace {
+    display: grid;
+    gap: var(--space-4);
+    color: inherit;
+    text-decoration: none;
   }
 
   .obra__foto :global(.foto) {
-    box-shadow: 0 2px 4px rgb(29 6 5 / 0.14), 0 26px 50px -18px rgb(29 6 5 / 0.45);
+    object-position: var(--encuadre, 50% 50%);
+    box-shadow: 0 2px 4px rgb(29 6 5 / 0.12), 0 22px 44px -20px rgb(29 6 5 / 0.4);
+    transition: box-shadow var(--dur-3) var(--ease-out);
   }
 
-  .obra__pie {
+  /* Render sobre transparente: la pieza entera sobre la luz tibia del taller. */
+  .con-fondo {
+    border-radius: var(--radius);
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 46%, color-mix(in srgb, var(--bronce) 34%, var(--escoria)) 0%, var(--fragua) 62%, var(--forja) 100%);
+  }
+
+  .con-fondo :global(img.foto) {
+    object-fit: contain;
+    padding: 12%;
+    filter: drop-shadow(0 20px 26px rgb(0 0 0 / 0.45));
+  }
+
+  .obra__enlace:hover .obra__foto :global(.foto) {
+    box-shadow: 0 2px 4px rgb(29 6 5 / 0.12), 0 30px 54px -18px rgb(29 6 5 / 0.5);
+  }
+
+  .obra__texto {
     display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: var(--space-3);
-    margin-top: var(--space-3);
-    opacity: var(--foco, 0);
-    transition: opacity var(--dur-3) var(--ease-out);
+    gap: var(--space-2);
+    justify-items: start;
   }
 
-  .obra__numeral {
-    grid-row: span 2;
-    font-family: var(--font-display);
-    font-size: 2rem;
-    line-height: 1;
-    color: var(--color-accent-on-light);
-  }
-
-  .obra__nombre {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    line-height: 1.2;
-  }
-
-  .obra__contexto {
+  .obra__rotulo {
+    font-family: var(--font-mono);
     font-size: var(--text-small);
     color: var(--texto-suave);
   }
 
+  .obra__nombre {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1.15;
+  }
+
+  .obra__resumen {
+    font-size: var(--text-small);
+    color: var(--texto-suave);
+    max-width: 34ch;
+  }
+
+  .obra__ver {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tactil);
+    font-weight: 500;
+    color: var(--color-accent-on-light);
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+
+  .obra__ver span {
+    transition: translate var(--dur-3) var(--ease-out);
+  }
+
+  .obra__enlace:hover .obra__ver span {
+    translate: 4px 0;
+  }
+
+  /* Celular y tablet: carrusel de costado, con el borde de la siguiente a la vista. */
+  @media (max-width: 1023px) {
+    .obra__casos {
+      display: flex;
+      gap: var(--space-4);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--gutter);
+      scrollbar-width: none;
+    }
+
+    .obra__casos::-webkit-scrollbar {
+      display: none;
+    }
+
+    .obra__caso {
+      flex: 0 0 min(78%, 20rem);
+      scroll-snap-align: start;
+    }
+
+    .obra__foto :global(.foto) {
+      aspect-ratio: 1 / 1;
+    }
+
+    .obra__nombre {
+      font-size: 1.25rem;
+    }
+  }
+
   @media (min-width: 1024px) {
-    .obra__trabajo {
-      left: 58%;
-      bottom: 8svh;
-      width: min(30vw, 54svh);
+    .obra__casos {
+      grid-template-columns: repeat(3, var(--ancho));
+      justify-content: center;
+      column-gap: clamp(2rem, 4vw, 4rem);
     }
 
     .obra__cabecera {
-      position: absolute;
-      top: calc(72px + var(--space-8));
-      left: 0;
-      right: 0;
+      justify-items: center;
+      text-align: center;
+    }
+
+    /* Con movimiento: la sección queda fija mientras se recorre la pista. */
+    .obra.abre {
+      padding-block: 0;
+    }
+
+    .obra.abre .obra__pista {
+      height: 220svh;
+    }
+
+    .obra.abre .obra__escenario {
+      position: sticky;
+      top: 0;
+      min-height: 100svh;
+      display: grid;
+      align-content: center;
+      padding-top: 72px;
+      overflow: clip;
+    }
+
+    .obra.abre .obra__caso {
+      will-change: transform, opacity;
     }
   }
 </style>
@@ -127,95 +208,104 @@ const numerales = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
 
   const seccion = document.querySelector<HTMLElement>('[data-obra]');
   if (seccion) {
-    const trabajos = Array.from(seccion.querySelectorAll<HTMLElement>('[data-obra-trabajo]'));
-    const n = trabajos.length;
-    const reducido = matchMedia('(prefers-reduced-motion: reduce)');
+    const pista = seccion.querySelector<HTMLElement>('.obra__pista')!;
+    const tarjetas = Array.from(seccion.querySelectorAll<HTMLElement>('[data-obra-caso]'));
+    const textos = tarjetas.map((t) => t.querySelector<HTMLElement>('[data-obra-texto]')!);
     const escritorio = matchMedia('(min-width: 1024px)');
+    const reducido = matchMedia('(prefers-reduced-motion: reduce)');
+    // Orden de llegada: primero la del centro, después las de los costados.
+    const turno = [1, 0, 2];
     let pendiente = false;
-    // Progreso suavizado: persigue al scroll en vez de saltar con cada paso de la rueda.
-    let suavizado = -1;
+    let suavizado = NaN;
+    // Distancia de cada tarjeta al centro de la fila, sin transformar.
+    let distancias: number[] = [];
 
-    const objetivo = () => {
-      const r = seccion.getBoundingClientRect();
-      return clamp(-r.top / Math.max(1, r.height - innerHeight));
+    const activo = () => escritorio.matches && !reducido.matches;
+
+    const medir = () => {
+      const centro = innerWidth / 2;
+      distancias = tarjetas.map((t) => centro - (t.offsetLeft + t.offsetWidth / 2));
+    };
+
+    const limpiar = () => {
+      tarjetas.forEach((t, i) => {
+        t.style.transform = '';
+        t.style.opacity = '';
+        textos[i].style.opacity = '';
+      });
     };
 
     const pintar = () => {
       pendiente = false;
-      const meta = objetivo();
-      if (suavizado < 0 || reducido.matches || Math.abs(meta - suavizado) > 0.5) suavizado = meta;
-      else suavizado += (meta - suavizado) * 0.12;
-      // Sigue animando hasta alcanzar el scroll.
-      if (Math.abs(meta - suavizado) > 0.0004) pedir();
-      else suavizado = meta;
+      if (!activo()) return;
+      const r = pista.getBoundingClientRect();
+      const meta = clamp(-r.top / Math.max(1, r.height - innerHeight));
+      if (Number.isNaN(suavizado) || Math.abs(meta - suavizado) > 0.5) suavizado = meta;
+      else suavizado += (meta - suavizado) * 0.1;
+      const seguir = Math.abs(meta - suavizado) > 0.0004;
+      if (!seguir) suavizado = meta;
       const p = suavizado;
-      const w = innerWidth;
       const h = innerHeight;
-      // Alto del pie (nombre y texto) del que está en foco: la pila sube al menos eso para
-      // que ninguna foto quede detrás del texto.
-      const pie = trabajos[0].querySelector<HTMLElement>('.obra__pie');
-      const altoPie = pie ? pie.offsetHeight + parseFloat(getComputedStyle(pie).marginTop) : 0;
 
-      trabajos.forEach((el, i) => {
-        // f = 0: en foco. f < 0: por entrar. f > 0: ya pasó (1 = primer lugar de la pila).
-        const f = p * (n - 1) - i;
-        // Zona muerta alrededor del foco: la foto descansa antes de moverse.
-        const sentido = Math.sign(f);
-        const t = suave(clamp((Math.abs(f) - 0.12) / 0.76));
-        const avance = sentido * t + (Math.abs(f) > 1 ? f - sentido : 0);
-
-        let x = 0;
-        let y = 0;
-        let escala = 1;
-        let opacidad = 1;
-
-        if (avance < 0) {
-          // Entra desde abajo a la derecha.
-          const a = clamp(-avance);
-          x = a * w * 0.18;
-          y = a * h * 0.9;
-          opacidad = 1 - clamp(-avance - 0.6, 0, 1);
-        } else if (avance > 0) {
-          // Se achica y se va a la pila, cada una más chica y más desfasada que la anterior.
-          const lugar = Math.min(avance, 3.2);
-          escala = 1 - 0.5 * Math.min(avance, 1) - 0.08 * Math.max(0, lugar - 1);
-          const ida = Math.min(avance, 1);
-          // Lugares que ya bajó en la pila (0 mientras todavía está saliendo del foco).
-          const extra = Math.max(0, lugar - 1);
-          if (escritorio.matches) {
-            // Pila en diagonal hacia arriba a la izquierda, debajo del título, separada de la
-            // foto en foco (antes su borde quedaba detrás del pie).
-            x = -w * (0.25 * ida + 0.075 * extra);
-            y = -h * (0.04 * ida + 0.07 * extra) - altoPie * ida;
-          } else {
-            x = -w * (0.3 * ida + 0.03 * extra);
-            y = -h * (0.03 * ida + 0.05 * extra) - altoPie * ida;
-          }
-          opacidad = 1 - clamp(avance - 2.6, 0, 1);
-        }
-
-        if (reducido.matches) {
-          // Sin movimiento: solo se ve el trabajo en foco.
-          el.style.transform = 'translateX(-50%)';
-          el.style.opacity = Math.abs(f) < 0.5 ? '1' : '0';
-        } else {
-          el.style.transform = `translate3d(calc(-50% + ${x.toFixed(2)}px), ${y.toFixed(2)}px, 0) scale(${escala.toFixed(4)})`;
-          el.style.opacity = opacidad.toFixed(3);
-        }
-        // Orden fijo por índice: la foto que entra siempre pasa por encima de la que sale.
-        el.style.zIndex = String(10 + i);
-        el.style.setProperty('--foco', String(1 - clamp(Math.abs(f) / 0.4)));
+      tarjetas.forEach((t, i) => {
+        // Sube a la pila (primera mitad) y se abre a su lugar (segunda).
+        const k = turno.indexOf(i);
+        const sube = suave(clamp((p - k * 0.08) / 0.3));
+        const abre = suave(clamp((p - 0.3 - k * 0.1) / 0.35));
+        const x = distancias[i] * (1 - abre);
+        const y = (1 - sube) * h * 0.45;
+        const giro = (1 - abre) * (i - 1) * 5;
+        t.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${giro.toFixed(2)}deg)`;
+        t.style.opacity = sube.toFixed(3);
+        t.style.zIndex = String(3 - k);
+        textos[i].style.opacity = abre.toFixed(3);
       });
+
+      if (seguir) pedir();
     };
 
     const pedir = () => {
-      if (!pendiente) {
-        pendiente = true;
-        requestAnimationFrame(pintar);
-      }
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(pintar);
     };
+
+    const preparar = () => {
+      seccion.classList.toggle('abre', activo());
+      if (!activo()) limpiar();
+      // La pista cambia el alto de la página: el motor de scroll vuelve a medir.
+      dispatchEvent(new Event('resize'));
+      medir();
+      pedir();
+    };
+
+    // Con la sección fija, el ancla #trabajos caería con las tarjetas todavía apiladas e
+    // invisibles: los enlaces llevan al punto del recorrido donde la tira ya está abierta.
+    const irAbierta = (suave: boolean) => {
+      const r = pista.getBoundingClientRect();
+      const y = scrollY + r.top + (r.height - innerHeight) * 0.92;
+      scrollTo({ top: y, behavior: suave && !reducido.matches ? 'smooth' : 'auto' });
+    };
+    document.addEventListener('click', (e) => {
+      const enlace = (e.target as Element).closest<HTMLAnchorElement>('a[href="#trabajos"], a[href="/#trabajos"]');
+      if (!enlace || !activo()) return;
+      e.preventDefault();
+      history.pushState(null, '', '#trabajos');
+      irAbierta(true);
+    });
+    if (location.hash === '#trabajos' && activo()) addEventListener('load', () => irAbierta(false));
+
+    preparar();
     addEventListener('scroll', pedir, { passive: true });
-    addEventListener('resize', pedir);
-    pintar();
+    addEventListener('resize', () => {
+      medir();
+      pedir();
+    });
+    escritorio.addEventListener('change', preparar);
+    reducido.addEventListener('change', preparar);
+    addEventListener('load', () => {
+      medir();
+      pedir();
+    });
   }
 </script>

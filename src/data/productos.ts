@@ -118,7 +118,7 @@ export const productos: Producto[] = [
     id: 'umbral',
     nombre: 'Umbral',
     tipo: 'aros',
-    descripcion: 'Aros rectangulares de chapa plegada y soldada a mano. Líneas rectas, cantos vivos.',
+    descripcion: 'Aros rectangulares de chapa plegada y soldada a mano, con los cantos vivos.',
     metal: 'Plata 925',
     terminacion: 'Pulido',
     piedra: 'Sin piedra',

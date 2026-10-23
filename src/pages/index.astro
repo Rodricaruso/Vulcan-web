@@ -1,10 +1,11 @@
 ---
-// Home: la bitácora de una pieza. Seis actos, ver scrollcraft/builds/vulcan/BRIEF.md.
+// Home: la bitácora de una pieza. Siete actos, ver scrollcraft/builds/vulcan/BRIEF.md.
 // El motor de scroll (public/scrollcraft/) no se edita: se tematiza con los tokens de abajo.
 import Base from '../layouts/Base.astro';
 import Navbar from '../components/Navbar.astro';
 import Transformacion from '../components/home/Transformacion.astro';
 import Frases from '../components/home/Frases.astro';
+import Factum from '../components/home/Factum.astro';
 import Recorrido from '../components/home/Recorrido.astro';
 import Vitrina from '../components/home/Vitrina.astro';
 import Obra from '../components/home/Obra.astro';
@@ -19,9 +20,10 @@ import Footer from '../components/Footer.astro';
   <main id="contenido" tabindex="-1">
     <Transformacion />
     <Frases />
+    <Factum />
+    <Obra />
     <Recorrido />
     <Vitrina />
-    <Obra />
     <Orden />
   </main>
   <Footer />
@@ -33,15 +35,15 @@ import Footer from '../components/Footer.astro';
 <style is:global>
   /* Los seis colores y las dos letras del motor, con la paleta de Vulcan. */
   :root {
-    --sc-canvas: #1d0605;
-    --sc-surface: #2a100c;
-    --sc-ink: #f2e9df;
-    --sc-ink-soft: #b8a595;
-    --sc-accent: #bf9b74;
-    --sc-accent-ink: #1d0605;
-    --sc-font-display: 'Marcellus', 'Times New Roman', serif;
-    --sc-font-text: 'IBM Plex Sans', system-ui, sans-serif;
-    --sc-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --sc-canvas: var(--color-bg);
+    --sc-surface: var(--color-surface);
+    --sc-ink: var(--color-text);
+    --sc-ink-soft: var(--color-text-muted);
+    --sc-accent: var(--color-accent);
+    --sc-accent-ink: var(--color-bg);
+    --sc-font-display: var(--font-display);
+    --sc-font-text: var(--font-body);
+    --sc-font-mono: var(--font-mono);
   }
 
   /* El motor pinta el body liso; acá vuelve la textura de piedra y la letra del sitio. */

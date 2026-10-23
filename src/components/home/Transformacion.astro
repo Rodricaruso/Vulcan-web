@@ -10,7 +10,6 @@
 // por su celda (container query) y el canto vive DENTRO de su caja: nunca invade al vecino.
 import { transformacion, acciones } from '../../content';
 import Foto from '../Foto.astro';
-import BotonContacto from '../BotonContacto.astro';
 
 const { etapas, inscripcion } = transformacion;
 const numerales = ['I', 'II', 'III', 'IV'];
@@ -23,8 +22,9 @@ const numerales = ['I', 'II', 'III', 'IV'];
         <h1 id="tf-titulo" class="tf__titulo">{transformacion.titulo}</h1>
         <p class="tf__bajada">{transformacion.bajada}</p>
         <div class="tf__acciones">
-          <BotonContacto origen="web-hero" />
-          <a class="boton boton--secundario tf__secundario" href="#proceso">{acciones.secundaria}</a>
+          <!-- La principal baja a la orden de trabajo (que arma el mensaje); la secundaria, a los casos. -->
+          <a class="boton boton--principal" href="#contacto">{acciones.principal}</a>
+          <a class="boton boton--secundario tf__secundario" href="#trabajos">{acciones.secundaria}</a>
         </div>
       </div>
 

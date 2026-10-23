@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Vulcan · plantilla de letra</title>
+<style>
+  /* Las guías van en celeste claro: después se borran por color al procesar el escaneo. */
+  @page { size: A4; margin: 10mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'IBM Plex Sans', Arial, sans-serif; color: #222; background: #ddd; }
+  .hoja { width: 190mm; height: 277mm; margin: 10mm auto; background: #fff; position: relative; padding: 9mm 0 0; page-break-after: always; break-after: page; }
+  .hoja:last-child { page-break-after: auto; break-after: auto; }
+  .cab { position: absolute; top: 1mm; left: 8mm; right: 8mm; display: flex; justify-content: space-between; font-size: 8pt; color: #888; }
+  .marca { position: absolute; width: 5mm; height: 5mm; background: #000; }
+  .m1 { top: 0; left: 0; } .m2 { top: 0; right: 0; } .m3 { bottom: 0; left: 0; } .m4 { bottom: 0; right: 0; }
+  .grilla { display: grid; grid-template-columns: repeat(10, 18mm); grid-auto-rows: 22mm; gap: 0; justify-content: center; margin-top: 2mm; }
+  .celda { position: relative; border: 0.25mm solid #9fd4f0; }
+  .celda span { position: absolute; top: 0.6mm; left: 1mm; font-size: 6.5pt; color: #9fd4f0; line-height: 1; }
+  /* Línea de mayúsculas, línea de minúsculas (punteada) y línea base. */
+  .celda::before { content: ''; position: absolute; left: 0; right: 0; top: 6mm; border-top: 0.2mm solid #cfeaf8; }
+  .celda::after { content: ''; position: absolute; left: 0; right: 0; top: 11mm; border-top: 0.2mm dashed #cfeaf8; }
+  .base { position: absolute; left: 0; right: 0; top: 16mm; border-top: 0.3mm solid #9fd4f0; }
+  .ayuda { max-width: 190mm; margin: 10mm auto; background: #fff; padding: 8mm 10mm; font-size: 11pt; line-height: 1.5; }
+  .ayuda h1 { font-size: 16pt; margin: 0 0 4mm; font-weight: 500; }
+  .ayuda ol { padding-left: 5mm; margin: 0; }
+  .ej { display: flex; gap: 6mm; align-items: center; margin-top: 4mm; }
+  .ej .celda { width: 18mm; height: 22mm; }
+  .ej .letra { position: absolute; left: 3mm; right: 3mm; bottom: 6mm; top: 6mm; font: 44px/1 'Segoe Script', 'Bradley Hand', cursive; color: #111; text-align: center; }
+  .ej .letra.min { top: 9mm; font-size: 34px; }
+  @media print { body { background: #fff; } .ayuda { display: none; } .hoja { margin: 0; } }
+</style>
+</head>
+<body>
+<div class="ayuda">
+  <h1>Cómo completar la plantilla</h1>
+  <ol>
+    <li><b>Imprimí al 100 %</b> (sin "ajustar a página"), en A4. Son 2 hojas. Este recuadro no se imprime.</li>
+    <li>Usá <b>fibra negra fina</b> (0,4–0,5 mm), la misma en todas las hojas. Nada de birome azul ni lápiz.</li>
+    <li>Escribí <b>como escribirías una anotación</b>, sin esmerarte de más: la gracia es que parezca tu letra.</li>
+    <li>Las <b>mayúsculas</b> llegan a la primera línea, las <b>minúsculas</b> a la punteada, y todo se apoya en la <b>línea base</b>. Las letras con "cola" (g, j, p, q, y) bajan por debajo de la base.</li>
+    <li>No toques los bordes de la celda ni la letrita de referencia de la esquina.</li>
+    <li>Las celdas que dicen <b>"otra"</b> son una segunda versión de la misma letra: escribila de nuevo, sin copiar la primera.</li>
+    <li>Escaneá a <b>300 dpi</b>, o sacá una foto <b>desde arriba, derecha</b>, con luz pareja y sin sombras. Que se vean los 4 cuadrados negros de las esquinas.</li>
+  </ol>
+  <div class="ej">
+    <div class="celda"><span>A</span><div class="base"></div><div class="letra">A</div></div>
+    <div class="celda"><span>a</span><div class="base"></div><div class="letra min">a</div></div>
+    <div class="celda"><span>g</span><div class="base"></div><div class="letra min" style="top:9mm;bottom:1mm">g</div></div>
+    <div>← Así: la mayúscula llega a la línea de arriba, la minúscula a la punteada y la g baja por debajo de la base.</div>
+  </div>
+</div>
+<div id="hojas"></div>
+<script>
+  const may = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+  const min = [...'abcdefghijklmnopqrstuvwxyz'];
+  const num = [...'0123456789'];
+  const extra = [...'ÑñáéíóúÁÉÍÓÚü'];
+  const signos = [...'.,;:-–/()\'"¿?¡!·+×±=%&#@°'];
+  const flechas = ['←', '→', '↑', '↓', '↔', '↕'];
+  // Segunda versión de lo que más se repite en una anotación (medidas, metales, nombres).
+  const otras = [...'aeionrsltdcmu0123456789'].map((c) => ({ c, otra: true }));
+  const todo = [...may, ...min, ...num, ...extra, ...signos, ...flechas].map((c) => ({ c })).concat(otras);
+  const porHoja = 120;
+  const cont = document.getElementById('hojas');
+  for (let h = 0; h * porHoja < todo.length; h++) {
+    const hoja = document.createElement('section');
+    hoja.className = 'hoja';
+    hoja.innerHTML = `<div class="marca m1"></div><div class="marca m2"></div><div class="marca m3"></div><div class="marca m4"></div>
+      <div class="cab"><span>VULCAN · PLANTILLA DE LETRA</span><span>HOJA ${h + 1}</span></div>`;
+    const g = document.createElement('div');
+    g.className = 'grilla';
+    todo.slice(h * porHoja, (h + 1) * porHoja).forEach(({ c, otra }) => {
+      const d = document.createElement('div');
+      d.className = 'celda';
+      d.innerHTML = `<span>${otra ? c + ' otra' : c}</span><div class="base"></div>`;
+      g.appendChild(d);
+    });
+    hoja.appendChild(g);
+    cont.appendChild(hoja);
+  }
+  // Palabras enteras: lo que más se repite en una lámina, escrito de corrido.
+  const palabras = ['plata 925', 'oro 18k', 'bronce', 'alpaca', 'sello', 'dije', 'aros', 'pulsera', 'charm', 'insignia',
+    'pieza n°', 'medida', 'peso', 'diámetro', 'alto', 'ancho', 'escala 1:1', 'tamaño real', 'mm', 'cm',
+    'g', 'Vulcan', 'taller', 'CABA', 'Buenos Aires', 'a medida', 'grabado', 'lacre', 'familia', 'para los tuyos'];
+  const ultima = cont.lastElementChild;
+  const t = document.createElement('div');
+  t.className = 'cab';
+  t.style.cssText = 'position:static;margin:6mm 8mm 0;color:#9fd4f0';
+  t.textContent = 'PALABRAS ENTERAS · escribilas de corrido, como en una anotación';
+  ultima.appendChild(t);
+  const gp = document.createElement('div');
+  gp.className = 'grilla';
+  gp.style.gridTemplateColumns = 'repeat(5, 36mm)';
+  palabras.forEach((w) => {
+    const d = document.createElement('div');
+    d.className = 'celda';
+    d.innerHTML = `<span>${w}</span><div class="base"></div>`;
+    gp.appendChild(d);
+  });
+  ultima.appendChild(gp);
+</script>
+</body>
+</html>

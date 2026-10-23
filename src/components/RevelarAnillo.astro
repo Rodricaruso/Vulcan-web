@@ -1,0 +1,395 @@
+---
+// Lámina con el anillo terminado arriba y el modelo 3D debajo. Donde pasa el mouse (o el dedo)
+// aparece el 3D dentro de un círculo de borde suave; el canto de la lámina se enciende en bronce
+// cerca del puntero y detrás queda un resplandor tibio, como de fragua.
+// La primera vez que la lámina se ve, el círculo la cruza una vez para mostrar que ahí pasa algo.
+// Sin JS se ve la foto del anillo terminado.
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import type { Foto } from '../content';
+
+interface Props {
+  arriba: Foto;
+  abajo: Foto;
+  pista: { mouse: string; tactil: string };
+}
+
+const { arriba, abajo, pista } = Astro.props;
+
+const archivos = import.meta.glob<{ default: ImageMetadata }>('/imagenes/**/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG}', { eager: true });
+const buscar = (archivo: string) =>
+  Object.entries(archivos).find(([ruta]) => ruta.replace(/\.[^.]+$/, '') === `/imagenes/${archivo}`)?.[1].default;
+
+const fuenteArriba = buscar(arriba.archivo);
+const fuenteAbajo = buscar(abajo.archivo);
+// Las dos al mismo tamaño y encuadre: la máscara las superpone píxel a píxel.
+const opciones = { width: 1600, format: 'webp' as const, quality: 82 };
+const imgArriba = fuenteArriba ? await getImage({ src: fuenteArriba, ...opciones }) : undefined;
+const imgAbajo = fuenteAbajo ? await getImage({ src: fuenteAbajo, ...opciones }) : undefined;
+const proporcion = fuenteArriba ? `${fuenteArriba.width} / ${fuenteArriba.height}` : '16 / 9';
+---
+
+<div class="revelar-zona" data-revelar>
+  <figure class="revelar">
+    <div
+      class="revelar__marco"
+      style={`aspect-ratio: ${proporcion}`}
+      tabindex="0"
+      role="button"
+      aria-pressed="false"
+      aria-label="Ver el modelo 3D del anillo"
+    >
+      {imgArriba && (
+        <img
+          class="revelar__foto"
+          src={imgArriba.src}
+          width={imgArriba.attributes.width}
+          height={imgArriba.attributes.height}
+          alt={arriba.alt}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      )}
+      {imgAbajo && (
+        <img
+          class="revelar__foto revelar__oculta"
+          src={imgAbajo.src}
+          width={imgAbajo.attributes.width}
+          height={imgAbajo.attributes.height}
+          alt=""
+          loading="eager"
+          decoding="async"
+          aria-hidden="true"
+        />
+      )}
+      <div class="revelar__luz" aria-hidden="true"></div>
+    </div>
+    <figcaption class="revelar__pie">
+      <span class="sr-only">{abajo.alt}.</span>
+      <span class="revelar__pista revelar__pista--mouse">{pista.mouse}</span>
+      <span class="revelar__pista revelar__pista--tactil">{pista.tactil}</span>
+    </figcaption>
+  </figure>
+</div>
+
+<style>
+  /* Zona: solo existe para alojar el resplandor detrás de la lámina. */
+  .revelar-zona {
+    --x: 50%;
+    --y: 50%;
+    position: relative;
+    isolation: isolate;
+  }
+
+  /* Resplandor de fragua: casi una temperatura, no una luz. */
+  .revelar-zona::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(rgb(191 155 116 / 0.08), transparent 70%);
+    filter: blur(10px);
+    transform: translate(calc(var(--x) - 350px), calc(var(--y) - 350px));
+    opacity: 0;
+    transition: opacity var(--dur-4) var(--ease-out);
+    pointer-events: none;
+  }
+
+  /* Lámina: borde fino y un respiro de papel oscuro alrededor de la imagen. */
+  .revelar {
+    --px: 50%;
+    --py: 50%;
+    position: relative;
+    margin: 0;
+    padding: var(--lamina-respiro);
+    background: linear-gradient(110deg, rgb(242 233 223 / 0.05), transparent 50%), var(--lamina-fondo);
+    border: 1px solid var(--lamina-borde);
+    border-radius: var(--radius);
+  }
+
+  /* Filo de bronce sobre el canto de la lámina, más intenso cerca del puntero. */
+  .revelar::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    border-radius: inherit;
+    background: radial-gradient(circle at var(--px) var(--py), rgb(191 155 116 / 0.7) 3%, transparent 70%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity var(--dur-4) var(--ease-out);
+    pointer-events: none;
+  }
+
+  .revelar__marco {
+    --mx: 50%;
+    --my: 50%;
+    --radio: clamp(150px, 22vw, 380px);
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-interno);
+    background: var(--color-bg);
+    touch-action: pan-y;
+  }
+
+  .revelar__marco:focus-visible {
+    outline: 2px solid var(--foco);
+    outline-offset: 3px;
+  }
+
+  .revelar__foto,
+  .revelar__luz {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .revelar__foto {
+    display: block;
+    object-fit: cover;
+  }
+
+  /* El modelo 3D: solo se ve dentro del círculo que sigue al puntero.
+     Centro lleno hasta casi la mitad del radio, para que se lea como ventana y no como tinte. */
+  .revelar__oculta {
+    -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, #000 calc(var(--radio) * 0.45), transparent var(--radio));
+    mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, #000 calc(var(--radio) * 0.45), transparent var(--radio));
+    opacity: 0;
+    transition: opacity var(--dur-4) var(--ease-out);
+  }
+
+  /* Los bordes se funden hacia Forja y una calidez de luz de taller tiñe las dos fotos por igual. */
+  .revelar__luz {
+    background: radial-gradient(
+      circle farthest-side at 50% 50%,
+      transparent 36%,
+      color-mix(in srgb, var(--color-bg) 78%, transparent) 124%
+    );
+    pointer-events: none;
+  }
+
+  .revelar__luz::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(120 60 40 / 0.35); /* calidez de luz de taller (efecto, no color de marca) */
+    mix-blend-mode: soft-light;
+  }
+
+  /* Activo: el puntero está encima (o el círculo hace su pasada de entrada). */
+  .revelar-zona.activo::after,
+  .revelar-zona.activo .revelar::before {
+    opacity: 1;
+  }
+
+  .revelar-zona.activo .revelar__oculta {
+    opacity: 1;
+    transition: opacity 500ms var(--ease-out);
+  }
+
+  /* Táctil: un toque sin arrastrar muestra el 3D entero; otro vuelve a la plata. */
+  .revelar-zona.completo .revelar__oculta {
+    -webkit-mask-image: none;
+    mask-image: none;
+    opacity: 1;
+  }
+
+  /* Pista sobre la imagen, arriba: se ve sin scrollear aunque la lámina pase el borde de la pantalla.
+     Se apaga después del primer uso. */
+  .revelar__pie {
+    position: absolute;
+    top: calc(var(--lamina-respiro) + var(--space-3));
+    left: calc(var(--lamina-respiro) + var(--space-3));
+    padding: var(--space-1) var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    color: var(--color-text);
+    background: color-mix(in srgb, var(--color-bg) 72%, transparent);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    pointer-events: none;
+    transition: opacity var(--dur-4) var(--ease-out);
+  }
+
+  .revelar-zona.usado .revelar__pie {
+    opacity: 0;
+  }
+
+  .revelar__pista--tactil {
+    display: none;
+  }
+
+  @media (hover: none) {
+    .revelar__pista--mouse {
+      display: none;
+    }
+
+    .revelar__pista--tactil {
+      display: inline;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .revelar-zona::after,
+    .revelar::before,
+    .revelar__oculta,
+    .revelar-zona.activo .revelar__oculta {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-revelar]').forEach((zona) => {
+    const figura = zona.querySelector<HTMLElement>('.revelar')!;
+    const marco = zona.querySelector<HTMLElement>('.revelar__marco')!;
+    if (!zona.querySelector('.revelar__oculta')) return;
+
+    const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Puntero en px relativos a la zona; el círculo lo sigue con un poco de retraso.
+    const puntero = { x: 0, y: 0, sx: 0, sy: 0 };
+    let corriendo = false;
+    let pasada = 0; // requestAnimationFrame de la pasada de entrada (0 = no está corriendo)
+
+    const pintar = () => {
+      const r = zona.getBoundingClientRect();
+      const f = figura.getBoundingClientRect();
+      const m = marco.getBoundingClientRect();
+      const cx = r.left + puntero.sx, cy = r.top + puntero.sy;
+      zona.style.setProperty('--x', `${puntero.sx}px`);
+      zona.style.setProperty('--y', `${puntero.sy}px`);
+      figura.style.setProperty('--px', `${((cx - f.left) / f.width) * 100}%`);
+      figura.style.setProperty('--py', `${((cy - f.top) / f.height) * 100}%`);
+      marco.style.setProperty('--mx', `${cx - m.left}px`);
+      marco.style.setProperty('--my', `${cy - m.top}px`);
+    };
+
+    const cuadro = () => {
+      const seguir = reducido ? 1 : 0.2;
+      puntero.sx += (puntero.x - puntero.sx) * seguir;
+      puntero.sy += (puntero.y - puntero.sy) * seguir;
+      pintar();
+      if (Math.abs(puntero.x - puntero.sx) + Math.abs(puntero.y - puntero.sy) > 0.3) {
+        requestAnimationFrame(cuadro);
+      } else {
+        corriendo = false;
+      }
+    };
+
+    const despertar = () => {
+      if (corriendo) return;
+      corriendo = true;
+      requestAnimationFrame(cuadro);
+    };
+
+    const cortarPasada = () => {
+      if (!pasada) return;
+      cancelAnimationFrame(pasada);
+      pasada = 0;
+    };
+
+    const ubicar = (clienteX: number, clienteY: number) => {
+      cortarPasada();
+      const r = zona.getBoundingClientRect();
+      puntero.x = clienteX - r.left;
+      puntero.y = clienteY - r.top;
+      // Si recién entra, el círculo nace donde está el puntero (no viaja desde el último lugar).
+      if (!zona.classList.contains('activo')) {
+        puntero.sx = puntero.x;
+        puntero.sy = puntero.y;
+        zona.classList.add('activo', 'usado');
+      }
+      despertar();
+    };
+
+    const salir = () => zona.classList.remove('activo');
+
+    // Pasada de entrada: el círculo cruza la lámina de izquierda a derecha, una vez.
+    const cruzar = () => {
+      if (zona.classList.contains('activo')) return;
+      const r = zona.getBoundingClientRect();
+      const m = marco.getBoundingClientRect();
+      const y = m.top - r.top + m.height * 0.5;
+      const desde = m.left - r.left + m.width * 0.18;
+      const hasta = m.left - r.left + m.width * 0.82;
+      const DURACION = 1800;
+      const inicio = performance.now();
+      zona.classList.add('activo');
+      const paso = (ahora: number) => {
+        const t = Math.min((ahora - inicio) / DURACION, 1);
+        const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+        puntero.x = puntero.sx = desde + (hasta - desde) * e;
+        puntero.y = puntero.sy = y;
+        pintar();
+        if (t < 1) {
+          pasada = requestAnimationFrame(paso);
+        } else {
+          pasada = 0;
+          salir();
+        }
+      };
+      pasada = requestAnimationFrame(paso);
+    };
+
+    figura.addEventListener('pointermove', (e) => {
+      if (e.pointerType === 'mouse') ubicar(e.clientX, e.clientY);
+    });
+    figura.addEventListener('pointerleave', (e) => {
+      if (e.pointerType === 'mouse') salir();
+    });
+
+    // Plata entera ↔ 3D entero (toque quieto en el celular, o Enter / Espacio con teclado).
+    const alternar = () => {
+      const completo = zona.classList.toggle('completo');
+      marco.setAttribute('aria-pressed', String(completo));
+    };
+    marco.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      alternar();
+      zona.classList.add('usado');
+    });
+
+    // Táctil: el dedo revela mientras se mueve, sin bloquear el scroll; un toque quieto alterna plata y 3D.
+    let arrastro = false;
+    marco.addEventListener('touchstart', () => (arrastro = false), { passive: true });
+    marco.addEventListener(
+      'touchmove',
+      (e) => {
+        arrastro = true;
+        zona.classList.remove('completo');
+        marco.setAttribute('aria-pressed', 'false');
+        ubicar(e.touches[0].clientX, e.touches[0].clientY);
+      },
+      { passive: true },
+    );
+    marco.addEventListener('touchend', () => {
+      if (!arrastro) alternar();
+      zona.classList.add('usado');
+      salir();
+    });
+    marco.addEventListener('touchcancel', salir, { passive: true });
+
+    if (!reducido) {
+      const io = new IntersectionObserver(
+        (entradas) => {
+          if (entradas.some((e) => e.isIntersecting)) {
+            io.disconnect();
+            setTimeout(cruzar, 400);
+          }
+        },
+        { threshold: 0.5 },
+      );
+      io.observe(marco);
+    }
+  });
+</script>

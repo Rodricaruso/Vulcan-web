@@ -1,207 +1,223 @@
 ---
+// Metales hoy, como cinta de cotizaciones: separa los tres anillos de la sección para joyeros.
+// La cinta es decorativa (aria-hidden); los lectores de pantalla leen la lista de abajo.
 import { metales } from '../content';
 import { filas, hayDatos, fechaActualizacion, fuentes, pesos, porcentaje } from '../lib/metales';
-import BotonContacto from './BotonContacto.astro';
 
 const estado = (v: number | null) => {
-  if (v === null) return { clase: 'neutro', simbolo: '—', texto: metales.sinComparacion, soloLector: true };
+  if (v === null) return { clase: 'neutro', simbolo: '—', texto: metales.sinComparacion };
   if (Math.abs(v) < 0.05) return { clase: 'neutro', simbolo: '=', texto: metales.igual };
   return v > 0
     ? { clase: 'sube', simbolo: '▲', texto: `${metales.sube} ${porcentaje(v)}` }
     : { clase: 'baja', simbolo: '▼', texto: `${metales.baja} ${porcentaje(v)}` };
 };
+
+const items = filas.map((fila) => ({ ...fila, e: estado(fila.variacion) }));
+// Cantidad par de copias: la pista se desplaza la mitad y empalma sin salto.
+const copias = 6;
 ---
 
-<section id="metales" class="seccion metales" aria-labelledby="metales-titulo">
-  <div class="contenedor metales__grilla">
-    <div class="metales__intro">
-      <h2 id="metales-titulo">{metales.titulo}</h2>
-      <p class="bajada">{metales.bajada}</p>
-    </div>
+<section id="metales" class="metales" aria-labelledby="metales-titulo" data-metales>
+  <h2 id="metales-titulo" class="sr-only">{metales.titulo}</h2>
 
-    <div class="metales__panel">
-      {hayDatos ? (
-        <>
-          <table class="tabla">
-            <caption class="sr-only">{metales.titulo}, actualizado el {fechaActualizacion}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{metales.columnas.metal}</th>
-                <th scope="col" class="num">{metales.columnas.valor}</th>
-                <th scope="col" class="num">{metales.columnas.variacion}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filas.map((fila) => {
-                const e = estado(fila.variacion);
-                return (
-                  <tr>
-                    <th scope="row">
-                      {fila.nombre}
-                      <span class="tabla__unidad">{fila.unidad}</span>
-                    </th>
-                    <td class="num tabla__valor">{pesos(fila.valor)}</td>
-                    <td class:list={['num tabla__variacion', e.clase]}>
-                      {e.simbolo && <span aria-hidden="true">{e.simbolo} </span>}
-                      <span class:list={{ 'sr-only': e.soloLector }}>{e.texto}</span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <p class="metales__nota">
-            {metales.aclaracion} {metales.otros}
-            <br />
-            <span class="etiqueta-mono">Actualizado el {fechaActualizacion}.</span>
-            {fuentes && <span class="etiqueta-mono"> Fuentes: {fuentes.dolar}; {fuentes.metales}.</span>}
-          </p>
-        </>
-      ) : (
-        <p class="metales__nota">{metales.sinDatos}</p>
-      )}
-    </div>
+  {hayDatos ? (
+    <>
+      <div class="metales__banda">
+        <p class="metales__rotulo" aria-hidden="true">{metales.rotulo}</p>
+        <div class="metales__ventana" aria-hidden="true">
+          <div class="metales__pista">
+            {Array.from({ length: copias }, () => (
+              <div class="metales__grupo">
+                {items.map((it) => (
+                  <span class="metales__item">
+                    <span class="metales__nombre">{it.nombre}</span>
+                    <span class="metales__valor">{pesos(it.valor)}</span>
+                    <span class="metales__unidad">{it.unidad}</span>
+                    <span class:list={['metales__var', it.e.clase]}>{it.e.simbolo} {it.e.texto}</span>
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+        <button class="metales__pausa" type="button" aria-pressed="false" aria-label={metales.pausar} data-pausar={metales.pausar} data-reanudar={metales.reanudar}>
+          <svg class="icono-pausa" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="2" /></svg>
+          <svg class="icono-play" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor" /></svg>
+        </button>
+      </div>
 
-    <BotonContacto origen="web-metales" variante="secundario" class="metales__cta" />
-  </div>
+      <ul class="sr-only">
+        {items.map((it) => <li>{it.nombre}, {it.unidad}: {pesos(it.valor)}. {it.e.texto}.</li>)}
+      </ul>
+
+      <p class="contenedor metales__nota">
+        {metales.aclaracion} {metales.otros} Actualizado el {fechaActualizacion}.
+        {fuentes && <span class="metales__fuentes">Fuentes: {fuentes.dolar}; {fuentes.metales}.</span>}
+      </p>
+    </>
+  ) : (
+    <p class="contenedor metales__nota">{metales.sinDatos}</p>
+  )}
 </section>
 
 <style>
   .metales {
-    border-top: 1px solid var(--color-border);
+    padding-bottom: var(--seccion);
   }
 
-  /* Mobile: título, tabla y botón, en ese orden. */
-  .metales__grilla {
-    display: grid;
-    gap: var(--space-6);
+  /* Banda a todo el ancho, como la pizarra de cotizaciones. */
+  .metales__banda {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    background: var(--cinta-fondo);
+    border-block: 1px solid var(--cinta-borde);
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
   }
 
-  .metales__grilla :global(.metales__cta) {
-    justify-self: stretch;
-  }
-
-  .tabla tbody th,
-  .tabla__variacion {
-    white-space: nowrap;
-  }
-
-  .metales__intro {
-    display: grid;
-    gap: var(--space-4);
-    justify-items: start;
-    align-content: start;
-  }
-
-  .metales__panel {
-    padding: var(--space-5);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-  }
-
-  .tabla {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .tabla th,
-  .tabla td {
-    padding: var(--space-4) 0;
-    border-bottom: 1px solid var(--color-border);
-    text-align: left;
-    vertical-align: baseline;
-  }
-
-  .tabla thead th {
-    padding-top: 0;
-    font-size: var(--text-meta);
-    font-weight: 400;
-    color: var(--color-text-muted);
-  }
-
-  .tabla tbody th {
+  .metales__rotulo {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding-inline: var(--gutter) var(--space-4);
+    background: var(--cinta-rotulo-fondo);
+    color: var(--cinta-rotulo-texto);
     font-weight: 500;
-  }
-
-  .tabla .num {
-    text-align: right;
-    padding-left: var(--space-3);
-  }
-
-  .tabla__unidad {
-    display: block;
-    font-size: var(--text-meta);
-    font-weight: 400;
-    color: var(--color-text-muted);
-  }
-
-  .tabla__valor {
-    font-family: var(--font-mono);
-    font-size: var(--text-lead);
-    font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
 
-  .tabla__variacion {
-    font-family: var(--font-mono);
+  .metales__ventana {
+    flex: 1;
+    overflow: hidden;
+    /* Los precios aparecen y se van fundidos, no cortados. */
+    mask-image: linear-gradient(90deg, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+  }
+
+  .metales__pista {
+    display: flex;
+    width: max-content;
+    animation: cotizar var(--cinta-vuelta) linear infinite;
+  }
+
+  .metales[data-pausada] .metales__pista,
+  .metales__banda:hover .metales__pista {
+    animation-play-state: paused;
+  }
+
+  .metales__grupo {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .metales__item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    border-right: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+
+  .metales__nombre {
+    font-family: var(--font-body);
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .metales__valor {
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .metales__unidad {
     font-size: var(--text-meta);
     color: var(--color-text-muted);
   }
 
-  .tabla__variacion.sube {
+  .metales__var {
+    font-size: var(--text-meta);
+    color: var(--color-text-muted);
+  }
+
+  .metales__var.sube {
     color: var(--color-up);
   }
 
-  .tabla__variacion.baja {
+  .metales__var.baja {
     color: var(--color-down);
   }
 
+  .metales__pausa {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: var(--tactil);
+    padding: 0;
+    background: var(--cinta-fondo);
+    color: var(--color-text-muted);
+    border: 0;
+    border-left: 1px solid var(--color-border);
+    cursor: pointer;
+  }
+
+  .metales__pausa:hover {
+    color: var(--color-text);
+  }
+
+  .icono-play,
+  .metales[data-pausada] .icono-pausa {
+    display: none;
+  }
+
+  .metales[data-pausada] .icono-play {
+    display: block;
+  }
+
   .metales__nota {
-    margin-top: var(--space-5);
-    font-size: var(--text-small);
+    margin-top: var(--space-3);
+    font-size: var(--text-meta);
     color: var(--color-text-muted);
   }
 
-  .metales__nota .etiqueta-mono {
-    font-size: var(--text-meta);
+  .metales__fuentes {
+    display: block;
+    opacity: 0.8;
   }
 
-  @media (min-width: 768px) {
-    .metales__panel {
-      padding: var(--space-6);
-    }
-  }
-
-  @media (max-width: 767px) {
-    .metales__panel {
-      padding: var(--space-4);
-    }
-
-    .tabla__valor {
-      font-size: var(--text-body);
+  @keyframes cotizar {
+    to {
+      transform: translateX(-50%);
     }
   }
 
-  /* Desktop: texto y botón a la izquierda, tabla a la derecha. */
-  @media (min-width: 1024px) {
-    .metales__grilla {
-      grid-template-columns: 5fr 7fr;
-      grid-template-rows: auto 1fr;
-      column-gap: var(--space-8);
-      row-gap: var(--space-5);
+  /* Quieta: una sola vuelta de precios, sin botón de pausa. */
+  @media (prefers-reduced-motion: reduce) {
+    .metales__pista {
+      animation: none;
     }
 
-    .metales__panel {
-      grid-column: 2;
-      grid-row: 1 / span 2;
+    .metales__grupo:not(:first-child),
+    .metales__pausa {
+      display: none;
     }
 
-    .metales__grilla :global(.metales__cta) {
-      grid-column: 1;
-      grid-row: 2;
-      justify-self: start;
-      align-self: start;
+    .metales__ventana {
+      overflow-x: auto;
+      mask-image: none;
     }
   }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-metales]').forEach((seccion) => {
+    const boton = seccion.querySelector<HTMLButtonElement>('.metales__pausa');
+    boton?.addEventListener('click', () => {
+      const pausada = seccion.toggleAttribute('data-pausada');
+      boton.setAttribute('aria-pressed', String(pausada));
+      boton.setAttribute('aria-label', (pausada ? boton.dataset.reanudar : boton.dataset.pausar) ?? '');
+    });
+  });
+</script>

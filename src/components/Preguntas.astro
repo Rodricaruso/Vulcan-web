@@ -1,5 +1,6 @@
 ---
 import { preguntas } from '../content';
+import { enlaceWhatsApp } from '../lib/whatsapp';
 ---
 
 <section id="preguntas" class="seccion" aria-labelledby="preguntas-titulo">
@@ -34,6 +35,10 @@ import { preguntas } from '../content';
         </div>
       ))}
     </div>
+    <p class="preguntas__otra">
+      {preguntas.otra.texto}
+      <a href={enlaceWhatsApp('web-preguntas')} target="_blank" rel="noopener" data-ref="web-preguntas">{preguntas.otra.enlace}</a>
+    </p>
   </div>
 </section>
 
@@ -41,6 +46,25 @@ import { preguntas } from '../content';
   .preguntas {
     display: grid;
     gap: var(--space-7);
+  }
+
+  /* En celular cierra la lista; en escritorio ocupa el hueco debajo del título. */
+  .preguntas__otra {
+    display: grid;
+    gap: var(--space-1);
+    color: var(--color-text-muted);
+  }
+
+  .preguntas__otra a {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tactil);
+    color: var(--color-accent);
+  }
+
+  .preguntas__otra a:hover {
+    color: var(--color-accent-hover);
   }
 
   .acordeon {
@@ -126,8 +150,19 @@ import { preguntas } from '../content';
   @media (min-width: 1024px) {
     .preguntas {
       grid-template-columns: 4fr 8fr;
-      gap: var(--space-8);
+      grid-template-rows: auto 1fr;
+      gap: var(--space-5) var(--space-8);
       align-items: start;
+    }
+
+    .acordeon {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+
+    .preguntas__otra {
+      grid-column: 1;
+      grid-row: 2;
     }
   }
 </style>

@@ -1,10 +1,11 @@
 ---
-// El taller: lo que la home resume. Proceso técnico, servicios para el gremio,
-// metales del día y preguntas frecuentes.
+// El taller: lo que la home resume. Primero el anillo que se revela (del 3D a la plata),
+// después el mismo anillo en tres etapas, el paso a paso, metales y preguntas.
 import Base from '../layouts/Base.astro';
 import Navbar from '../components/Navbar.astro';
+import RevelarAnillo from '../components/RevelarAnillo.astro';
+import TresEtapas from '../components/TresEtapas.astro';
 import Proceso from '../components/Proceso.astro';
-import Servicios from '../components/Servicios.astro';
 import Metales from '../components/Metales.astro';
 import Preguntas from '../components/Preguntas.astro';
 import CtaFinal from '../components/CtaFinal.astro';
@@ -18,9 +19,10 @@ import { taller } from '../content';
     <header class="contenedor taller__cabecera">
       <h1>{taller.titulo}</h1>
       <p class="bajada">{taller.bajada}</p>
+      <RevelarAnillo {...taller.revelado} />
     </header>
+    <TresEtapas {...taller.etapas} />
     <Proceso />
-    <Servicios />
     <Metales />
     <Preguntas />
     <CtaFinal />
@@ -32,10 +34,16 @@ import { taller } from '../content';
   .taller__cabecera {
     display: grid;
     gap: var(--space-4);
-    padding-block: var(--space-8) var(--seccion);
+    padding-top: var(--space-8);
   }
 
   .taller__cabecera h1 {
     max-width: 16ch;
+  }
+
+  /* Ancho tope: en una pantalla de 900 px de alto entran el título y el anillo entero. */
+  .taller__cabecera :global(.revelar-zona) {
+    max-width: 1040px;
+    margin-top: var(--space-4);
   }
 </style>

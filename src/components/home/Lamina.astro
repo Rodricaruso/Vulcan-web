@@ -6,6 +6,7 @@
 //   terminación  → pulido: brillo que barre y destellos; esmerilado: grano mate
 //   piedra       → esmeralda de talla rectangular; "no sé": engarce vacío punteado
 // Escucha el formulario [data-orden]. Animación con GSAP (DrawSVG).
+import { simboloPath, simboloViewBox } from '../../lib/simbolo';
 
 // Cada pieza: cuerpo (relleno de metal y recorte), trama (sombreado), líneas (tinta),
 // dónde va la piedra y dónde brilla.
@@ -21,7 +22,7 @@ type Pieza = {
   frente?: string[]; // garras que van delante de la piedra (formas cerradas, tapan la piedra)
   gema?: 'esmeralda' | 'esmeralda-perfil' | 'oval' | 'gota'; // talla de la piedra (sin gema: no lleva)
   piedra?: string; // transform de la piedra
-  monograma?: [number, number, number]; // x, y, tamaño de la V cuando no hay piedra
+  monograma?: [number, number, number]; // x, y (base), tamaño del símbolo cuando no hay piedra
   destellos: [number, number][];
 };
 
@@ -176,13 +177,13 @@ const piezas: Pieza[] = [
       </linearGradient>
       <linearGradient id="lam-luz" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0" stop-color="#fff" stop-opacity="0" />
-        <stop offset="0.5" stop-color="#fffaf0" stop-opacity="0.85" />
+        <stop offset="0.5" style="stop-color: var(--grabado-brillo)" stop-opacity="0.85" />
         <stop offset="1" stop-color="#fff" stop-opacity="0" />
       </linearGradient>
       <linearGradient id="lam-verde" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#2fb878" />
-        <stop offset="0.45" stop-color="#0f6a43" />
-        <stop offset="1" stop-color="#063a24" />
+        <stop offset="0" style="stop-color: var(--esmeralda-luz)" />
+        <stop offset="0.45" style="stop-color: var(--esmeralda)" />
+        <stop offset="1" style="stop-color: var(--esmeralda-sombra)" />
       </linearGradient>
       <!-- Borde de acuarela del lavado y grano del esmerilado. -->
       <filter id="lam-acuarela" x="-20%" y="-20%" width="140%" height="140%">
@@ -253,7 +254,18 @@ const piezas: Pieza[] = [
           {p.cadena?.map((d) => <path d={d} class="lam-cadena" data-fundido />)}
         </g>
         {p.monograma && (
-          <text x={p.monograma[0]} y={p.monograma[1]} font-size={p.monograma[2]} text-anchor="middle" class="lam-monograma" data-monograma>V</text>
+          // El símbolo de Vulcan grabado: mismo lugar y alto que tenía la V (base en y, alto ≈ 0,8 × tamaño).
+          <svg
+            x={p.monograma[0] - p.monograma[2] * 0.46}
+            y={p.monograma[1] - p.monograma[2] * 0.8}
+            width={p.monograma[2] * 0.92}
+            height={p.monograma[2] * 0.8}
+            viewBox={simboloViewBox}
+            class="lam-monograma"
+            data-monograma
+          >
+            <path d={simboloPath} vector-effect="non-scaling-stroke" />
+          </svg>
         )}
         {p.gema && (
           <g transform={p.piedra}>
@@ -295,12 +307,17 @@ const piezas: Pieza[] = [
     Aros: { id: 'aros', nombre: 'Aros', lamina: 'III' },
     Otra: { id: 'pin', nombre: 'Pin', lamina: 'IV' },
   };
-  // Paletas [luz, medio, sombra]: pulido con contraste alto, esmerilado aplanado.
+  // Paletas [luz, medio, sombra] desde los tokens (--plata-pulido-luz, etc.): pulido con contraste
+  // alto, esmerilado aplanado. Se leen ya resueltas porque GSAP necesita el color real para interpolar.
+  const raiz = getComputedStyle(document.documentElement);
+  const tonos = (metal: string, acabado: string) =>
+    ['luz', 'medio', 'sombra'].map((t) => raiz.getPropertyValue(`--${metal}-${acabado}-${t}`).trim());
+  const paleta = (metal: string) => ({ pulido: tonos(metal, 'pulido'), mate: tonos(metal, 'mate') });
   const METALES: Record<string, { pulido: string[]; mate: string[] }> = {
-    'Plata 925': { pulido: ['#f6f8f9', '#c3cad0', '#7f8891'], mate: ['#dfe3e6', '#c6ccd1', '#a7aeb5'] },
-    'Oro 18k': { pulido: ['#fff0b8', '#e2b54c', '#9c6c18'], mate: ['#efd38a', '#ddb862', '#bf9440'] },
-    Alpaca: { pulido: ['#f1f2ec', '#b9bdb2', '#7b8075'], mate: ['#d9dbd3', '#bfc2b8', '#a2a69b'] },
-    Bronce: { pulido: ['#f6cf9c', '#c47e45', '#7c4520'], mate: ['#dfae7b', '#c58a57', '#a46a3c'] },
+    'Plata 925': paleta('plata'),
+    'Oro 18k': paleta('oro'),
+    Alpaca: paleta('alpaca'),
+    Bronce: paleta('bronce'),
   };
 
   const figura = document.querySelector<HTMLElement>('[data-lamina]');
@@ -374,7 +391,7 @@ const piezas: Pieza[] = [
     const pintarPiedra = () => {
       const gema = parte('[data-gema]')[0];
       const mono = parte('[data-monograma]');
-      // Pieza sin piedra (el sello): la V grabada siempre a la vista.
+      // Pieza sin piedra (el sello): el símbolo grabado siempre a la vista.
       if (!gema) {
         gsap.to(mono, { opacity: 1, duration: d(0.5) });
         return;
@@ -482,18 +499,18 @@ const piezas: Pieza[] = [
     border-radius: var(--radius);
     box-shadow: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 60px -20px rgb(0 0 0 / 0.7);
     /* Metal por defecto (plata); el script lo cambia según la orden. */
-    --m-luz: #f2f4f5;
-    --m-medio: #c3cad0;
-    --m-sombra: #8d969e;
+    --m-luz: var(--plata-pulido-luz);
+    --m-medio: var(--plata-pulido-medio);
+    --m-sombra: var(--plata-pulido-sombra);
   }
 
   .lam-papel {
-    fill: #efe4d3;
+    fill: var(--grabado-papel);
   }
 
   .lam-filete {
     fill: none;
-    stroke: #3b2417;
+    stroke: var(--grabado-tinta);
     stroke-width: 1.3;
   }
 
@@ -502,21 +519,21 @@ const piezas: Pieza[] = [
   }
 
   .lam-rotulo {
-    fill: #3b2417;
+    fill: var(--grabado-tinta);
     font-family: var(--font-display);
     font-size: 11px;
     letter-spacing: 0.16em;
   }
 
   .lam-nombre {
-    fill: #3b2417;
+    fill: var(--grabado-tinta);
     font-family: var(--font-display);
     font-size: 21px;
     letter-spacing: 0.08em;
   }
 
   .lam-detalle {
-    fill: #6b4a2c;
+    fill: var(--grabado-acento);
     font-family: var(--font-mono);
     font-size: 10.5px;
   }
@@ -526,7 +543,7 @@ const piezas: Pieza[] = [
   }
 
   .lam-trama-linea {
-    stroke: #3b2417;
+    stroke: var(--grabado-tinta);
     stroke-width: 0.9;
   }
 
@@ -538,7 +555,7 @@ const piezas: Pieza[] = [
 
   .lam-lineas path {
     fill: none;
-    stroke: #3b2417;
+    stroke: var(--grabado-tinta);
     stroke-width: 1.7;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -561,7 +578,7 @@ const piezas: Pieza[] = [
 
   .lam-monograma {
     fill: none;
-    stroke: #3b2417;
+    stroke: var(--grabado-tinta);
     stroke-width: 1.2;
     font-family: var(--font-display);
   }
@@ -578,7 +595,7 @@ const piezas: Pieza[] = [
 
   .lam-gema {
     fill: url(#lam-verde);
-    stroke: #0b2a1c;
+    stroke: var(--esmeralda-borde);
     opacity: 0;
     transform-box: fill-box;
     transform-origin: center;
@@ -601,13 +618,13 @@ const piezas: Pieza[] = [
   /* Piedra a definir: engarce vacío, punteado. */
   .lam-gema.dudosa {
     fill: none;
-    stroke: #3b2417;
+    stroke: var(--grabado-tinta);
     stroke-dasharray: 2 2.5;
   }
 
   .lam-destello {
-    fill: #fffaf0;
-    stroke: #6b4a2c;
+    fill: var(--grabado-brillo);
+    stroke: var(--grabado-acento);
     stroke-width: 0.6;
     opacity: 0;
     transform-box: fill-box;

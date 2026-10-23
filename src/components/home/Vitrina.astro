@@ -1,90 +1,285 @@
 ---
-// Acto 4: variedad. El scroll vertical lleva el riel de costado: ocho piezas,
-// más rápido que el resto de la página. Abre con el título y cierra en el catálogo.
+// Acto 6: variedad. Dos tiras de piezas en ladrillo (la de abajo corrida media tarjeta)
+// que el scroll lleva de costado, juntas y con inercia: arrancan tarde y frenan suave.
+// Las piezas reales van al centro y los lugares libres a los costados; a mitad de recorrido
+// las piezas quedan centradas en la pantalla. La que pasa por el centro sube y se enciende;
+// las de los costados se apagan. Cada pieza lleva a su ficha en el catálogo.
 import { vitrina } from '../../content';
 import { productos } from '../../data/productos';
 import TarjetaPieza from '../TarjetaPieza.astro';
+
+// Intercaladas, para que cada tira mezcle tipos de pieza.
+const filas = [productos.filter((_, i) => i % 2 === 0), productos.filter((_, i) => i % 2 === 1)];
+// TODO Rodrigo: lugares para las próximas piezas, uno a la izquierda y dos a la derecha de
+// cada tira (así las dos tiras quedan centradas igual). Se sacan a medida que entran piezas.
+const libres = { antes: 1, despues: 2 };
 ---
 
-<section class="vitrina" data-sc-act="pan" data-sc-span="4.6" aria-labelledby="vitrina-titulo">
+<section class="vitrina" data-sc-act="pan" data-sc-span="2" aria-labelledby="vitrina-titulo" data-vitrina>
   <div class="vitrina__escenario" data-sc-stage>
-    <div class="vitrina__riel" data-sc-pan="0.04">
-      <header class="vitrina__cabecera">
-        <h2 id="vitrina-titulo">{vitrina.titulo}</h2>
-        <p class="bajada">{vitrina.bajada}</p>
-      </header>
+    <header class="contenedor vitrina__cabecera">
+      <h2 id="vitrina-titulo">{vitrina.titulo}</h2>
+      <p class="bajada">{vitrina.bajada}</p>
+    </header>
 
-      {productos.map((pieza, i) => (
-        <div class="vitrina__item" style={`--i: ${i}`}>
-          <TarjetaPieza pieza={pieza} />
+    <div class="vitrina__filas">
+      {filas.map((fila, f) => (
+        <div class:list={['vitrina__fila', { 'vitrina__fila--b': f === 1 }]} data-vitrina-fila>
+          {Array.from({ length: libres.antes }, () => (
+            <div class="vitrina__item vitrina__libre" aria-hidden="true" data-vitrina-item>
+              <span>Pieza nueva</span>
+            </div>
+          ))}
+          {fila.map((pieza) => (
+            <a class="vitrina__item vitrina__pieza" href={`/catalogo#${pieza.id}`} data-vitrina-item data-vitrina-real>
+              <TarjetaPieza pieza={pieza} />
+            </a>
+          ))}
+          {Array.from({ length: libres.despues }, () => (
+            <div class="vitrina__item vitrina__libre" aria-hidden="true" data-vitrina-item>
+              <span>Pieza nueva</span>
+            </div>
+          ))}
         </div>
       ))}
-
-      <a class="vitrina__cierre" href={vitrina.enlace.href}>
-        <span>{vitrina.enlace.texto}</span>
-      </a>
     </div>
+
+    <a class="vitrina__cierre" href={vitrina.enlace.href}>
+      {vitrina.enlace.texto} <span aria-hidden="true">→</span>
+    </a>
   </div>
 </section>
 
 <style>
+  .vitrina {
+    /* El ancho sale del alto: las dos tiras tienen que entrar en la pantalla. */
+    --ancho: clamp(9.5rem, calc((100svh - 26rem) * 0.4), 17rem);
+    --hueco: clamp(1rem, 2vw, 2rem);
+  }
+
+  /* En celular la bajada ocupa dos líneas: las tarjetas ceden ese alto. */
+  @media (max-width: 640px) {
+    .vitrina {
+      --ancho: clamp(8rem, calc((100svh - 29rem) * 0.4), 13rem);
+    }
+  }
+
   .vitrina__escenario {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(1.25rem, 3svh, 2.5rem);
     background: var(--color-surface);
     border-block: 1px solid var(--color-border);
     padding-top: 72px;
   }
 
-  .vitrina__riel {
-    align-items: center;
-    gap: clamp(1.25rem, 3vw, 3rem);
-    padding-inline: var(--gutter);
+  .vitrina__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--space-6);
+    row-gap: var(--space-2);
   }
 
-  .vitrina__cabecera {
-    flex: 0 0 min(80vw, 24rem);
+  .vitrina__filas {
     display: grid;
-    gap: var(--space-4);
+    gap: var(--hueco);
+  }
+
+  .vitrina__fila {
+    display: flex;
+    gap: var(--hueco);
+    width: max-content;
+    padding-inline: var(--gutter);
+    will-change: transform;
+  }
+
+  /* El ladrillo: media tarjeta de corrimiento. */
+  .vitrina__fila--b {
+    padding-left: calc(var(--gutter) + (var(--ancho) + var(--hueco)) / 2);
   }
 
   .vitrina__item {
-    flex: 0 0 clamp(13rem, 21vw, 19rem);
+    flex: 0 0 var(--ancho);
   }
 
-  /* Cada pieza se asienta en orden a medida que el riel avanza. */
+  .vitrina__pieza {
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--radius);
+  }
+
+  .vitrina__pieza :global(.pieza__imagen) {
+    transition: border-color var(--dur-3) var(--ease-out);
+  }
+
+  .vitrina__pieza:hover :global(.pieza__imagen) {
+    border-color: var(--color-accent);
+  }
+
+  /* En la home la ficha va corta: nombre, tipo y metal. */
+  .vitrina__item :global(.pieza) {
+    gap: var(--space-2);
+  }
+
+  .vitrina__item :global(.pieza__nombre) {
+    font-size: 1.25rem;
+  }
+
+  .vitrina__item :global(.pieza__terminacion) {
+    display: none;
+  }
+
+  /* --foco lo escribe el script: 1 en el centro de la pantalla, 0 en los bordes.
+     Lejos del centro las piezas se apagan bastante, sin desaparecer. */
   @media (prefers-reduced-motion: no-preference) {
     .vitrina__item {
-      --llegada: clamp(0, calc(var(--sc-p, 1) * 9 - var(--i) + 1.5), 1);
-      opacity: calc(0.55 + 0.45 * var(--llegada));
-      transform: translateY(calc((1 - var(--llegada)) * 18px));
+      opacity: calc(0.22 + 0.78 * var(--foco, 1));
+      transform: translateY(calc((1 - var(--foco, 1)) * 16px));
     }
   }
 
-  .vitrina__cierre {
-    flex: 0 0 clamp(13rem, 21vw, 19rem);
+  /* Lugar vacío: el marco de una pieza que todavía no está. */
+  .vitrina__libre {
+    align-self: start;
     aspect-ratio: 4 / 5;
     display: grid;
     place-items: center;
-    padding: var(--space-5);
-    border: 1px solid var(--color-accent);
+    border: 1px dashed var(--color-border);
     border-radius: var(--radius);
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    text-align: center;
-    text-decoration: none;
-    color: var(--color-text);
-    transition: background-color var(--dur-3) var(--ease-out);
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+    color: var(--color-text-muted);
+  }
+
+  /* Enlace secundario: las piezas ya llevan al catálogo, esto es el atajo. */
+  .vitrina__cierre {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 48px;
+    padding-inline: var(--space-2);
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 0.3em;
+    transition: color var(--dur-3) var(--ease-out), text-decoration-color var(--dur-3) var(--ease-out);
+  }
+
+  .vitrina__cierre span {
+    transition: translate var(--dur-3) var(--ease-out);
   }
 
   .vitrina__cierre:hover {
-    background: var(--color-surface-2);
+    color: var(--color-accent);
+    text-decoration-color: currentColor;
   }
 
-  @media (max-height: 760px) {
-    .vitrina__item,
-    .vitrina__cierre {
-      flex-basis: clamp(12rem, 17vw, 15rem);
+  .vitrina__cierre:hover span {
+    translate: 4px 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vitrina__fila {
+      will-change: auto;
     }
   }
 </style>
+
+<script>
+  const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const suave = (t: number) => t * t * (3 - 2 * t);
+
+  const seccion = document.querySelector<HTMLElement>('[data-vitrina]');
+  if (seccion) {
+    const filas = Array.from(seccion.querySelectorAll<HTMLElement>('[data-vitrina-fila]')).map((el) => ({
+      el,
+      items: Array.from(el.querySelectorAll<HTMLElement>('[data-vitrina-item]')),
+      centros: [] as number[],
+    }));
+    const reales = Array.from(seccion.querySelectorAll<HTMLElement>('[data-vitrina-real]'));
+    // Las dos tiras se mueven juntas: arrancan un poco tarde y persiguen al scroll con
+    // inercia, así frenan suave.
+    const retraso = 0.1;
+    const inercia = 0.065;
+    const reducido = matchMedia('(prefers-reduced-motion: reduce)');
+    let pendiente = false;
+    // Posición que centra las piezas reales, y cuánto se corre hacia cada lado.
+    let centro = 0;
+    let recorrido = 0;
+    let x = NaN;
+
+    // Medidas sin transformar: se toman una vez y al cambiar el tamaño de la ventana.
+    const medir = () => {
+      const w = innerWidth;
+      const izq = Math.min(...reales.map((it) => it.offsetLeft));
+      const der = Math.max(...reales.map((it) => it.offsetLeft + it.offsetWidth));
+      const paso = reales.length > 1 ? reales[1].offsetLeft - reales[0].offsetLeft : 0;
+      centro = w / 2 - (izq + der) / 2;
+      // Si las piezas entran en la pantalla, apenas un ajuste; si no, lo justo para verlas
+      // todas, con media tarjeta de aire en cada punta.
+      recorrido = Math.max(w * 0.05, (der - izq - w) / 2 + paso / 2);
+      filas.forEach((f) => {
+        f.centros = f.items.map((it) => it.offsetLeft + it.offsetWidth / 2);
+      });
+    };
+
+    const progreso = () => {
+      const r = seccion.getBoundingClientRect();
+      return clamp(-r.top / Math.max(1, r.height - innerHeight));
+    };
+
+    const pintar = () => {
+      pendiente = false;
+      const w = innerWidth;
+
+      if (reducido.matches) {
+        filas.forEach((f) => {
+          f.el.style.transform = '';
+          f.items.forEach((it) => it.style.setProperty('--foco', '1'));
+        });
+        return;
+      }
+
+      const t = suave(clamp((progreso() - retraso) / (1 - retraso)));
+      // Arranca corrida a la derecha y termina corrida a la izquierda.
+      const meta = centro + recorrido * (1 - 2 * t);
+      if (Number.isNaN(x) || Math.abs(meta - x) > w) x = meta;
+      else x += (meta - x) * inercia;
+      const seguir = Math.abs(meta - x) > 0.3;
+      if (!seguir) x = meta;
+
+      filas.forEach((f) => {
+        f.el.style.transform = `translate3d(${x.toFixed(2)}px, 0, 0)`;
+        f.centros.forEach((c, i) => {
+          const d = Math.abs(c + x - w / 2) / (w / 2);
+          f.items[i].style.setProperty('--foco', (1 - suave(clamp(d * 1.15 - 0.08))).toFixed(3));
+        });
+      });
+
+      if (seguir) pedir();
+    };
+
+    const pedir = () => {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(pintar);
+    };
+
+    medir();
+    pintar();
+    addEventListener('scroll', pedir, { passive: true });
+    addEventListener('resize', () => {
+      medir();
+      pedir();
+    });
+    reducido.addEventListener('change', pedir);
+    // Las fotos pueden cambiar el ancho de la tira al cargar.
+    addEventListener('load', () => {
+      medir();
+      pedir();
+    });
+  }
+</script>

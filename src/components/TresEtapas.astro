@@ -1,0 +1,70 @@
+---
+// El mismo anillo en tres etapas, en una sola foto horizontal. Cada rótulo va debajo de su pieza.
+import Foto from './Foto.astro';
+import type { Foto as TipoFoto } from '../content';
+
+interface Props {
+  titulo: string;
+  foto: TipoFoto;
+  rotulos: string[];
+}
+
+const { titulo, foto, rotulos } = Astro.props;
+---
+
+<figure class="tres-etapas contenedor">
+  <h2 class="tres-etapas__titulo">{titulo}</h2>
+  <div class="tres-etapas__lamina">
+    <Foto foto={foto} proporcion="2 / 1" sizes="(min-width: 1280px) 1240px, 100vw" />
+  </div>
+  <figcaption>
+    <ol class="tres-etapas__rotulos" style={`--n: ${rotulos.length}`}>
+      {rotulos.map((rotulo) => <li>{rotulo}</li>)}
+    </ol>
+  </figcaption>
+</figure>
+
+<style>
+  .tres-etapas {
+    margin-block: var(--seccion);
+  }
+
+  .tres-etapas__titulo {
+    margin-bottom: var(--space-5);
+    font-size: var(--text-h3);
+  }
+
+  .tres-etapas__lamina {
+    padding: var(--lamina-respiro);
+    background: var(--lamina-fondo);
+    border: 1px solid var(--lamina-borde);
+    border-radius: var(--radius);
+  }
+
+  .tres-etapas__lamina :global(.foto) {
+    border-radius: var(--radius-interno);
+  }
+
+  .tres-etapas__rotulos {
+    list-style: none;
+    margin: 0;
+    padding: var(--space-3) 0 0;
+    display: grid;
+    grid-template-columns: repeat(var(--n), 1fr);
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .tres-etapas__titulo {
+      font-size: var(--text-h2);
+    }
+
+    .tres-etapas__rotulos {
+      font-size: var(--text-small);
+    }
+  }
+</style>

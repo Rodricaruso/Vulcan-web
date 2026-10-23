@@ -7,7 +7,7 @@ export type Foto = {
   etiqueta: string; // qué foto va ahí, se muestra en el placeholder
 };
 
-export type TipoMensaje = 'cliente' | 'modelado' | 'impresion' | 'marcas';
+export type TipoMensaje = 'cliente' | 'modelado' | 'impresion' | 'marcas' | 'gremio';
 
 export const sitio = {
   nombre: 'Vulcan',
@@ -16,9 +16,9 @@ export const sitio = {
   whatsapp: '5491100000000',
   telefonoVisible: '+54 11 0000-0000',
   instagram: '', // TODO: 'https://instagram.com/usuario'
-  title: 'Joyas a medida con impresión 3D en Buenos Aires | Vulcan',
+  title: 'Joyas a medida y anillos sello en CABA | Vulcan',
   description:
-    'Joyas a medida en CABA: diseñamos tu pieza en 3D, la imprimimos, la fundimos en plata u oro y la terminamos a mano. Contanos tu idea por WhatsApp.',
+    'Joyas a medida y anillos sello en CABA, para vos o iguales para toda una familia o un grupo. Partimos de tu foto, dibujo o idea y la hacemos en plata u oro. Pedidos por WhatsApp.',
 };
 
 export const mensajes: Record<TipoMensaje, string> = {
@@ -26,11 +26,12 @@ export const mensajes: Record<TipoMensaje, string> = {
   modelado: 'Hola Vulcan, vengo de la web (ref: {ref}). Necesito modelar: ',
   impresion: 'Hola Vulcan, vengo de la web (ref: {ref}). Necesito imprimir: ',
   marcas: 'Hola Vulcan, vengo de la web (ref: {ref}). Tengo una marca y quiero producir: ',
+  gremio: 'Hola Vulcan, vengo de la web (ref: {ref}). Tengo un taller o una marca y necesito: ',
 };
 
 export const acciones = {
   principal: 'Contanos tu idea',
-  secundaria: 'Ver cómo lo hacemos',
+  secundaria: 'Trabajos que hicimos',
 };
 
 export const menu = [
@@ -45,45 +46,50 @@ export const menu = [
 // Las etapas usan las fotos de hero/.
 
 export const transformacion = {
-  titulo: 'Tu idea, forjada a medida',
-  bajada: 'La diseñamos con vos en 3D, la pasamos a metal y la terminamos a mano en nuestro taller de CABA.',
+  titulo: 'Joyas a medida y anillos sello',
+  bajada: 'Las hacemos en nuestro taller de CABA, de a una o iguales para toda una familia o un grupo.',
   // Inscripción del canto de la moneda: los cuatro estados, en latín de inscripción.
   inscripcion: 'IDEA · FORMA · CERA · METALLVM · IDEA · FORMA · CERA · METALLVM ·',
   etapas: [
-    { nombre: 'Boceto', detalle: 'Tu idea, en papel', foto: { archivo: 'hero/1-boceto', alt: 'Boceto a mano del escudo para un anillo sello', etiqueta: 'Boceto' } },
-    { nombre: 'Modelo 3D', detalle: 'Cada medida, decidida con vos', foto: { archivo: 'hero/2-modelo-3d', alt: 'Modelo 3D del anillo sello con escudo en el programa de diseño', etiqueta: 'Modelo 3D' } },
-    { nombre: 'Resina', detalle: 'Impresa en alto detalle', foto: { archivo: 'hero/3-resina', alt: 'El anillo sello impreso en resina de alto detalle, sostenido en la mano', etiqueta: 'Resina' } },
-    { nombre: 'Metal', detalle: 'Fundida y pulida a mano', foto: { archivo: 'hero/4-metal', alt: 'El anillo sello terminado en metal, sostenido en la mano', etiqueta: 'Metal' } },
+    { nombre: 'Boceto', detalle: 'Lo que traigas', foto: { archivo: 'hero/1-boceto', alt: 'Boceto a mano del escudo para un anillo sello', etiqueta: 'Boceto' } },
+    { nombre: 'Modelo 3D', detalle: 'En pantalla, al milímetro', foto: { archivo: 'hero/2-modelo-3d', alt: 'Modelo 3D del anillo sello con escudo en el programa de diseño', etiqueta: 'Modelo 3D' } },
+    { nombre: 'Resina', detalle: 'La primera que podés tocar', foto: { archivo: 'hero/3-resina', alt: 'El anillo sello impreso en resina de alto detalle, sostenido en la mano', etiqueta: 'Resina' } },
+    { nombre: 'Metal', detalle: 'Plata, oro, alpaca o bronce', foto: { archivo: 'hero/4-metal', alt: 'El anillo sello terminado en metal, sostenido en la mano', etiqueta: 'Metal' } },
   ] satisfies { nombre: string; detalle: string; foto: Foto }[],
 };
 
 export const frases = [
-  'Cada pieza empieza en una conversación.',
-  'La diseñamos con vos, decisión por decisión: forma, metal, terminación.',
-  'La impresora pone la precisión. Lo demás lo hacen las manos.',
+  // Tres pasos, de la referencia a la pertenencia. Cortas: se leen al pasar.
+  'Traé tu imagen de referencia. Con ella iniciamos.',
+  'Lo modelamos en 3D y lo ajustamos con vos.',
+  'Tu molde queda en el taller, por si alguien se suma a los tuyos.',
 ];
 
 export const recorrido = {
   titulo: 'Del 3D al metal',
-  bajada: 'Es lo que más nos preguntan. Así pasa una pieza de la pantalla a tu mano.',
+  bajada: 'Es lo que más nos preguntan: cómo un archivo en la compu termina siendo un anillo de plata.',
   pasos: [
-    { titulo: 'Diseño', texto: 'Partimos de tu boceto, una foto o una frase. Definimos la pieza con vos.', dibujo: 'lapiz' },
-    { titulo: 'Modelo 3D', texto: 'La dibujamos en CAD pensando en cómo se fabrica: espesores, engarces y la contracción del metal.', dibujo: 'malla' },
-    { titulo: 'Impresión', texto: 'Un prototipo para probar tamaño y forma. Con tu OK, el modelo maestro en resina de alto detalle.', dibujo: 'capas' },
-    { titulo: 'Molde', texto: 'Del modelo maestro sale un molde de silicona. En el molde se inyecta cera: una copia exacta.', dibujo: 'molde' },
-    { titulo: 'Fundición', texto: 'La cera se reemplaza por metal fundido: es la cera perdida, la técnica de siempre.', dibujo: 'crisol' },
-    { titulo: 'A mano', texto: 'Limado, engarce de piedras si lleva, y pulido en el banco hasta el brillo final.', dibujo: 'lima' },
+    { titulo: 'Diseño', texto: 'Con tu referencia definimos el talle y el metal, y recién ahí dibujamos.', dibujo: 'lapiz' },
+    { titulo: 'Modelo 3D', texto: 'La pieza se dibuja en la compu, pensando desde el principio en cómo se va a fabricar.', dibujo: 'malla' },
+    { titulo: 'Impresión', texto: 'Te imprimimos un prototipo para que lo pruebes. Con tu visto bueno, imprimimos el modelo definitivo en resina.', dibujo: 'capas' },
+    { titulo: 'Molde', texto: 'Del modelo sale un molde de silicona, y del molde, copias exactas en cera.', dibujo: 'molde' },
+    { titulo: 'Fundición', texto: 'La cera va dentro de un yeso. Al quemarla deja el hueco exacto y ahí se cuela el metal. Es la cera perdida, una técnica de hace miles de años.', dibujo: 'crisol' },
+    { titulo: 'A mano', texto: 'Limado, engarce de piedras si lleva, y pulido en el banco.', dibujo: 'lima' },
   ] as { titulo: string; texto: string; dibujo: 'lapiz' | 'malla' | 'capas' | 'molde' | 'crisol' | 'lima' }[],
+  enlace: { texto: 'Ver el proceso completo', href: '/taller' },
+};
+
+// La pieza terminada, entre las frases y los casos.
+export const factum = {
   fotoFinal: {
     archivo: 'proceso/5-terminacion',
     alt: 'Dos anillos sello con escudo terminados y pulidos a mano',
     etiqueta: 'Pieza terminada',
   } satisfies Foto,
-  pieFoto: 'La pieza terminada en el banco, a mano.',
+  pieFoto: 'Recién salida del banco.',
   // Latín de inscripción: "hecho a mano". Se talla letra por letra sobre la foto final.
   inscripcion: 'FACTVM · MANV',
   selloTexto: 'VULCAN · TALLER · CABA · HECHO A MANO ·',
-  enlace: { texto: 'Ver el proceso completo', href: '/taller' },
 };
 
 export const vitrina = {
@@ -94,16 +100,175 @@ export const vitrina = {
 
 export const obra = {
   titulo: 'Lo que ya hicimos',
-  bajada: 'Encargos reales, de la idea a la mano de quien lo pidió.',
+  bajada: 'Tres encargos y cómo los resolvimos.',
+  enlace: 'Conocer el caso',
+};
+
+// ---------------------------------------------------------------- casos --
+// Cada caso tiene su página en /casos/<slug>. Solo hechos que contó Rodrigo: no inventar.
+// Las fotos que faltan se ven como placeholder con el nombre del archivo que va ahí.
+
+export type Caso = {
+  slug: string;
+  nombre: string;
+  resumen: string; // la tarjeta de la home
+  estado: string;
+  portada: Foto;
+  // Para fotos con fondo transparente (renders): la pieza va entera sobre un degradé.
+  portadaFondo?: boolean;
+  // object-position de la portada, si la pieza no está centrada en la foto.
+  portadaEncuadre?: string;
+  // Aclaración debajo de la portada, si la imagen no es una foto de la pieza terminada.
+  portadaNota?: string;
+  ficha: [string, string][];
+  meta: { title: string; description: string };
+  intro: string;
+  historia: { texto: string; foto: Foto; proporcion?: string }[]; // proporción: si la foto no es vertical 4:5
+  cierre: string;
+};
+
+export const casos: Caso[] = [
+  {
+    slug: 'sello-familiar',
+    nombre: 'El sello de la familia',
+    resumen: 'Un escudo que estaba en una carta antigua, en un anillo para cada hija.',
+    estado: 'Entregado',
+    portada: { archivo: 'trabajos/trabajo-1', alt: 'Dos anillos sello con el escudo del águila, terminados, sobre una mesa de madera', etiqueta: 'Portada · 4:5' },
+    ficha: [
+      ['Pieza', 'Anillo sello'],
+      ['Metal', 'Plata 925 y bronce enchapado en oro'],
+      ['Técnica', 'Modelado 3D, molde y fundición'],
+    ],
+    meta: {
+      title: 'Caso: el sello de una familia, para cada hija | Vulcan',
+      description: 'Un escudo familiar dibujado en una carta antigua, convertido en un anillo sello con molde propio para cada integrante. Plata 925 y bronce enchapado en oro.',
+    },
+    intro: 'El padre les había regalado a sus hijas un anillo con el escudo de la familia. Con los años, algunos se perdieron y otros estaban golpeados. Decidimos hacer uno nuevo, con molde propio, para que cada uno pueda tener el suyo.',
+    historia: [
+      {
+        texto: 'El escudo estaba dibujado en una carta antigua de la familia. Partimos de una foto de esa carta.',
+        foto: { archivo: 'hero/1-boceto', alt: 'El escudo de la familia, dibujado en tinta en una carta antigua', etiqueta: 'La carta · 4:5' },
+      },
+      {
+        texto: 'Lo redibujamos en 3D para que cada detalle del escudo se pudiera fundir.',
+        foto: { archivo: 'hero/2-modelo-3d', alt: 'Modelo 3D del anillo sello con el escudo del águila', etiqueta: 'Modelo 3D · 4:5' },
+      },
+      {
+        texto: 'Antes de hacer el molde, lo imprimimos en resina para probarlo.',
+        foto: { archivo: 'hero/3-resina', alt: 'El anillo sello impreso en resina, sostenido en la mano', etiqueta: 'Resina · 4:5' },
+      },
+      {
+        texto: 'Tomamos la medida de cada integrante, y eran todas distintas. Con un solo molde salieron todos los talles. Después, cada anillo se ajustó y se pulió.',
+        foto: { archivo: 'hero/4-metal', alt: 'El anillo sello terminado en metal, sostenido en la mano', etiqueta: 'Metal · 4:5' },
+      },
+    ],
+    cierre: 'Los hicimos en plata y, para quienes los querían dorados, en bronce enchapado en oro. El molde queda en el taller: cuando una nieta o un nieto quiera el suyo, sale igual.',
+  },
+  {
+    slug: 'escuela-de-arqueria',
+    nombre: 'El anillo de la escuela de arquería',
+    resumen: 'El logo de una escuela, simplificado para poder fundirlo, con piedras de color.',
+    estado: 'En producción',
+    // Render del diseño final (fondo transparente). Cuando esté fundido, va la foto real.
+    portada: { archivo: 'casos/arqueria-portada', alt: 'Render del anillo sello de plata con el logo del arquero sobre un inlay de piedra marrón', etiqueta: 'Portada · 4:5' },
+    portadaFondo: true,
+    portadaNota: 'Render del diseño final',
+    ficha: [
+      ['Pieza', 'Anillo sello'],
+      ['Detalle', 'Grabado personal adentro e inlay de piedras de color'],
+      ['Técnica', 'Modelado 3D, impresión, molde y fundición'],
+    ],
+    meta: {
+      title: 'Caso: el anillo de una escuela de arquería | Vulcan',
+      description: 'El logo de una escuela de arquería llevado a un anillo sello, con grabado personal adentro e inlay de piedras de color. Un anillo y después diez más para sus mejores alumnos.',
+    },
+    intro: 'Una escuela de arquería nos trajo su logo para hacer un anillo. Después de ese primero, encargó diez más para sus mejores alumnos.',
+    historia: [
+      {
+        texto: 'El logo original, a la derecha, tenía manchas y trazos muy finos. Lo simplificamos, a la izquierda, para que se pudiera imprimir y fundir sin perder lo que lo hace reconocible.',
+        foto: { archivo: 'casos/arqueria-1-logo', alt: 'El logo de la escuela de arquería: a la izquierda simplificado para el anillo, a la derecha el original', etiqueta: 'El logo' }, proporcion: '2 / 1',
+      },
+      {
+        texto: 'Antes de modelar, armamos con IA una imagen de cómo podía quedar, para acordar el diseño con la escuela.',
+        foto: { archivo: 'casos/arqueria-2-propuesta', alt: 'Propuesta del anillo hecha con IA: un sello de plata con el logo del arquero', etiqueta: 'Propuesta' },
+      },
+      {
+        texto: 'Lo modelamos en 3D, con el logo en relieve dentro del óvalo del sello.',
+        foto: { archivo: 'casos/arqueria-3-modelo', alt: 'Modelo 3D del anillo sello con el logo del arquero en relieve', etiqueta: 'Modelo 3D' }, proporcion: '7 / 5',
+      },
+      {
+        texto: 'Lo imprimimos en resina para probar la medida y, con eso, hicimos el molde. Todos los anillos salen iguales: adentro, cada uno lleva un grabado distinto, y por fuera un inlay de piedras de color hace resaltar el logo.',
+        foto: { archivo: 'casos/arqueria-4-impresion', alt: 'El anillo impreso en resina transparente, sostenido entre los dedos, con un calibre atrás', etiqueta: 'Impresión en resina' },
+      },
+    ],
+    cierre: 'Cada alumno se lleva el sello de su escuela, con su propio grabado por dentro.',
+  },
+  {
+    slug: 'medalla-de-casamiento',
+    nombre: 'La medalla del casamiento',
+    resumen: 'Un escudo con las iniciales de los novios y sus perros, grabado en bronce para una boda en Italia.',
+    estado: 'Entregada',
+    // La moneda está un poco a la izquierda: el encuadre la sigue para que no se corte.
+    // (casos/medalla-recorte es la misma moneda recortada en círculo, por si se necesita.)
+    portada: { archivo: 'casos/medalla-portada-mesa', alt: 'Medalla de bronce con un escudo coronado, las iniciales J y L y dos huellas de perro, apoyada sobre una mesa de madera', etiqueta: 'Portada · 4:5' },
+    portadaEncuadre: '40% 50%',
+    ficha: [
+      ['Pieza', 'Medalla de 6 cm'],
+      ['Metal', 'Bronce'],
+      ['Técnica', 'Modelado 3D, prueba impresa, grabado láser y pulido'],
+    ],
+    meta: {
+      title: 'Caso: una medalla para un casamiento en Italia | Vulcan',
+      description: 'Un escudo con las iniciales de los novios y sus perros, grabado con láser sobre una medalla de bronce de 6 cm, para un casamiento en un castillo de Italia.',
+    },
+    intro: 'Para un casamiento en un castillo de Italia, nos pidieron un regalo para los novios: un escudo propio.',
+    historia: [
+      {
+        texto: 'Partimos de la imagen que nos mandaron: un escudo coronado con las iniciales de los novios. Le sumamos las huellas de sus dos perros, cada una con su inicial.',
+        foto: { archivo: 'casos/medalla-1-referencia', alt: 'La imagen de referencia: escudo con corona y las iniciales J y L, con las huellas marcadas en azul', etiqueta: 'Referencia' }, proporcion: '1 / 1',
+      },
+      {
+        texto: 'Lo modelamos en 3D: la corona, el escudo, las ramas de laurel y las huellas.',
+        foto: { archivo: 'casos/medalla-2-modelo', alt: 'Modelo 3D de la medalla con el escudo, la corona, las ramas y las huellas', etiqueta: 'Modelo 3D' }, proporcion: '7 / 5',
+      },
+      {
+        texto: 'Imprimimos una prueba en tamaño real, 6 centímetros, para ver el relieve y las proporciones en la mano.',
+        foto: { archivo: 'casos/medalla-3-prueba', alt: 'La prueba impresa de la medalla, blanca, sostenida en la mano junto a un calibre', etiqueta: 'Prueba impresa' },
+      },
+      {
+        texto: 'Con la prueba aprobada, la medalla se grabó con láser sobre bronce y después se pulió.',
+        foto: { archivo: 'casos/medalla-4-medalla', alt: 'La medalla de bronce terminada, con el escudo grabado', etiqueta: 'Medalla' }, proporcion: '1 / 1',
+      },
+    ],
+    cierre: 'Después viajó a Italia, para el casamiento.',
+  },
+];
+
+export const casoPagina = {
+  volver: 'Volver a los casos',
+  otros: 'Otros casos',
+  numero: 'Caso',
 };
 
 export const taller = {
   meta: {
     title: 'El taller: cómo hacemos joyas con impresión 3D | Vulcan',
-    description: 'Del modelo 3D al metal: impresión en resina, molde, cera perdida y terminación a mano. Servicios para joyeros y marcas, y el precio de los metales hoy.',
+    description: 'Del modelo 3D al metal: impresión en resina, molde, cera perdida y terminación a mano. También para joyeros y marcas. Y el precio de los metales hoy.',
   },
-  titulo: 'El taller, por dentro',
-  bajada: 'Todo lo que pasa entre tu idea y la pieza en tu mano, con el detalle técnico.',
+  titulo: 'Cómo se hace un anillo',
+  bajada: 'El detalle técnico de cada etapa y cómo se arma el precio.',
+  // Arriba se ve la pieza terminada; donde pasa el mouse (o el dedo) aparece el modelo 3D.
+  revelado: {
+    arriba: { archivo: 'taller/anillo-plata-nuevo', alt: 'Anillo sello de plata con escudo de sol y laterales calados', etiqueta: 'Anillo terminado · 16:9' },
+    abajo: { archivo: 'taller/anillo-3d-bronce', alt: 'El mismo anillo sello como modelo 3D en malla', etiqueta: 'Modelo 3D · 16:9' },
+    pista: { mouse: 'Pasá el mouse por el anillo', tactil: 'Deslizá el dedo o tocá el anillo' },
+  },
+  // El mismo anillo en tres etapas, fotografiado en el taller (sobre la plancha de corte).
+  etapas: {
+    titulo: 'El mismo anillo, en tres momentos',
+    foto: { archivo: 'taller/tres-etapas-real', alt: 'El mismo anillo sello en tres etapas: impreso en resina, inyectado en cera y terminado en plata', etiqueta: 'Tres etapas · 2:1' },
+    rotulos: ['Impresión en resina', 'Inyección en cera', 'Plata pulida'],
+  },
 };
 
 export const catalogo = {
@@ -112,7 +277,7 @@ export const catalogo = {
     description: 'Anillos, dijes y aros de Vulcan. Cada pieza se hace por encargo en plata u oro, con tu talle y la terminación que elijas. Guía de talles incluida.',
   },
   titulo: 'Catálogo',
-  bajada: 'Piezas de la casa. Todas se hacen por encargo: elegís talle, metal y terminación, y si querés la cambiamos a tu medida.',
+  bajada: 'Todas se hacen por encargo, con tu talle y el metal que elijas. Si querés cambiarle algo, se cambia.',
   filtroTodas: 'Todas',
   talles: {
     titulo: 'Guía de talles',
@@ -142,8 +307,8 @@ export const orden = {
   ],
   idea: { etiqueta: 'Tu idea', pregunta: 'Último paso: tu idea', ayuda: 'Una frase alcanza. Las fotos o el boceto los mandás por WhatsApp.' },
   sellado: 'Sellada',
-  enviar: 'Contanos tu idea',
-  pie: 'Se abre WhatsApp con tu orden escrita. No se envía nada hasta que lo mandes vos.',
+  enviar: 'Mandar la orden por WhatsApp',
+  pie: 'Se abre WhatsApp con tu orden escrita. No se envía nada hasta que la mandes vos.',
 };
 
 export const hero = {
@@ -206,7 +371,7 @@ export const trabajos = {
   titulo: 'Lo que ya hicimos',
   // TODO: reemplazar por los 4 casos reales. No inventar clientes ni frases.
   casos: [
-    { nombre: 'Anillo sello con escudo', contexto: 'Plata 925. Del boceto a mano al anillo en metal, con el escudo en relieve.', foto: { archivo: 'trabajos/trabajo-1', alt: 'Dos anillos sello con escudo terminados, sobre una mesa de madera', etiqueta: 'Trabajo 1 · 3:4' } },
+    { nombre: 'Anillo sello con escudo', contexto: 'Plata 925, con el escudo en relieve.', foto: { archivo: 'trabajos/trabajo-1', alt: 'Dos anillos sello con escudo terminados, sobre una mesa de madera', etiqueta: 'Trabajo 1 · 3:4' } },
     { nombre: 'Aros rectangulares de plata', contexto: 'Plata 925. Hechos a mano en el banco: chapa cortada, plegada y soldada.', foto: { archivo: 'trabajos/aros-plata', alt: 'Par de aros rectangulares de plata pulida, parados sobre una base de madera', etiqueta: 'Trabajo 2 · 3:4' } },
     { nombre: 'Aros rectangulares dorados', contexto: 'El mismo diseño, con enchapado de oro.', foto: { archivo: 'trabajos/aros-dorados', alt: 'Par de aros rectangulares enchapados en oro, sobre papel de seda', etiqueta: 'Trabajo 3 · 3:4' } },
     { nombre: 'Solitario', contexto: 'Plata 925 con una circonia cúbica cuadrada, engarzada a garras en el banco.', foto: { archivo: 'trabajos/solitario', alt: 'Anillo solitario de plata con una circonia cuadrada engarzada, sostenido en la mano sobre el banco de joyero', etiqueta: 'Trabajo 4 · 3:4' } },
@@ -216,36 +381,37 @@ export const trabajos = {
 // Los **dobles asteriscos** marcan lo que va en negrita.
 // Cada etapa tiene su foto: idealmente la misma pieza en los 5 momentos.
 export const proceso = {
-  titulo: 'Cómo lo hacemos, por dentro',
+  titulo: 'Nuestros servicios',
+  bajada: 'Podés encargarnos la pieza entera o solo la etapa que te falta.',
   etapas: [
     {
       titulo: 'Diseño',
       icono: 'pen-nib-light',
-      texto: 'Partimos de tu **boceto, foto o idea** y definimos la pieza **con vos**.',
+      texto: 'Con tu referencia armamos el diseño y lo ajustamos hasta que lo **apruebes**.',
       foto: { archivo: 'proceso/1-diseno', alt: 'Boceto a mano del escudo para un anillo sello', etiqueta: 'Boceto · 4:5' },
     },
     {
       titulo: 'Modelado 3D',
       icono: 'cube-transparent-light',
-      texto: 'La dibujamos en **CAD**, pensada para fabricarse: **espesores, engarces y contracción del metal**.',
+      texto: 'Archivo en **CAD** con los espesores mínimos, el lugar de cada piedra y lo que se achica el metal al enfriarse.',
       foto: { archivo: 'proceso/2-modelado-3d', alt: 'Modelo 3D de dos anillos sello con escudo', etiqueta: 'Render CAD · 4:5' },
     },
     {
       titulo: 'Impresión 3D',
       icono: 'stack-light',
-      texto: '**Prototipo en ABS** para probar el tamaño. **Modelo maestro en resina de alto detalle** para el molde.',
+      texto: 'Un **prototipo en ABS** para probar el tamaño en la mano. Después, el modelo maestro en resina, que es el que va al molde.',
       foto: { archivo: 'proceso/3-impresion-3d', alt: 'Anillo sello impreso en resina de alto detalle', etiqueta: 'Pieza impresa en resina · 4:5' },
     },
     {
       titulo: 'Fundición',
       icono: 'fire-light',
-      texto: '**Molde de silicona**, cera y **cera perdida** en **plata, oro, alpaca o bronce**. El molde queda: **se puede repetir**.',
+      texto: '**Molde de silicona**, cera inyectada y cera perdida, en plata, oro, alpaca o bronce. El molde se guarda.',
       foto: { archivo: 'proceso/4-fundicion', alt: 'Anillo sello en metal claro después de la fundición', etiqueta: 'Pieza fundida en bruto · 4:5' },
     },
     {
       titulo: 'Terminación',
       icono: 'diamond-light',
-      texto: '**Engarce de piedras**, si lleva, y **pulido a mano** hasta el brillo final.',
+      texto: 'Engarce de piedras, si lleva, y **pulido a mano**.',
       foto: { archivo: 'proceso/5-terminacion', alt: 'Dos anillos sello con escudo terminados y pulidos', etiqueta: 'Pieza terminada · 4:5' },
     },
   ] satisfies { titulo: string; icono: string; texto: string; foto: Foto }[],
@@ -294,9 +460,12 @@ export const servicios = {
 
 export const metales = {
   titulo: 'Precio de los metales hoy',
+  rotulo: 'Metales hoy',
+  pausar: 'Pausar las cotizaciones',
+  reanudar: 'Reanudar las cotizaciones',
   bajada:
     'La fundición se cobra con la cotización del día. Por eso no damos precios cerrados: te mostramos cómo está el metal hoy.',
-  columnas: { metal: 'Metal', valor: 'Precio en pesos', variacion: 'Vs. día anterior' },
+  columnas: { metal: 'Metal', valor: 'Precio en pesos', variacion: 'Frente a ayer' },
   aclaracion:
     'Referencia del metal según la cotización internacional, ajustada a la ley (925 y 18k). No es el precio de una pieza.',
   otros: 'Alpaca y bronce: consultanos.',
@@ -314,8 +483,9 @@ export type Pregunta = {
   link?: { texto: string; href: string };
 };
 
-export const preguntas: { titulo: string; items: Pregunta[] } = {
+export const preguntas: { titulo: string; otra: { texto: string; enlace: string }; items: Pregunta[] } = {
   titulo: 'Preguntas frecuentes',
+  otra: { texto: '¿No está tu pregunta?', enlace: 'Escribinos por WhatsApp' },
   items: [
     {
       pregunta: '¿Tengo que tener el modelo 3D?',
@@ -324,7 +494,7 @@ export const preguntas: { titulo: string; items: Pregunta[] } = {
     {
       pregunta: '¿Cómo se cotiza una pieza?',
       respuesta: [
-        'Depende de lo que imagines: el diseño, el tamaño, el metal y si lleva piedras. Mandanos tu idea y te pasamos el presupuesto. El precio se arma así:',
+        'Mandanos tu idea y te pasamos el presupuesto. Se arma así:',
       ],
       formula: [
         'Diseño y modelado, según la complejidad',
@@ -336,7 +506,7 @@ export const preguntas: { titulo: string; items: Pregunta[] } = {
     },
     {
       pregunta: '¿En qué metales trabajan?',
-      respuesta: ['Plata 925, oro 18k, alpaca y bronce. Si buscás otro metal, consultanos y lo conseguimos.'],
+      respuesta: ['Plata 925, oro 18k, alpaca y bronce. Si buscás otro metal, consultanos.'],
     },
     {
       pregunta: '¿Trabajan con piedras?',
@@ -344,12 +514,15 @@ export const preguntas: { titulo: string; items: Pregunta[] } = {
     },
     {
       pregunta: '¿Cuánto tarda una pieza?',
-      respuesta: ['[Plazos reales por etapa: diseño, prototipo, fundición y terminación.]'],
+      // TODO Rodrigo: sumar plazos reales por etapa (diseño, prototipo, fundición, terminación).
+      respuesta: ['Depende del diseño y del metal. Te damos el plazo junto con el presupuesto, antes de empezar.'],
     },
     {
       pregunta: '¿Se puede hacer una sola unidad?',
       respuesta: [
-        'Sí. Cada encargo a medida es una pieza única. Para marcas, la producción arranca desde [definir mínimo] unidades.',
+        'Sí. Y si después querés más iguales, el molde ya está hecho.',
+        // TODO Rodrigo: cuando esté definido, sumar el mínimo de producción para marcas.
+        'Si tenés una marca, consultanos el mínimo de producción.',
       ],
     },
     {
@@ -358,28 +531,30 @@ export const preguntas: { titulo: string; items: Pregunta[] } = {
         'No. La impresión 3D se usa para el modelo; la joya final es metal fundido y pulido a mano. Lo que cambia es el diseño: formas y texturas que a mano casi no se pueden lograr.',
       ],
     },
-    {
-      pregunta: '¿Hacen envíos?',
-      respuesta: ['[Retiro en CABA y alcance de los envíos.]'],
-    },
+    // TODO Rodrigo: confirmar retiro en CABA y alcance de los envíos; hasta entonces la pregunta no se publica.
+    // {
+    //   pregunta: '¿Hacen envíos?',
+    //   respuesta: ['…'],
+    // },
     {
       pregunta: 'Soy joyero, ¿me imprimen un modelo que ya tengo?',
       respuesta: [
-        'Sí. Mandanos el archivo [formatos] y te decimos qué material conviene: resina para el modelo maestro o PLA para fundir directo.',
+        // TODO Rodrigo: sumar los formatos de archivo que aceptás (STL, OBJ, 3DM…).
+        'Sí. Mandanos el archivo y te decimos qué material conviene: resina para el modelo maestro o PLA para fundir directo.',
       ],
     },
     {
       pregunta: '¿Para quién es?',
       respuesta: [
-        'Para quien quiere una joya única, para joyeros que necesitan modelado o impresión y para marcas que quieren producir su propia línea.',
+        'Para quien quiere una joya propia o un sello para su familia o su grupo. También trabajamos para joyeros que necesitan modelado o impresión, y para marcas que quieren producir su línea.',
       ],
     },
   ],
 };
 
 export const ctaFinal = {
-  titulo: 'Ahora contanos qué imaginaste',
-  texto: 'Mandanos tu idea, aunque sea un garabato. Te respondemos con cómo hacerla realidad.',
+  titulo: 'Mandanos lo que tengas',
+  texto: 'Alcanza con un garabato o una foto. Te respondemos cómo la haríamos, en qué metal y cuánto costaría.',
   fotos: [
     { archivo: 'cta-final/1', alt: 'Dos anillos sello con escudo terminados', etiqueta: 'Collage 1 · 3:4' },
     { archivo: 'cta-final/aros-plata-banco', alt: 'Aro rectangular de plata sobre el taco de madera del banco', etiqueta: 'Collage 2 · 3:4' },

@@ -1,20 +1,84 @@
-/* Tokens de Vulcan. Contrastes verificados (WCAG) en la sección 2 del MD. */
-:root {
-  /* Color */
-  --color-bg: #1d0605;            /* Forja */
-  --color-surface: #2a100c;       /* Fragua */
-  --color-surface-2: #361812;     /* Escoria */
-  --color-accent: #bf9b74;        /* Bronce: único acento */
-  --color-accent-hover: #d3b48f;  /* Bronce claro */
-  --color-text: #f2e9df;          /* Cera */
-  --color-text-muted: #b8a595;    /* Ceniza */
-  --color-accent-on-light: #6b4a2c; /* Bronce profundo */
-  --color-up: #8fae7e;            /* Salvia */
-  --color-down: #d9826a;          /* Cobre */
-  --color-border: rgb(242 233 223 / 0.1);
-  --color-border-strong: rgb(242 233 223 / 0.24);
+/* Tokens de Vulcan, en tres capas:
+   1. Primitivos: los valores crudos con nombre propio (la paleta de la marca y los metales).
+   2. Semánticos: para qué sirve cada color. Cambian entre los dos mundos:
+      "el taller" (oscuro, :root) y "el archivo" (claro, .tema-claro).
+   3. Componentes: lo propio de la lámina, la cinta, el sello y los botones.
+   Los componentes usan solo las capas 2 y 3. Contrastes verificados (WCAG) en el spec y en marca-vulcan.md.
+   `npm run tokens` exporta los primitivos a src/styles/tokens.json (para Figma y redes). */
 
-  /* Roles que cambian en la sección clara */
+/* ------------------------------------------------------------------ 1. Primitivos -- */
+:root {
+  /* Paleta de la marca */
+  --forja: #1d0605;           /* fondo del taller */
+  --fragua: #2a100c;          /* superficies sobre Forja */
+  --escoria: #361812;         /* superficie elevada */
+  --bronce: #bf9b74;          /* único acento de interfaz */
+  --bronce-claro: #d3b48f;    /* hover del acento */
+  --bronce-profundo: #6b4a2c; /* acento sobre claro */
+  --cera: #f2e9df;            /* texto sobre oscuro · fondo del archivo */
+  --ceniza: #b8a595;          /* texto secundario sobre oscuro */
+  --tierra: #5e4a3f;          /* texto secundario sobre claro */
+  --salvia: #8fae7e;          /* dato que sube */
+  --cobre: #d9826a;           /* dato que baja */
+  --lacre: #8a1f2d;           /* solo el sello y la línea de insignias; solo sobre claro */
+
+  /* Lámina de grabado (la orden de trabajo) */
+  --sepia: #3b2417;           /* tinta del grabado */
+  --papel: #efe4d3;           /* papel de la lámina */
+  --marfil: #fffaf0;          /* brillo del pulido */
+
+  /* Metales: acuarela de la lámina, [luz, medio, sombra]. Pulido con contraste alto; mate aplanado. */
+  --plata-pulido-luz: #f6f8f9;
+  --plata-pulido-medio: #c3cad0;
+  --plata-pulido-sombra: #7f8891;
+  --plata-mate-luz: #dfe3e6;
+  --plata-mate-medio: #c6ccd1;
+  --plata-mate-sombra: #a7aeb5;
+  --oro-pulido-luz: #fff0b8;
+  --oro-pulido-medio: #e2b54c;
+  --oro-pulido-sombra: #9c6c18;
+  --oro-mate-luz: #efd38a;
+  --oro-mate-medio: #ddb862;
+  --oro-mate-sombra: #bf9440;
+  --alpaca-pulido-luz: #f1f2ec;
+  --alpaca-pulido-medio: #b9bdb2;
+  --alpaca-pulido-sombra: #7b8075;
+  --alpaca-mate-luz: #d9dbd3;
+  --alpaca-mate-medio: #bfc2b8;
+  --alpaca-mate-sombra: #a2a69b;
+  --bronce-pulido-luz: #f6cf9c;
+  --bronce-pulido-medio: #c47e45;
+  --bronce-pulido-sombra: #7c4520;
+  --bronce-mate-luz: #dfae7b;
+  --bronce-mate-medio: #c58a57;
+  --bronce-mate-sombra: #a46a3c;
+
+  /* Piedra (esmeralda de la lámina) */
+  --esmeralda-luz: #2fb878;
+  --esmeralda: #0f6a43;
+  --esmeralda-sombra: #063a24;
+  --esmeralda-borde: #0b2a1c;
+}
+
+/* ------------------------------------------------------------------ 2. Semánticos -- */
+:root {
+  /* Color: nombres fijos que usa toda la web */
+  --color-bg: var(--forja);
+  --color-surface: var(--fragua);
+  --color-surface-2: var(--escoria);
+  --color-accent: var(--bronce);
+  --color-accent-hover: var(--bronce-claro);
+  --color-text: var(--cera);
+  --color-text-muted: var(--ceniza);
+  --color-accent-on-light: var(--bronce-profundo);
+  --color-text-muted-on-light: var(--tierra);
+  --color-up: var(--salvia);
+  --color-down: var(--cobre);
+  --color-lacre: var(--lacre);
+  --color-border: rgb(242 233 223 / 0.1);        /* Cera al 10 % */
+  --color-border-strong: rgb(242 233 223 / 0.24); /* Cera al 24 % */
+
+  /* Roles que cambian según el mundo. Por defecto, el taller (oscuro). */
   --fondo: var(--color-bg);
   --texto: var(--color-text);
   --texto-suave: var(--color-text-muted);
@@ -49,10 +113,14 @@
   --space-9: 96px;
   --gutter: var(--space-4);
   --seccion: var(--space-7); /* mobile: secciones más juntas */
+  --ancho-max: 1280px;       /* solo el contenido; los fondos van a todo el ancho */
+  --alto-navbar: 88px;       /* lo que se deja arriba al saltar a un ancla */
 
   /* Forma */
   --radius: 4px;
+  --radius-interno: 2px; /* imagen dentro de una lámina */
   --tactil: 44px;
+  --boton-alto: 48px;
 
   /* Movimiento */
   --dur-1: 100ms;
@@ -70,12 +138,54 @@
   }
 }
 
-/* Sección clara: Cera de fondo, el acento pasa a Bronce profundo. */
+/* El archivo (sección clara): Cera de fondo, el acento pasa a Bronce profundo. */
 .tema-claro {
   --fondo: var(--color-text);
   --texto: var(--color-bg);
-  --texto-suave: #5e4a3f;
+  --texto-suave: var(--color-text-muted-on-light);
   --acento: var(--color-accent-on-light);
-  --borde: rgb(29 6 5 / 0.14);
+  --borde: rgb(29 6 5 / 0.14); /* Forja al 14 % */
   --foco: var(--color-accent-on-light);
+}
+
+/* ------------------------------------------------------------------ 3. Componentes -- */
+:root {
+  /* Lámina: marco con borde fino y un respiro alrededor de la imagen (el taller y el archivo). */
+  --lamina-fondo: var(--color-surface);
+  --lamina-borde: var(--color-border-strong);
+  --lamina-respiro: var(--space-2);
+
+  /* Cinta de cotizaciones (Metales hoy) */
+  --cinta-fondo: var(--color-surface);
+  --cinta-borde: var(--color-border-strong);
+  --cinta-rotulo-fondo: var(--color-accent);
+  --cinta-rotulo-texto: var(--color-bg);
+  --cinta-vuelta: 36s;
+
+  /* Sello: tinta de lacre, o relieve seco del color del papel */
+  --sello-tinta: var(--color-lacre);
+
+  /* Lámina de grabado (la orden de trabajo) */
+  --grabado-tinta: var(--sepia);
+  --grabado-papel: var(--papel);
+  --grabado-brillo: var(--marfil);
+  --grabado-acento: var(--bronce-profundo);
+
+  /* Botones */
+  --boton-principal-fondo: var(--color-accent);
+  --boton-principal-texto: var(--color-bg);
+  --boton-principal-hover: var(--color-accent-hover);
+  --boton-secundario-borde: var(--color-border-strong);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --lamina-respiro: var(--space-3);
+  }
+}
+
+.tema-claro {
+  --boton-principal-fondo: var(--color-bg);
+  --boton-principal-texto: var(--color-text);
+  --boton-principal-hover: var(--color-surface-2);
 }

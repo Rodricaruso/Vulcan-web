@@ -1,4 +1,6 @@
 ---
+import { simboloPath, simboloViewBox } from '../lib/simbolo';
+
 // El sello de Vulcan: recurso gráfico de la marca (el anillo sello firmaba y cerraba en Roma).
 // Dos estados: 'tinta' (estampado, con textura de tinta) y 'relieve' (relieve seco: grabado
 // en el papel sin tinta). Se pasa de uno a otro con la clase .sello--tinta.
@@ -34,7 +36,9 @@ const { id, texto = 'VULCAN · TALLER · CABA · HECHO A MANO ·', estado = 'tin
     <circle cx="60" cy="60" r="50.5" class="sello__linea" />
     <circle cx="60" cy="60" r="29" class="sello__linea" />
     <text class="sello__anillo"><textPath href={`#${id}-giro`} textLength="238">{texto}</textPath></text>
-    <text class="sello__letra" x="60" y="72.5" text-anchor="middle">V</text>
+    <svg x="43" y="45.4" width="34" height="29.2" viewBox={simboloViewBox}>
+      <path fill="currentColor" d={simboloPath} />
+    </svg>
   </g>
 </svg>
 
@@ -69,14 +73,9 @@ const { id, texto = 'VULCAN · TALLER · CABA · HECHO A MANO ·', estado = 'tin
     letter-spacing: 0.06em;
   }
 
-  .sello__letra {
-    font-family: var(--font-display);
-    font-size: 36px;
-  }
-
   /* Tinta: bordó de sello de pasaporte, que se mezcla con el papel. */
   .sello--tinta {
-    color: #8a1f2d;
+    color: var(--sello-tinta);
     mix-blend-mode: multiply;
     opacity: 0.88;
   }

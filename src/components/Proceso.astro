@@ -15,7 +15,10 @@ const n = proceso.etapas.length;
 <section id="tecnologia" class="proceso tema-claro" style={`--n: ${n}`} aria-labelledby="proceso-titulo" data-proceso>
   <div class="proceso__panel">
     <div class="contenedor proceso__grilla">
-      <h2 id="proceso-titulo" class="proceso__titulo">{proceso.titulo}</h2>
+      <div class="proceso__titulo">
+        <h2 id="proceso-titulo">{proceso.titulo}</h2>
+        <p class="proceso__bajada">{proceso.bajada}</p>
+      </div>
 
       <div class="proceso__visor">
         {proceso.etapas.map((etapa, i) => (
@@ -79,7 +82,23 @@ const n = proceso.etapas.length;
 
   .proceso__titulo {
     justify-self: start;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .proceso__titulo h2 {
     font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.75rem);
+  }
+
+  .proceso__bajada {
+    color: var(--texto-suave);
+    font-size: var(--text-small);
+  }
+
+  @media (min-width: 768px) {
+    .proceso__bajada {
+      font-size: var(--text-lead);
+    }
   }
 
   .proceso__visor {
