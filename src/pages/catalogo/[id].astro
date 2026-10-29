@@ -1,0 +1,186 @@
+---
+// Una pieza del catálogo con página propia, para que pueda aparecer sola en buscadores.
+// La ficha es la misma de /catalogo; los datos que todavía dicen "A confirmar" no se muestran.
+import Base from '../../layouts/Base.astro';
+import Navbar from '../../components/Navbar.astro';
+import Foto from '../../components/Foto.astro';
+import CtaFinal from '../../components/CtaFinal.astro';
+import Footer from '../../components/Footer.astro';
+import { catalogo } from '../../content';
+import { productos, tipos, type Producto } from '../../data/productos';
+import { consultaPieza } from '../../lib/whatsapp';
+import { imagenParaCompartir, imagenAbsoluta } from '../../lib/imagenes';
+import { idNegocio } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return productos.map((pieza) => ({ params: { id: pieza.id }, props: { pieza } }));
+}
+
+interface Props {
+  pieza: Producto;
+}
+
+const { pieza } = Astro.props;
+const tipo = tipos[pieza.tipo].singular;
+const ref = `web-pieza-${pieza.id}`;
+const ruta = `/catalogo/${pieza.id}`;
+
+// "anillo de plata 925", "aros enchapados en oro"
+const material = pieza.metal.toLowerCase();
+const frase = material.startsWith('enchapado')
+  ? `${tipo.toLowerCase()} ${pieza.tipo === 'aros' ? material.replace('enchapado', 'enchapados') : material}`
+  : `${tipo.toLowerCase()} de ${material}`;
+const title = `${pieza.nombre}: ${frase} a medida | Vulcan`;
+// El metal se agrega solo si la descripción no lo nombra ya.
+const nombraMetal = pieza.descripcion.toLowerCase().includes(material.split(' ')[0]);
+const description = [pieza.descripcion, nombraMetal ? '' : `${pieza.metal}.`, catalogo.pieza.encargo].filter(Boolean).join(' ');
+
+const aConfirmar = (valor: string) => valor === 'A confirmar';
+const ficha: [string, string][] = (
+  [
+    ['Metal', pieza.metal],
+    ['Terminación', pieza.terminacion],
+    ['Piedra', pieza.piedra],
+    ['Peso aprox.', pieza.peso],
+    ['Medidas', pieza.medidas],
+  ] as [string, string][]
+).filter(([, valor]) => !aConfirmar(valor));
+
+const imagen = pieza.foto && (await imagenParaCompartir(pieza.foto.archivo, Astro.site));
+const foto = pieza.foto && (await imagenAbsoluta(pieza.foto.archivo, Astro.site));
+
+// Product sin "offers": no hay precio fijo, y una oferta sin precio da error en Search Console.
+const producto = {
+  '@type': 'Product',
+  '@id': `${new URL(ruta, Astro.site).href}#pieza`,
+  name: `${tipo} ${pieza.nombre}`,
+  description: pieza.descripcion,
+  ...(foto ? { image: foto } : {}),
+  material: pieza.metal,
+  category: tipos[pieza.tipo].plural,
+  brand: { '@type': 'Brand', name: 'Vulcan' },
+  manufacturer: { '@id': idNegocio(Astro.site) },
+  url: new URL(ruta, Astro.site).href,
+};
+---
+
+<Base
+  title={title}
+  description={description}
+  migas={[{ nombre: 'Inicio', ruta: '/' }, { nombre: catalogo.titulo, ruta: '/catalogo' }, { nombre: pieza.nombre, ruta }]}
+  esquema={[producto]}
+  imagen={imagen}
+>
+  <Navbar />
+  <main id="contenido" tabindex="-1" class="contenedor pieza-pagina">
+    <div class="pieza-pagina__foto">
+      {pieza.foto && <Foto foto={pieza.foto} proporcion="4 / 5" carga="eager" prioridad sizes="(min-width: 900px) 50vw, 100vw" />}
+    </div>
+
+    <div class="pieza-pagina__texto">
+      <a class="pieza-pagina__volver" href={`/catalogo#${pieza.id}`}><span aria-hidden="true">←</span> {catalogo.pieza.volver}</a>
+      <h1>{pieza.nombre}</h1>
+      <p class="pieza-pagina__tipo">{tipo} · {pieza.metal}</p>
+      <p class="bajada">{pieza.descripcion}</p>
+      <dl class="pieza-pagina__ficha">
+        {ficha.map(([dato, valor]) => <div><dt>{dato}</dt><dd>{valor}</dd></div>)}
+        <div><dt>Precio</dt><dd>Consultanos</dd></div>
+      </dl>
+      <p class="pieza-pagina__encargo">{catalogo.pieza.encargo}</p>
+      <a class="boton boton--principal" href={consultaPieza(pieza, ref)} target="_blank" rel="noopener" data-ref={ref}>
+        Consultar por {pieza.nombre}
+      </a>
+    </div>
+  </main>
+  <CtaFinal />
+  <Footer />
+</Base>
+
+<style>
+  .pieza-pagina {
+    display: grid;
+    gap: var(--space-7);
+    padding-block: var(--space-8) var(--seccion);
+  }
+
+  .pieza-pagina__foto {
+    overflow: hidden;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    align-self: start;
+  }
+
+  .pieza-pagina__foto :global(.foto) {
+    border-radius: 0;
+  }
+
+  .pieza-pagina__texto {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    justify-items: start;
+  }
+
+  .pieza-pagina__volver {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tactil);
+    font-size: var(--text-small);
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .pieza-pagina__volver:hover {
+    color: var(--color-accent);
+  }
+
+  .pieza-pagina__tipo {
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+    color: var(--color-text-muted);
+  }
+
+  .pieza-pagina__texto .bajada {
+    color: var(--color-text-muted);
+    max-width: 38ch;
+  }
+
+  .pieza-pagina__ficha {
+    width: 100%;
+    margin: var(--space-3) 0 0;
+    display: grid;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .pieza-pagina__ficha div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .pieza-pagina__ficha dt {
+    color: var(--color-text-muted);
+  }
+
+  .pieza-pagina__ficha dd {
+    margin: 0;
+    text-align: right;
+  }
+
+  .pieza-pagina__encargo {
+    font-size: var(--text-small);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-3);
+  }
+
+  @media (min-width: 900px) {
+    .pieza-pagina {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+      align-items: center;
+    }
+  }
+</style>

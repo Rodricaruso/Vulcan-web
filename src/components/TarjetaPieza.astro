@@ -1,10 +1,11 @@
 ---
 // Una pieza del catálogo. Versión corta en la Vitrina de la home; versión completa
-// (ficha y botón de consulta) en /catalogo. Todas usan la misma ficha: es una colección.
+// (ficha y botón de consulta) en /catalogo, con enlace a la página de la pieza.
+// Todas usan la misma ficha: es una colección.
 import { tipos, type Producto } from '../data/productos';
-import { sitio } from '../content';
 import Foto from './Foto.astro';
 import DibujoPieza from './DibujoPieza.astro';
+import { consultaPieza } from '../lib/whatsapp';
 
 interface Props {
   pieza: Producto;
@@ -14,12 +15,13 @@ interface Props {
 const { pieza, completa = false } = Astro.props;
 const tipo = tipos[pieza.tipo].singular;
 const ref = `web-catalogo-${pieza.id}`;
-const mensaje = `Hola Vulcan, vengo de la web (ref: ${ref}). Me interesa ${tipo.toLowerCase() === 'aros' ? 'los aros' : `el ${tipo.toLowerCase()}`} ${pieza.nombre}. `;
-const consulta = `https://wa.me/${sitio.whatsapp}?text=${encodeURIComponent(mensaje)}`;
+const consulta = consultaPieza(pieza, ref);
+const pagina = `/catalogo/${pieza.id}`;
 ---
 
 <article class:list={['pieza', { 'pieza--completa': completa }]} data-tipo={pieza.tipo}>
   <div class="pieza__imagen">
+    {completa && <a class="pieza__enlace-foto" href={pagina} tabindex="-1" aria-hidden="true"></a>}
     {pieza.foto ? (
       <Foto foto={pieza.foto} proporcion="4 / 5" carga={completa ? 'lazy' : 'eager'} sizes={completa ? '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw' : '(min-width: 768px) 22rem, 70vw'} />
     ) : (
@@ -28,7 +30,7 @@ const consulta = `https://wa.me/${sitio.whatsapp}?text=${encodeURIComponent(mens
   </div>
 
   <div class="pieza__cuerpo">
-    <h3 class="pieza__nombre">{pieza.nombre}</h3>
+    <h3 class="pieza__nombre">{completa ? <a href={pagina}>{pieza.nombre}</a> : pieza.nombre}</h3>
     <p class="pieza__tipo">{tipo} · {pieza.metal}</p>
 
     {completa && (
@@ -60,6 +62,7 @@ const consulta = `https://wa.me/${sitio.whatsapp}?text=${encodeURIComponent(mens
   }
 
   .pieza__imagen {
+    position: relative;
     aspect-ratio: 4 / 5;
     overflow: hidden;
     border-radius: var(--radius);
@@ -80,6 +83,25 @@ const consulta = `https://wa.me/${sitio.whatsapp}?text=${encodeURIComponent(mens
     font-family: var(--font-display);
     font-weight: 400;
     font-size: 1.5rem;
+  }
+
+  .pieza__nombre a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color var(--dur-3) var(--ease-out);
+  }
+
+  .pieza__nombre a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* La foto también lleva a la página de la pieza (el enlace accesible es el nombre). */
+  .pieza__enlace-foto {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
   }
 
   .pieza__tipo,

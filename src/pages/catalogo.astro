@@ -10,9 +10,20 @@ import { productos, tipos, talles, cadenas, type TipoPieza } from '../data/produ
 
 const presentes = Object.keys(tipos).filter((t) => productos.some((p) => p.tipo === t)) as TipoPieza[];
 const { talles: guia } = catalogo;
+
+const lista = {
+  '@type': 'ItemList',
+  name: catalogo.titulo,
+  itemListElement: productos.map((p, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: p.nombre,
+    url: new URL(`/catalogo/${p.id}`, Astro.site).href,
+  })),
+};
 ---
 
-<Base title={catalogo.meta.title} description={catalogo.meta.description}>
+<Base title={catalogo.meta.title} description={catalogo.meta.description} esquema={[lista]}>
   <Navbar />
   <main id="contenido" tabindex="-1">
     <section class="contenedor catalogo" aria-labelledby="catalogo-titulo">

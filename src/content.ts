@@ -289,6 +289,11 @@ export const catalogo = {
     description: 'Anillos, dijes y aros de Vulcan. Cada pieza se hace por encargo en plata u oro, con tu talle y la terminación que elijas. Guía de talles incluida.',
   },
   titulo: 'Catálogo',
+  // Página de cada pieza (/catalogo/<id>).
+  pieza: {
+    volver: 'Volver al catálogo',
+    encargo: 'Se hace por encargo en CABA.',
+  },
   bajada: 'Todas se hacen por encargo, con tu talle y el metal que elijas. Si querés cambiarle algo, se cambia.',
   filtroTodas: 'Todas',
   talles: {
