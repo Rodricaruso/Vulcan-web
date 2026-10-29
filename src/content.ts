@@ -12,10 +12,13 @@ export type TipoMensaje = 'cliente' | 'modelado' | 'impresion' | 'marcas' | 'gre
 export const sitio = {
   nombre: 'Vulcan',
   ciudad: 'CABA, Buenos Aires',
-  // Número de prueba (no existe): las bases del hackathon no permiten datos reales.
+  responsable: 'Rodrigo Caruso', // figura en la política de privacidad
   whatsapp: '5491131002597',
   telefonoVisible: '+54 11 3100-2597',
   instagram: '', // TODO: 'https://instagram.com/usuario'
+  // ID de medición de Google Analytics 4 ('G-XXXXXXXXXX'). Vacío: no se carga y la
+  // política de privacidad no menciona estadísticas.
+  googleAnalytics: '',
   title: 'Joyas a medida y anillos sello en CABA | Vulcan',
   description:
     'Joyas a medida y anillos sello en CABA, para vos o iguales para una familia o un grupo. Partimos de tu foto, dibujo o idea y la hacemos en plata u oro.',
@@ -573,4 +576,66 @@ export const textosUI = {
   abrirMenu: 'Abrir menú',
   cerrarMenu: 'Cerrar menú',
   paso: 'Paso',
+};
+
+// Página de error: 404 en números romanos, como los estados de la moneda.
+export const error404 = {
+  title: 'Página no encontrada | Vulcan',
+  description: 'Esta dirección no existe en el sitio de Vulcan.',
+  numeral: 'CDIV',
+  titulo: '¡Upss! Error 404',
+  bajada: 'La dirección que abriste no existe.',
+  accion: 'Volver al inicio',
+  inscripcion: 'NIHIL · HIC · EST · NIHIL · HIC · EST · NIHIL · HIC · EST ·',
+};
+
+// Política de privacidad (Ley 25.326). Cada bloque es un título y sus párrafos.
+export const privacidad = {
+  title: 'Política de privacidad | Vulcan',
+  description: 'Qué datos recibe Vulcan, para qué los usa, cuánto tiempo los guarda y cómo pedir que se borren.',
+  titulo: 'Política de privacidad',
+  actualizada: 'Actualizada el 29 de octubre de 2026.',
+  bloques: [
+    {
+      titulo: 'Quién es el responsable',
+      parrafos: [
+        'Este sitio es de Vulcan, el taller de joyería de {responsable} en la Ciudad Autónoma de Buenos Aires. Para cualquier consulta sobre tus datos, escribinos por WhatsApp al {telefono}.',
+      ],
+    },
+    {
+      titulo: 'Qué datos recibimos',
+      parrafos: [
+        'El sitio no tiene formularios que guarden datos. Cuando armás tu orden o tocás un botón de contacto, se abre WhatsApp con un mensaje ya escrito, y no se envía nada hasta que lo mandás vos.',
+        'Por WhatsApp nos llegan tu nombre, tu número y lo que quieras contarnos de la pieza: fotos, bocetos, talles, iniciales o escudos.',
+      ],
+    },
+    {
+      titulo: 'Para qué los usamos',
+      parrafos: ['Para presupuestar y hacer tu pieza, y para hablar con vos sobre el encargo. No los vendemos ni los compartimos con nadie.'],
+    },
+    {
+      titulo: 'Cuánto tiempo los guardamos',
+      parrafos: ['Las fotos y los bocetos que nos mandás quedan en una carpeta con tu nombre mientras dura el trabajo. Cuando lo terminamos, los borramos.'],
+    },
+    {
+      titulo: 'Fotos de tu pieza',
+      parrafos: ['Si queremos mostrar tu pieza en este sitio o en Instagram, te lo preguntamos antes. Si no querés, no se publica.'],
+    },
+    {
+      titulo: 'Estadísticas de visitas',
+      soloConAnalytics: true,
+      parrafos: [
+        'Usamos Google Analytics para saber cuántas personas entran al sitio y qué páginas miran. Google guarda cookies en tu navegador y recibe datos como el tipo de dispositivo, la ciudad aproximada y las páginas que visitaste, sin tu nombre ni tu número.',
+        'Podés borrar o bloquear esas cookies desde tu navegador, o instalar el complemento de Google para desactivar Analytics.',
+      ],
+      enlace: { texto: 'Complemento para desactivar Google Analytics', href: 'https://tools.google.com/dlpage/gaoptout' },
+    },
+    {
+      titulo: 'Tus derechos',
+      parrafos: [
+        'Podés pedirnos ver, corregir o borrar tus datos cuando quieras, escribiéndonos por WhatsApp.',
+        'El titular de los datos personales tiene la facultad de ejercer el derecho de acceso a los mismos en forma gratuita a intervalos no inferiores a seis meses, salvo que se acredite un interés legítimo al efecto conforme lo establecido en el artículo 14, inciso 3 de la Ley N° 25.326. La Agencia de Acceso a la Información Pública, en su carácter de Órgano de Control de la Ley N° 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas vigentes en materia de protección de datos personales.',
+      ],
+    },
+  ] as { titulo: string; parrafos: string[]; soloConAnalytics?: boolean; enlace?: { texto: string; href: string } }[],
 };

@@ -86,6 +86,19 @@ const breadcrumb = migas && {
     {conDatosEstructurados && <script is:inline type="application/ld+json" set:html={JSON.stringify(negocio)} />}
     {conPreguntas && <script is:inline type="application/ld+json" set:html={JSON.stringify(faq)} />}
     {breadcrumb && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumb)} />}
+    {sitio.googleAnalytics && (
+      <Fragment>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${sitio.googleAnalytics}`}></script>
+        <script is:inline define:vars={{ id: sitio.googleAnalytics }}>
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function () {
+            dataLayer.push(arguments);
+          };
+          gtag('js', new Date());
+          gtag('config', id);
+        </script>
+      </Fragment>
+    )}
     <slot name="head" />
   </head>
   <body>

@@ -2,24 +2,64 @@
 import Base from '../layouts/Base.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
-import { sitio } from '../content';
+import { sitio, privacidad } from '../content';
+
+// La sección de estadísticas solo aparece si Google Analytics está activo.
+const bloques = privacidad.bloques.filter((b) => !b.soloConAnalytics || sitio.googleAnalytics);
+const completar = (texto: string) => texto.replace('{responsable}', sitio.responsable).replace('{telefono}', sitio.telefonoVisible.replaceAll(' ', ' '));
 ---
 
-<Base sinIndexar title={`Política de privacidad | ${sitio.nombre}`} description={`Cómo ${sitio.nombre} trata los datos de quienes visitan el sitio.`}>
+<Base title={privacidad.title} description={privacidad.description}>
   <Navbar />
   <main id="contenido" tabindex="-1" class="seccion">
-    <div class="contenedor">
-      <h1>Política de privacidad</h1>
-      <p class="bajada">[Texto pendiente: qué datos se recolectan (analytics), para qué se usan y cómo pedir que se borren.]</p>
+    <div class="contenedor privacidad">
+      <header class="privacidad__cabecera">
+        <h1>{privacidad.titulo}</h1>
+        <p class="etiqueta-mono">{privacidad.actualizada}</p>
+      </header>
+
+      {bloques.map((bloque) => (
+        <section class="privacidad__bloque">
+          <h2>{bloque.titulo}</h2>
+          {bloque.parrafos.map((p) => <p>{completar(p)}</p>)}
+          {bloque.enlace && <p><a href={bloque.enlace.href} target="_blank" rel="noopener">{bloque.enlace.texto}</a></p>}
+        </section>
+      ))}
     </div>
   </main>
   <Footer />
 </Base>
 
 <style>
-  .contenedor {
+  .privacidad {
     display: grid;
-    gap: var(--space-5);
-    min-height: 50vh;
+    gap: var(--space-7);
+    max-width: 44rem;
+  }
+
+  .privacidad__cabecera {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .privacidad__cabecera .etiqueta-mono {
+    color: var(--color-text-muted);
+  }
+
+  .privacidad__bloque {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .privacidad__bloque h2 {
+    font-size: var(--text-h3);
+  }
+
+  .privacidad__bloque p {
+    color: var(--color-text-muted);
+  }
+
+  .privacidad__bloque a {
+    color: var(--color-accent);
   }
 </style>

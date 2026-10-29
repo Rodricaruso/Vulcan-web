@@ -1,19 +1,39 @@
 ---
+// Página de error con la moneda de la portada: en la cara, 404 en números romanos;
+// en el canto, una inscripción que gira despacio. Un solo camino de salida: el inicio.
 import Base from '../layouts/Base.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
-import { sitio } from '../content';
+import { error404 } from '../content';
 ---
 
-<Base sinIndexar title={`Página no encontrada | ${sitio.nombre}`} description={`Esta dirección no existe en el sitio de ${sitio.nombre}.`}>
+<Base sinIndexar title={error404.title} description={error404.description}>
   <Navbar />
-  <main id="contenido" tabindex="-1" class="seccion">
-    <div class="contenedor">
-      <h1>Esta página no existe</h1>
-      <p class="bajada">Puede que el enlace esté mal escrito o que la página se haya movido.</p>
-      <div class="acciones">
-        <a class="boton boton--principal" href="/">Ir al inicio</a>
-        <a class="boton boton--secundario" href="/catalogo">Ver el catálogo</a>
+  <main id="contenido" tabindex="-1" class="error">
+    <div class="contenedor error__grilla">
+      <div class="error__moneda" aria-hidden="true">
+        <svg class="error__canto" viewBox="0 0 400 400">
+          <defs>
+            <path id="error-giro" d="M200 200 m-178 0 a178 178 0 1 1 356 0 a178 178 0 1 1 -356 0" />
+          </defs>
+          <circle class="error__estrias" cx="200" cy="200" r="196" />
+          <circle class="error__filete" cx="200" cy="200" r="160" />
+          <text class="error__inscripcion" textLength="1100" lengthAdjust="spacing">
+            <textPath href="#error-giro">{error404.inscripcion}</textPath>
+          </text>
+        </svg>
+        <svg class="error__cara" viewBox="0 0 400 400">
+          <circle class="error__disco" cx="200" cy="200" r="150" />
+          <circle class="error__aro" cx="200" cy="200" r="132" />
+          <text class="error__numeral" x="200" y="200" text-anchor="middle" dominant-baseline="central">{error404.numeral}</text>
+          <path class="error__raya" d="M150 262 H250" />
+        </svg>
+      </div>
+
+      <div class="error__texto">
+        <h1>{error404.titulo}</h1>
+        <p class="bajada">{error404.bajada}</p>
+        <a class="boton boton--principal" href="/">{error404.accion}</a>
       </div>
     </div>
   </main>
@@ -21,17 +41,128 @@ import { sitio } from '../content';
 </Base>
 
 <style>
-  .contenedor {
-    display: grid;
-    gap: var(--space-5);
-    align-content: center;
-    justify-items: start;
-    min-height: 50vh;
+  .error {
+    background:
+      radial-gradient(closest-side at 30% 50%, rgb(191 155 116 / 0.12), transparent 70%),
+      var(--color-bg) url('/texturas/forja.webp') center top / 100% auto;
+    overflow: clip;
   }
 
-  .acciones {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
+  .error__grilla {
+    min-height: calc(100svh - 72px);
+    display: grid;
+    align-content: center;
+    gap: var(--space-7);
+    padding-block: var(--space-8);
+  }
+
+  /* -------------------------------------------------------------- moneda -- */
+  .error__moneda {
+    position: relative;
+    width: min(72vw, 22rem);
+    aspect-ratio: 1;
+    justify-self: center;
+  }
+
+  .error__canto,
+  .error__cara {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .error__canto {
+    animation: girar 60s linear infinite;
+  }
+
+  .error__estrias {
+    fill: none;
+    stroke: rgb(191 155 116 / 0.5);
+    stroke-width: 6;
+    stroke-dasharray: 1.2 4;
+  }
+
+  .error__filete {
+    fill: none;
+    stroke: rgb(191 155 116 / 0.35);
+    stroke-width: 1;
+  }
+
+  .error__inscripcion {
+    fill: var(--color-accent);
+    font-family: var(--font-display);
+    font-size: 17px;
+  }
+
+  .error__disco {
+    fill: var(--color-surface);
+    stroke: rgb(211 180 143 / 0.55);
+    stroke-width: 1;
+    filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.6));
+  }
+
+  .error__aro {
+    fill: none;
+    stroke: rgb(191 155 116 / 0.25);
+    stroke-width: 1;
+  }
+
+  .error__numeral {
+    fill: var(--color-accent);
+    font-family: var(--font-display);
+    font-size: 96px;
+    letter-spacing: 0.04em;
+  }
+
+  .error__raya {
+    stroke: rgb(191 155 116 / 0.45);
+    stroke-width: 1;
+  }
+
+  /* --------------------------------------------------------------- texto -- */
+  .error__texto {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+
+  .error__texto h1 {
+    max-width: 14ch;
+  }
+
+  .error__texto .bajada {
+    max-width: 36ch;
+    color: var(--color-text-muted);
+  }
+
+  .error__texto .boton {
+    margin-top: var(--space-3);
+  }
+
+  /* ---------------------------------------------------------- escritorio -- */
+  @media (min-width: 900px) {
+    .error__grilla {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      column-gap: clamp(3rem, 6vw, 6rem);
+    }
+
+    .error__moneda {
+      width: min(100%, 26rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .error__canto {
+      animation: none;
+    }
+  }
+
+  @keyframes girar {
+    to {
+      transform: rotate(-360deg);
+    }
   }
 </style>
