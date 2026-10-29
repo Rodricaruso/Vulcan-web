@@ -24,6 +24,9 @@ export const sitio = {
   // ID de medición de Google Analytics 4 ('G-XXXXXXXXXX'). Vacío: no se carga y la
   // política de privacidad no menciona estadísticas.
   googleAnalytics: '',
+  // Código de verificación de Google Search Console (solo el content de la meta, no la etiqueta entera).
+  // Hace falta solo si se verifica por etiqueta HTML; con el registro TXT en Vercel, queda vacío.
+  googleVerificacion: '',
   title: 'Joyas a medida y anillos sello en CABA | Vulcan',
   description:
     'Joyas a medida y anillos sello en CABA, para vos o iguales para una familia o un grupo. Partimos de tu foto, dibujo o idea y la hacemos en plata u oro.',

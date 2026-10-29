@@ -107,6 +107,7 @@ const grafo = {
     <meta name="description" content={description} />
     {sinIndexar ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <link rel="preload" href={marcellus} as="font" type="font/woff2" crossorigin />
+    {sitio.googleVerificacion && <meta name="google-site-verification" content={sitio.googleVerificacion} />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="theme-color" content="#1d0605" />
     <meta property="og:type" content="website" />
