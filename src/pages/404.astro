@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import { sitio } from '../content';
+---
+
+<Base sinIndexar title={`Página no encontrada | ${sitio.nombre}`} description={`Esta dirección no existe en el sitio de ${sitio.nombre}.`}>
+  <Navbar />
+  <main id="contenido" tabindex="-1" class="seccion">
+    <div class="contenedor">
+      <h1>Esta página no existe</h1>
+      <p class="bajada">Puede que el enlace esté mal escrito o que la página se haya movido.</p>
+      <div class="acciones">
+        <a class="boton boton--principal" href="/">Ir al inicio</a>
+        <a class="boton boton--secundario" href="/catalogo">Ver el catálogo</a>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .contenedor {
+    display: grid;
+    gap: var(--space-5);
+    align-content: center;
+    justify-items: start;
+    min-height: 50vh;
+  }
+
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+</style>

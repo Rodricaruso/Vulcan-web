@@ -22,7 +22,7 @@ const numerales = ['I', 'II', 'III'];
 const otros = casos.filter((c) => c.slug !== caso.slug);
 ---
 
-<Base title={caso.meta.title} description={caso.meta.description}>
+<Base title={caso.meta.title} description={caso.meta.description} migas={[{ nombre: 'Inicio', ruta: '/' }, { nombre: caso.nombre, ruta: `/casos/${caso.slug}` }]}>
   <Navbar />
   <main id="contenido" tabindex="-1" class="caso tema-claro">
     <header class="contenedor caso__cabecera">

@@ -21,7 +21,7 @@ const numerales = ['I', 'II', 'III'];
           <li class="obra__caso" data-obra-caso>
             <a class="obra__enlace" href={`/casos/${caso.slug}`}>
               <div class:list={['obra__foto', { 'con-fondo': caso.portadaFondo }]} style={caso.portadaEncuadre && `--encuadre: ${caso.portadaEncuadre}`}>
-                <Foto foto={caso.portada} proporcion="4 / 5" carga="eager" sizes="(min-width: 1024px) 22rem, 90vw" />
+                <Foto foto={caso.portada} proporcion="4 / 5" sizes="(min-width: 1024px) 22rem, 90vw" />
               </div>
               <div class="obra__texto" data-obra-texto>
                 <p class="obra__rotulo">

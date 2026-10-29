@@ -50,7 +50,7 @@ const numerales = ['I', 'II', 'III', 'IV'];
             <div class="tf__cara" data-tf-cara>
               {etapas.map((etapa, i) => (
                 <div class="tf__capa" style={i === 0 ? '' : 'opacity: 0'} data-tf-capa>
-                  <Foto foto={etapa.foto} proporcion="1 / 1" carga="eager" sizes="(min-width: 1024px) 34vw, 80vw" class="tf__foto" />
+                  <Foto foto={etapa.foto} proporcion="1 / 1" carga={i === 0 ? 'eager' : 'lazy'} prioridad={i === 0} sizes="(min-width: 1024px) 34vw, 80vw" class="tf__foto" />
                 </div>
               ))}
               <span class="tf__brillo" aria-hidden="true"></span>

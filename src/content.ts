@@ -18,7 +18,7 @@ export const sitio = {
   instagram: '', // TODO: 'https://instagram.com/usuario'
   title: 'Joyas a medida y anillos sello en CABA | Vulcan',
   description:
-    'Joyas a medida y anillos sello en CABA, para vos o iguales para toda una familia o un grupo. Partimos de tu foto, dibujo o idea y la hacemos en plata u oro. Pedidos por WhatsApp.',
+    'Joyas a medida y anillos sello en CABA, para vos o iguales para una familia o un grupo. Partimos de tu foto, dibujo o idea y la hacemos en plata u oro.',
 };
 
 export const mensajes: Record<TipoMensaje, string> = {
