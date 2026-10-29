@@ -16,7 +16,7 @@ interface Props {
 
 const { foto, proporcion, carga = 'lazy', prioridad = false, sizes = '(min-width: 768px) 40vw, 100vw', class: clase } = Astro.props;
 
-const imagen = buscarImagen(foto.archivo);
+const imagen = await buscarImagen(foto.archivo);
 ---
 
 {imagen ? (

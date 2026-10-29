@@ -1,17 +1,30 @@
-// Busca una foto de /imagenes por su nombre (sin extensión). La usan Foto.astro y el schema.
+// Busca una foto de /imagenes por su nombre (sin extensión). La usan Foto.astro, RevelarAnillo y el schema.
+// Carga diferida: solo se importan las fotos que alguna página pide.
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
-const archivos = import.meta.glob<{ default: ImageMetadata }>('/imagenes/**/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG}', { eager: true });
+// Toda foto que entra en este patrón se publica en dist/ aunque ninguna página la use, así que
+// quedan afuera los originales y las versiones viejas (PNG de hasta 2,8 MB). Si alguna vuelve a
+// usarse, sacala de esta lista. foto compartir wpp ya está convertida en public/compartir.jpg.
+const archivos = import.meta.glob<{ default: ImageMetadata }>([
+  '/imagenes/**/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG}',
+  '!/imagenes/originales/**',
+  '!/imagenes/foto compartir wpp.jpg',
+  '!/imagenes/taller/{anillo-3d,anillo-3d-nuevo,anillo-plata,tres-etapas}.png',
+  '!/imagenes/taller/untitled.*',
+  '!/imagenes/taller/WhatsApp*',
+]);
 
-export const buscarImagen = (archivo: string) =>
-  Object.entries(archivos).find(([ruta]) => ruta.replace(/\.[^.]+$/, '') === `/imagenes/${archivo}`)?.[1].default;
+export const buscarImagen = async (archivo: string) => {
+  const cargar = Object.entries(archivos).find(([ruta]) => ruta.replace(/\.[^.]+$/, '') === `/imagenes/${archivo}`)?.[1];
+  return cargar ? (await cargar()).default : undefined;
+};
 
 // Versión de hasta 1200×630 para compartir en WhatsApp y redes. Las fotos se recortan siguiendo
 // su encuadre; los renders con fondo transparente van enteros sobre el color de la marca.
 // El optimizador no agranda ni rellena: devuelve la medida real para declararla en og:image.
 export const imagenParaCompartir = async (archivo: string, site: URL | undefined, opciones: { encuadre?: string; render?: boolean } = {}) => {
-  const src = buscarImagen(archivo);
+  const src = await buscarImagen(archivo);
   if (!src) return undefined;
   const img = await getImage({
     src,
@@ -34,7 +47,7 @@ export type ImagenCompartir = NonNullable<Awaited<ReturnType<typeof imagenParaCo
 
 // Versión web de una foto, con URL absoluta: para el schema.
 export const imagenAbsoluta = async (archivo: string, site: URL | undefined) => {
-  const src = buscarImagen(archivo);
+  const src = await buscarImagen(archivo);
   if (!src) return undefined;
   const img = await getImage({ src, width: 1200, format: 'webp', quality: 80 });
   return new URL(img.src, site).href;

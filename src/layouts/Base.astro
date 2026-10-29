@@ -3,6 +3,8 @@ import '../styles/global.css';
 import { sitio, preguntas } from '../content';
 import { idNegocio, idWeb } from '../lib/schema';
 import type { ImagenCompartir } from '../lib/imagenes';
+// La fuente de los títulos se ve apenas abre la página: se precarga (ya trae font-display: swap).
+import marcellus from '@fontsource/marcellus/files/marcellus-latin-400-normal.woff2?url';
 
 interface Props {
   title?: string;
@@ -104,6 +106,7 @@ const grafo = {
     <title>{title}</title>
     <meta name="description" content={description} />
     {sinIndexar ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <link rel="preload" href={marcellus} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="theme-color" content="#1d0605" />
     <meta property="og:type" content="website" />

@@ -5,8 +5,8 @@
 // La primera vez que la lámina se ve, el círculo la cruza una vez para mostrar que ahí pasa algo.
 // Sin JS se ve la foto del anillo terminado.
 import { getImage } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
 import type { Foto } from '../content';
+import { buscarImagen } from '../lib/imagenes';
 
 interface Props {
   arriba: Foto;
@@ -16,12 +16,8 @@ interface Props {
 
 const { arriba, abajo, pista } = Astro.props;
 
-const archivos = import.meta.glob<{ default: ImageMetadata }>('/imagenes/**/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG}', { eager: true });
-const buscar = (archivo: string) =>
-  Object.entries(archivos).find(([ruta]) => ruta.replace(/\.[^.]+$/, '') === `/imagenes/${archivo}`)?.[1].default;
-
-const fuenteArriba = buscar(arriba.archivo);
-const fuenteAbajo = buscar(abajo.archivo);
+const fuenteArriba = await buscarImagen(arriba.archivo);
+const fuenteAbajo = await buscarImagen(abajo.archivo);
 // Las dos al mismo tamaño y encuadre: la máscara las superpone píxel a píxel.
 const opciones = { width: 1600, format: 'webp' as const, quality: 82 };
 const imgArriba = fuenteArriba ? await getImage({ src: fuenteArriba, ...opciones }) : undefined;
