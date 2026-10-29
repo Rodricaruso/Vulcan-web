@@ -16,6 +16,11 @@ export const sitio = {
   whatsapp: '5491131002597',
   telefonoVisible: '+54 11 3100-2597',
   instagram: '', // TODO: 'https://instagram.com/usuario'
+  // Otros perfiles del negocio (Google Maps, Facebook…). Van al schema como sameAs.
+  redes: [] as string[],
+  formasDePago: '', // TODO: por ejemplo 'Efectivo, transferencia, Mercado Pago'. Vacío: no va al schema.
+  // Horario de atención para el schema. Vacío: no se publica. Ej.: [{ dias: ['Monday', 'Friday'], abre: '10:00', cierra: '18:00' }]
+  horario: [] as { dias: string[]; abre: string; cierra: string }[],
   // ID de medición de Google Analytics 4 ('G-XXXXXXXXXX'). Vacío: no se carga y la
   // política de privacidad no menciona estadísticas.
   googleAnalytics: '',

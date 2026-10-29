@@ -1,29 +1,38 @@
 ---
 import '../styles/global.css';
 import { sitio, preguntas } from '../content';
+import { idNegocio, idWeb } from '../lib/schema';
 
 interface Props {
   title?: string;
   description?: string;
-  conDatosEstructurados?: boolean;
+  conDatosEstructurados?: boolean; // la home: suma el schema WebSite
   conPreguntas?: boolean; // schema FAQPage: solo en la página que muestra las preguntas
   migas?: { nombre: string; ruta: string }[]; // schema BreadcrumbList, desde el inicio hasta esta página
   sinIndexar?: boolean; // páginas que todavía no deben salir en buscadores
+  esquema?: Record<string, unknown>[]; // nodos propios de la página (caso, pieza…), se suman al @graph
 }
 
-const { title = sitio.title, description = sitio.description, conDatosEstructurados = false, conPreguntas = false, migas, sinIndexar = false } = Astro.props;
+const { title = sitio.title, description = sitio.description, conDatosEstructurados = false, conPreguntas = false, migas, sinIndexar = false, esquema = [] } = Astro.props;
 // Sin barra final, igual que los enlaces internos y que Vercel (vercel.json).
 const canonical = new URL(Astro.url.pathname.replace(/(.)\/$/, '$1'), Astro.site);
 const imagenCompartir = new URL('/compartir.jpg', Astro.site);
 
+const redes = [sitio.instagram, ...sitio.redes].filter(Boolean);
+
 const negocio = {
-  '@context': 'https://schema.org',
   '@type': 'JewelryStore',
+  '@id': idNegocio(Astro.site),
   name: sitio.nombre,
   url: Astro.site?.href,
+  logo: new URL('/logo.png', Astro.site).href,
   telephone: sitio.telefonoVisible,
   image: imagenCompartir.href,
   description: sitio.description,
+  priceRange: '$$',
+  currenciesAccepted: 'ARS',
+  ...(sitio.formasDePago ? { paymentAccepted: sitio.formasDePago } : {}),
+  knowsAbout: ['Anillos sello', 'Joyería a medida', 'Impresión 3D de joyería', 'Fundición a la cera perdida', 'Modelado 3D'],
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Ciudad Autónoma de Buenos Aires',
@@ -31,12 +40,30 @@ const negocio = {
     addressCountry: 'AR',
   },
   areaServed: 'AR',
-  ...(sitio.instagram ? { sameAs: [sitio.instagram] } : {}),
+  ...(redes.length ? { sameAs: redes } : {}),
+  ...(sitio.horario.length
+    ? {
+        openingHoursSpecification: sitio.horario.map((h) => ({
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: h.dias,
+          opens: h.abre,
+          closes: h.cierra,
+        })),
+      }
+    : {}),
+};
+
+const web = {
+  '@type': 'WebSite',
+  '@id': idWeb(Astro.site),
+  name: sitio.nombre,
+  url: Astro.site?.href,
+  inLanguage: 'es-AR',
+  publisher: { '@id': idNegocio(Astro.site) },
 };
 
 // Solo preguntas con respuesta real: las que tienen [pendientes] no se publican en el schema.
 const faq = {
-  '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: preguntas.items
     .filter((p) => !p.respuesta.join(' ').includes('['))
@@ -51,7 +78,6 @@ const faq = {
 };
 
 const breadcrumb = migas && {
-  '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: migas.map((m, i) => ({
     '@type': 'ListItem',
@@ -59,6 +85,12 @@ const breadcrumb = migas && {
     name: m.nombre,
     item: new URL(m.ruta, Astro.site).href,
   })),
+};
+
+// Un solo JSON-LD por página. El negocio va siempre: es a quien apuntan los demás nodos.
+const grafo = {
+  '@context': 'https://schema.org',
+  '@graph': [negocio, ...(conDatosEstructurados ? [web] : []), ...(conPreguntas ? [faq] : []), ...(breadcrumb ? [breadcrumb] : []), ...esquema],
 };
 ---
 
@@ -83,9 +115,7 @@ const breadcrumb = migas && {
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Anillo sello de plata con un rosetón grabado, mitad terminado y mitad modelo 3D" />
     <meta name="twitter:card" content="summary_large_image" />
-    {conDatosEstructurados && <script is:inline type="application/ld+json" set:html={JSON.stringify(negocio)} />}
-    {conPreguntas && <script is:inline type="application/ld+json" set:html={JSON.stringify(faq)} />}
-    {breadcrumb && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumb)} />}
+    {!sinIndexar && <script is:inline type="application/ld+json" set:html={JSON.stringify(grafo)} />}
     {sitio.googleAnalytics && (
       <Fragment>
         <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${sitio.googleAnalytics}`}></script>
