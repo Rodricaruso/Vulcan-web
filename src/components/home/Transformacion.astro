@@ -159,6 +159,9 @@ const numerales = ['I', 'II', 'III', 'IV'];
     position: absolute;
     left: 50%;
     top: 50%;
+    /* Sin esto la caja se limita a la mitad derecha de la moneda y el centrado se corre. */
+    width: max-content;
+    white-space: nowrap;
     translate: -50% -52%;
     font-family: var(--font-display);
     font-size: calc(var(--caja) * 1.25);

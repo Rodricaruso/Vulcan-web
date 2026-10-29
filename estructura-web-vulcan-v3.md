@@ -379,7 +379,7 @@ Mientras no estén las fotos, se usan placeholders con las proporciones exactas.
 
 ## 8. Datos y medición
 
-- **WhatsApp:** `https://wa.me/5491100000000?text=<mensaje codificado>`. El número vive en un solo lugar del archivo de contenido.
+- **WhatsApp:** `https://wa.me/5491131002597?text=<mensaje codificado>`. El número vive en un solo lugar del archivo de contenido.
 - **Origen dentro del mensaje** (WhatsApp ignora parámetros extra):
 
 | Público | Mensaje prellenado |
