@@ -1,3 +1,13 @@
+# Buscadores y asistentes de IA: todo el sitio está abierto.
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+User-agent: Google-Extended
+Allow: /
+
 User-agent: *
 Allow: /
 
