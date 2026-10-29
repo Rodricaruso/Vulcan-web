@@ -130,6 +130,7 @@ export type Caso = {
   portadaNota?: string;
   ficha: [string, string][];
   meta: { title: string; description: string };
+  fecha: string; // YYYY-MM-DD, datePublished del schema. Vacío: no se publica.
   intro: string;
   historia: { texto: string; foto: Foto; proporcion?: string }[]; // proporción: si la foto no es vertical 4:5
   cierre: string;
@@ -151,6 +152,7 @@ export const casos: Caso[] = [
       title: 'Caso: el sello de una familia, para cada hija | Vulcan',
       description: 'Un escudo familiar dibujado en una carta antigua, convertido en un anillo sello con molde propio para cada integrante. Plata 925 y bronce enchapado en oro.',
     },
+    fecha: '', // TODO Rodrigo: fecha de entrega (YYYY-MM-DD)
     intro: 'El padre les había regalado a sus hijas un anillo con el escudo de la familia. Con los años, algunos se perdieron y otros estaban golpeados. Decidimos hacer uno nuevo, con molde propio, para que cada uno pueda tener el suyo.',
     historia: [
       {
@@ -190,6 +192,7 @@ export const casos: Caso[] = [
       title: 'Caso: el anillo de una escuela de arquería | Vulcan',
       description: 'El logo de una escuela de arquería llevado a un anillo sello, con grabado personal adentro e inlay de piedras de color. Un anillo y después diez más para sus mejores alumnos.',
     },
+    fecha: '', // TODO Rodrigo: fecha de entrega (YYYY-MM-DD)
     intro: 'Una escuela de arquería nos trajo su logo para hacer un anillo. Después de ese primero, encargó diez más para sus mejores alumnos.',
     historia: [
       {
@@ -229,6 +232,7 @@ export const casos: Caso[] = [
       title: 'Caso: una medalla para un casamiento en Italia | Vulcan',
       description: 'Un escudo con las iniciales de los novios y sus perros, grabado con láser sobre una medalla de bronce de 6 cm, para un casamiento en un castillo de Italia.',
     },
+    fecha: '', // TODO Rodrigo: fecha de entrega (YYYY-MM-DD)
     intro: 'Para un casamiento en un castillo de Italia, nos pidieron un regalo para los novios: un escudo propio.',
     historia: [
       {

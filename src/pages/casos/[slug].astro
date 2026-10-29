@@ -6,7 +6,9 @@ import Navbar from '../../components/Navbar.astro';
 import Foto from '../../components/Foto.astro';
 import CtaFinal from '../../components/CtaFinal.astro';
 import Footer from '../../components/Footer.astro';
-import { casos, casoPagina, type Caso } from '../../content';
+import { casos, casoPagina, vitrina, sitio, type Caso } from '../../content';
+import { imagenParaCompartir, imagenAbsoluta } from '../../lib/imagenes';
+import { idNegocio } from '../../lib/schema';
 
 export function getStaticPaths() {
   return casos.map((caso, i) => ({ params: { slug: caso.slug }, props: { caso, i } }));
@@ -20,9 +22,31 @@ interface Props {
 const { caso, i } = Astro.props;
 const numerales = ['I', 'II', 'III'];
 const otros = casos.filter((c) => c.slug !== caso.slug);
+
+const imagen = await imagenParaCompartir(caso.portada.archivo, Astro.site, { encuadre: caso.portadaEncuadre, render: caso.portadaFondo });
+const fotos = (await Promise.all([caso.portada, ...caso.historia.map((e) => e.foto)].map((f) => imagenAbsoluta(f.archivo, Astro.site)))).filter(Boolean);
+const material = caso.ficha.find(([dato]) => dato === 'Metal')?.[1];
+const pieza = caso.ficha.find(([dato]) => dato === 'Pieza')?.[1];
+
+// Article y no CreativeWork: la página cuenta un encargo con texto propio, y Google lee
+// Article (titular, imágenes, autor, fecha) para mostrarla en resultados y en Discover.
+const articulo = {
+  '@type': 'Article',
+  '@id': `${new URL(`/casos/${caso.slug}`, Astro.site).href}#caso`,
+  headline: caso.nombre,
+  description: caso.meta.description,
+  image: fotos,
+  author: { '@id': idNegocio(Astro.site) },
+  publisher: { '@id': idNegocio(Astro.site) },
+  inLanguage: 'es-AR',
+  mainEntityOfPage: new URL(`/casos/${caso.slug}`, Astro.site).href,
+  about: [pieza, 'Joyería a medida'].filter(Boolean),
+  ...(material ? { material } : {}),
+  ...(caso.fecha ? { datePublished: caso.fecha } : {}),
+};
 ---
 
-<Base title={caso.meta.title} description={caso.meta.description} migas={[{ nombre: 'Inicio', ruta: '/' }, { nombre: caso.nombre, ruta: `/casos/${caso.slug}` }]}>
+<Base title={caso.meta.title} description={caso.meta.description} migas={[{ nombre: 'Inicio', ruta: '/' }, { nombre: caso.nombre, ruta: `/casos/${caso.slug}` }]} esquema={[articulo]} imagen={imagen}>
   <Navbar />
   <main id="contenido" tabindex="-1" class="caso tema-claro">
     <header class="contenedor caso__cabecera">
@@ -77,6 +101,12 @@ const otros = casos.filter((c) => c.slug !== caso.slug);
             </a>
           </li>
         ))}
+        <li>
+          <a href={vitrina.enlace.href}>
+            <span class="caso__otro-nombre">{vitrina.enlace.texto}</span>
+            <span class="caso__otro-resumen">{vitrina.bajada}</span>
+          </a>
+        </li>
       </ul>
     </nav>
   </main>

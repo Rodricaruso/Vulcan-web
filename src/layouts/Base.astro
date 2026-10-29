@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { sitio, preguntas } from '../content';
 import { idNegocio, idWeb } from '../lib/schema';
+import type { ImagenCompartir } from '../lib/imagenes';
 
 interface Props {
   title?: string;
@@ -11,9 +12,10 @@ interface Props {
   migas?: { nombre: string; ruta: string }[]; // schema BreadcrumbList, desde el inicio hasta esta página
   sinIndexar?: boolean; // páginas que todavía no deben salir en buscadores
   esquema?: Record<string, unknown>[]; // nodos propios de la página (caso, pieza…), se suman al @graph
+  imagen?: ImagenCompartir; // imagen propia para compartir; si no, /compartir.jpg
 }
 
-const { title = sitio.title, description = sitio.description, conDatosEstructurados = false, conPreguntas = false, migas, sinIndexar = false, esquema = [] } = Astro.props;
+const { title = sitio.title, description = sitio.description, conDatosEstructurados = false, conPreguntas = false, migas, sinIndexar = false, esquema = [], imagen } = Astro.props;
 // Sin barra final, igual que los enlaces internos y que Vercel (vercel.json).
 const canonical = new URL(Astro.url.pathname.replace(/(.)\/$/, '$1'), Astro.site);
 const imagenCompartir = new URL('/compartir.jpg', Astro.site);
@@ -110,10 +112,10 @@ const grafo = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={imagenCompartir} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Anillo sello de plata con un rosetón grabado, mitad terminado y mitad modelo 3D" />
+    <meta property="og:image" content={imagen?.url ?? imagenCompartir} />
+    <meta property="og:image:width" content={String(imagen?.ancho ?? 1200)} />
+    <meta property="og:image:height" content={String(imagen?.alto ?? 630)} />
+    {!imagen && <meta property="og:image:alt" content="Anillo sello de plata con un rosetón grabado, mitad terminado y mitad modelo 3D" />}
     <meta name="twitter:card" content="summary_large_image" />
     {!sinIndexar && <script is:inline type="application/ld+json" set:html={JSON.stringify(grafo)} />}
     {sitio.googleAnalytics && (
