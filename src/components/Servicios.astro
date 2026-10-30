@@ -1,6 +1,11 @@
 ---
-import { servicios } from '../content';
+// Cada tarjeta lleva la foto de su página de servicio y entera es un enlace a esa página.
+// El botón de WhatsApp queda por encima del enlace y sigue abriendo el chat.
+import { servicios, paginasServicio } from '../content';
 import BotonContacto from './BotonContacto.astro';
+import Foto from './Foto.astro';
+
+const fotoDe = (pagina: string) => paginasServicio.find((s) => pagina.endsWith(`/${s.slug}`))?.foto;
 ---
 
 <section id="servicios" class="seccion" aria-labelledby="servicios-titulo">
@@ -12,12 +17,19 @@ import BotonContacto from './BotonContacto.astro';
     <ul class="servicios__grilla">
       {servicios.tarjetas.map((tarjeta) => (
         <li class="tarjeta">
-          <h3><a class="tarjeta__enlace" href={tarjeta.pagina}>{tarjeta.titulo}</a></h3>
-          <p>{tarjeta.texto}</p>
-          <ul class="lista tarjeta__items">
-            {tarjeta.items.map((item) => <li>{item}</li>)}
-          </ul>
-          <BotonContacto origen={tarjeta.ref} tipo={tarjeta.tipo} variante="secundario" class="tarjeta__cta" />
+          {fotoDe(tarjeta.pagina) && (
+            <div class="tarjeta__foto">
+              <Foto foto={fotoDe(tarjeta.pagina)!} proporcion="4 / 3" sizes="(min-width: 1024px) 30vw, 100vw" />
+            </div>
+          )}
+          <div class="tarjeta__cuerpo">
+            <h3><a class="tarjeta__enlace" href={tarjeta.pagina}>{tarjeta.titulo}</a></h3>
+            <p>{tarjeta.texto}</p>
+            <ul class="lista tarjeta__items">
+              {tarjeta.items.map((item) => <li>{item}</li>)}
+            </ul>
+            <BotonContacto origen={tarjeta.ref} tipo={tarjeta.tipo} variante="secundario" class="tarjeta__cta" />
+          </div>
         </li>
       ))}
     </ul>
@@ -40,13 +52,40 @@ import BotonContacto from './BotonContacto.astro';
   }
 
   .tarjeta {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s ease;
+  }
+
+  .tarjeta:hover {
+    border-color: var(--color-accent);
+  }
+
+  .tarjeta__foto {
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tarjeta__foto :global(.foto) {
+    border-radius: 0;
+    transition: transform 0.4s ease;
+  }
+
+  .tarjeta:hover .tarjeta__foto :global(.foto) {
+    transform: scale(1.03);
+  }
+
+  .tarjeta__cuerpo {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
     padding: var(--space-6) var(--space-5);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
   }
 
   .tarjeta__items {
@@ -69,8 +108,26 @@ import BotonContacto from './BotonContacto.astro';
     text-underline-offset: 0.2em;
   }
 
-  .tarjeta__enlace:hover {
+  .tarjeta:hover .tarjeta__enlace {
     color: var(--color-accent);
+  }
+
+  /* El enlace del título cubre la tarjeta entera, foto incluida. */
+  .tarjeta__enlace::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .tarjeta :global(.tarjeta__cta) {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tarjeta__foto :global(.foto) {
+      transition: none;
+    }
   }
 
   .servicios__pie {
@@ -84,7 +141,7 @@ import BotonContacto from './BotonContacto.astro';
       margin-bottom: var(--space-6);
     }
 
-    .tarjeta {
+    .tarjeta__cuerpo {
       gap: var(--space-3);
       padding: var(--space-5) var(--space-4);
     }
