@@ -141,7 +141,30 @@ const fotoDe = (pagina: string) => paginasServicio.find((s) => pagina.endsWith(`
       margin-bottom: var(--space-6);
     }
 
+    /* Tarjeta horizontal: texto a la izquierda y la foto, más angosta, a la derecha. */
+    .tarjeta {
+      flex-direction: row-reverse;
+    }
+
+    .servicios__grilla {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tarjeta__foto {
+      flex: 0 0 30%;
+      min-width: 0;
+      align-self: flex-start;
+      margin: var(--space-5) var(--space-4) 0 0;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+    }
+
+    .tarjeta__foto :global(.foto) {
+      aspect-ratio: 3 / 4;
+    }
+
     .tarjeta__cuerpo {
+      min-width: 0;
       gap: var(--space-3);
       padding: var(--space-5) var(--space-4);
     }
