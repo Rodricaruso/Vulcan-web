@@ -12,7 +12,7 @@ import BotonContacto from './BotonContacto.astro';
     <ul class="servicios__grilla">
       {servicios.tarjetas.map((tarjeta) => (
         <li class="tarjeta">
-          <h3>{tarjeta.titulo}</h3>
+          <h3><a class="tarjeta__enlace" href={tarjeta.pagina}>{tarjeta.titulo}</a></h3>
           <p>{tarjeta.texto}</p>
           <ul class="lista tarjeta__items">
             {tarjeta.items.map((item) => <li>{item}</li>)}
@@ -61,6 +61,16 @@ import BotonContacto from './BotonContacto.astro';
 
   .tarjeta__items {
     margin-bottom: var(--space-3);
+  }
+
+  .tarjeta__enlace {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .tarjeta__enlace:hover {
+    color: var(--color-accent);
   }
 
   .servicios__pie {

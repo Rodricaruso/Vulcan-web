@@ -22,7 +22,7 @@ const { title = sitio.title, description = sitio.description, conDatosEstructura
 const canonical = new URL(Astro.url.pathname.replace(/(.)\/$/, '$1'), Astro.site);
 const imagenCompartir = new URL('/compartir.jpg', Astro.site);
 
-const redes = [sitio.instagram, ...sitio.redes].filter(Boolean);
+const redes = [sitio.instagram, sitio.mapa, ...sitio.redes].filter(Boolean);
 
 const negocio = {
   '@type': 'JewelryStore',
@@ -39,11 +39,12 @@ const negocio = {
   knowsAbout: ['Anillos sello', 'Joyería a medida', 'Impresión 3D de joyería', 'Fundición a la cera perdida', 'Modelado 3D'],
   address: {
     '@type': 'PostalAddress',
-    addressLocality: 'Ciudad Autónoma de Buenos Aires',
+    addressLocality: `${sitio.barrio}, Ciudad Autónoma de Buenos Aires`,
     addressRegion: 'CABA',
     addressCountry: 'AR',
   },
   areaServed: 'AR',
+  ...(sitio.mapa ? { hasMap: sitio.mapa } : {}),
   ...(redes.length ? { sameAs: redes } : {}),
   ...(sitio.horario.length
     ? {

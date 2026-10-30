@@ -11,15 +11,20 @@ export type TipoMensaje = 'cliente' | 'modelado' | 'impresion' | 'marcas' | 'gre
 
 export const sitio = {
   nombre: 'Vulcan',
-  ciudad: 'CABA, Buenos Aires',
+  ciudad: 'Belgrano, CABA',
+  // El barrio va al schema: el taller está en Belgrano, lejos de las joyerías del centro.
+  barrio: 'Belgrano',
   responsable: 'Rodrigo Caruso', // figura en la política de privacidad
   whatsapp: '5491131002597',
   telefonoVisible: '+54 11 3100-2597',
-  instagram: '', // TODO: 'https://instagram.com/usuario'
-  // Otros perfiles del negocio (Google Maps, Facebook…). Van al schema como sameAs.
+  instagram: 'https://www.instagram.com/vulcanjoyas/',
+  // Ficha de Google (link fijo por su CID). Va al schema como hasMap y sameAs.
+  mapa: 'https://maps.google.com/?cid=487930550770398641',
+  // Otros perfiles del negocio (Facebook…). Van al schema como sameAs.
   redes: [] as string[],
-  formasDePago: '', // TODO: por ejemplo 'Efectivo, transferencia, Mercado Pago'. Vacío: no va al schema.
-  // Horario de atención para el schema. Vacío: no se publica. Ej.: [{ dias: ['Monday', 'Friday'], abre: '10:00', cierra: '18:00' }]
+  formasDePago: 'Efectivo, transferencia',
+  // No hay horario de atención: las visitas se coordinan por WhatsApp. Si algún día lo hay,
+  // va al schema. Ej.: [{ dias: ['Monday', 'Friday'], abre: '10:00', cierra: '18:00' }]
   horario: [] as { dias: string[]; abre: string; cierra: string }[],
   // ID de medición de Google Analytics 4 ('G-XXXXXXXXXX'). Vacío: no se carga y la
   // política de privacidad no menciona estadísticas.
@@ -155,7 +160,7 @@ export const casos: Caso[] = [
       title: 'Caso: el sello de una familia, para cada hija | Vulcan',
       description: 'Un escudo familiar dibujado en una carta antigua, convertido en un anillo sello con molde propio para cada integrante. Plata 925 y bronce enchapado en oro.',
     },
-    fecha: '', // TODO Rodrigo: fecha de entrega (YYYY-MM-DD)
+    fecha: '', // opcional: fecha de entrega (YYYY-MM-DD); Google la muestra como fecha del caso
     intro: 'El padre les había regalado a sus hijas un anillo con el escudo de la familia. Con los años, algunos se perdieron y otros estaban golpeados. Decidimos hacer uno nuevo, con molde propio, para que cada uno pueda tener el suyo.',
     historia: [
       {
@@ -195,7 +200,7 @@ export const casos: Caso[] = [
       title: 'Caso: el anillo de una escuela de arquería | Vulcan',
       description: 'El logo de una escuela de arquería llevado a un anillo sello, con grabado personal adentro e inlay de piedras de color. Un anillo y después diez más para sus mejores alumnos.',
     },
-    fecha: '', // TODO Rodrigo: fecha de entrega (YYYY-MM-DD)
+    fecha: '', // opcional: fecha de entrega (YYYY-MM-DD); Google la muestra como fecha del caso
     intro: 'Una escuela de arquería nos trajo su logo para hacer un anillo. Después de ese primero, encargó diez más para sus mejores alumnos.',
     historia: [
       {
@@ -235,7 +240,7 @@ export const casos: Caso[] = [
       title: 'Caso: una medalla para un casamiento en Italia | Vulcan',
       description: 'Un escudo con las iniciales de los novios y sus perros, grabado con láser sobre una medalla de bronce de 6 cm, para un casamiento en un castillo de Italia.',
     },
-    fecha: '', // TODO Rodrigo: fecha de entrega (YYYY-MM-DD)
+    fecha: '', // opcional: fecha de entrega (YYYY-MM-DD); Google la muestra como fecha del caso
     intro: 'Para un casamiento en un castillo de Italia, nos pidieron un regalo para los novios: un escudo propio.',
     historia: [
       {
@@ -252,7 +257,7 @@ export const casos: Caso[] = [
       },
       {
         texto: 'Con la prueba aprobada, la medalla se grabó con láser sobre bronce y después se pulió.',
-        foto: { archivo: 'casos/medalla-4-medalla', alt: 'La medalla de bronce terminada, con el escudo grabado', etiqueta: 'Medalla' }, proporcion: '1 / 1',
+        foto: { archivo: 'casos/medalla-4-medalla', alt: 'La medalla de bronce terminada, con el escudo grabado, en un estuche de terciopelo bordó', etiqueta: 'Medalla' }, proporcion: '1 / 1',
       },
     ],
     cierre: 'Después viajó a Italia, para el casamiento.',
@@ -295,7 +300,7 @@ export const catalogo = {
   // Página de cada pieza (/catalogo/<id>).
   pieza: {
     volver: 'Volver al catálogo',
-    encargo: 'Se hace por encargo en CABA.',
+    encargo: 'Se hace por encargo en nuestro taller de Belgrano, CABA.',
   },
   bajada: 'Todas se hacen por encargo, con tu talle y el metal que elijas. Si querés cambiarle algo, se cambia.',
   filtroTodas: 'Todas',
@@ -374,7 +379,7 @@ export const pasos = [
     items: [
       'Packaging [confirmar si es personalizado]',
       'Pieza única: se hace una sola, la tuya',
-      'Retiro en CABA y envíos [confirmar alcance]',
+      'Envío por mensajería en moto o retiro coordinado en Belgrano',
     ],
     foto: { archivo: 'pasos/3-entrega', alt: 'Anillo sello con escudo terminado, puesto en la mano', etiqueta: 'Pieza en mano o packaging · vertical' },
     cta: true,
@@ -393,7 +398,7 @@ export const trabajos = {
   casos: [
     { nombre: 'Anillo sello con escudo', contexto: 'Plata 925, con el escudo en relieve.', foto: { archivo: 'trabajos/trabajo-1', alt: 'Dos anillos sello con escudo terminados, sobre una mesa de madera', etiqueta: 'Trabajo 1 · 3:4' } },
     { nombre: 'Aros rectangulares de plata', contexto: 'Plata 925. Hechos a mano en el banco: chapa cortada, plegada y soldada.', foto: { archivo: 'trabajos/aros-plata', alt: 'Par de aros rectangulares de plata pulida, parados sobre una base de madera', etiqueta: 'Trabajo 2 · 3:4' } },
-    { nombre: 'Aros rectangulares dorados', contexto: 'El mismo diseño, con enchapado de oro.', foto: { archivo: 'trabajos/aros-dorados', alt: 'Par de aros rectangulares enchapados en oro, sobre papel de seda', etiqueta: 'Trabajo 3 · 3:4' } },
+    { nombre: 'Aros rectangulares dorados', contexto: 'El mismo diseño, en plata 925 enchapada en oro.', foto: { archivo: 'trabajos/aros-dorados', alt: 'Par de aros rectangulares enchapados en oro, sobre papel de seda', etiqueta: 'Trabajo 3 · 3:4' } },
     { nombre: 'Solitario', contexto: 'Plata 925 con una circonia cúbica cuadrada, engarzada a garras en el banco.', foto: { archivo: 'trabajos/solitario', alt: 'Anillo solitario de plata con una circonia cuadrada engarzada, sostenido en la mano sobre el banco de joyero', etiqueta: 'Trabajo 4 · 3:4' } },
   ] satisfies { nombre: string; contexto: string; foto: Foto }[],
 };
@@ -447,10 +452,11 @@ export const servicios = {
       items: [
         'Desde boceto o referencia',
         'Espesores y engarces pensados para fundición',
-        'Archivo para tu impresora o la nuestra [formatos]',
+        'Archivo en STL, OBJ, 3DM o STEP, para tu impresora o la nuestra',
       ],
       tipo: 'modelado',
       ref: 'web-modelado',
+      pagina: '/servicios/modelado-3d-joyeria',
     },
     {
       titulo: 'Impresión 3D',
@@ -462,6 +468,7 @@ export const servicios = {
       ],
       tipo: 'impresion',
       ref: 'web-impresion',
+      pagina: '/servicios/impresion-3d-resina-joyeria',
     },
     {
       titulo: 'Producción para marcas',
@@ -469,13 +476,140 @@ export const servicios = {
       items: [
         'Diseño, modelado y molde propio',
         'Fundición en plata, oro, alpaca o bronce',
-        'Desde [definir mínimo] unidades',
+        'Sin mínimo de unidades, con descuento por cantidad',
       ],
       tipo: 'marcas',
       ref: 'web-marcas',
+      pagina: '/servicios/fundicion-para-joyeros',
     },
-  ] satisfies { titulo: string; texto: string; items: string[]; tipo: TipoMensaje; ref: string }[],
+  ] satisfies { titulo: string; texto: string; items: string[]; tipo: TipoMensaje; ref: string; pagina: string }[],
   pie: 'Coordinamos la fundición y el engarce con nuestros proveedores, así no tenés que buscar a nadie más.',
+};
+
+// Una página por servicio para joyeros y marcas (/servicios/<slug>). Las viñetas son las de
+// la tarjeta de `servicios` que comparte el tipo; las preguntas van como subtítulos y al schema.
+export type PaginaServicio = {
+  slug: string;
+  nombre: string; // migas y enlaces entre servicios
+  tarjeta: TipoMensaje; // la tarjeta de servicios.tarjetas de la que salen las viñetas
+  tipo: TipoMensaje; // mensaje de WhatsApp
+  meta: { title: string; description: string };
+  titulo: string;
+  bajada: string;
+  foto: Foto;
+  proporcion: string;
+  preguntas: { pregunta: string; respuesta: string[]; link?: { texto: string; href: string } }[];
+};
+
+export const paginasServicio: PaginaServicio[] = [
+  {
+    slug: 'modelado-3d-joyeria',
+    nombre: 'Modelado 3D',
+    tarjeta: 'modelado',
+    tipo: 'modelado',
+    meta: {
+      title: 'Modelado 3D de joyería para joyeros y marcas | Vulcan',
+      description: 'Pasamos tu boceto, foto o pieza a un modelo 3D listo para imprimir y fundir, con espesores y engarces pensados para fundición. En STL, OBJ, 3DM o STEP.',
+    },
+    titulo: 'Modelado 3D de joyas, listo para fundir',
+    bajada: 'Pasamos tu diseño a un archivo CAD con los espesores mínimos, el lugar de cada piedra y lo que se achica el metal al enfriarse.',
+    foto: { archivo: 'casos/arqueria-3-modelo', alt: 'Modelo 3D de un anillo sello con el logo de un arquero, en el programa de diseño', etiqueta: 'Modelo 3D' },
+    proporcion: '7 / 5',
+    preguntas: [
+      {
+        pregunta: '¿Qué tengo que mandar para modelar una pieza?',
+        respuesta: ['Un boceto, una foto de referencia o un modelo que ya tengas. Si es un anillo, sumá el talle. Si lleva piedras, pasanos sus medidas.'],
+      },
+      {
+        pregunta: '¿En qué formato me entregan el archivo?',
+        respuesta: ['En STL, OBJ, 3DM o STEP, el que lea tu impresora o tu programa.'],
+      },
+      {
+        pregunta: '¿También lo imprimen y lo funden?',
+        respuesta: ['Si querés, sí: lo imprimimos en resina y coordinamos la fundición. Si tenés taller, te llevás el archivo y seguís vos.'],
+        link: { texto: 'Impresión 3D para joyería', href: '/servicios/impresion-3d-resina-joyeria' },
+      },
+      {
+        pregunta: '¿Cómo se cotiza el modelado?',
+        respuesta: ['Según lo compleja que sea la pieza. Mandanos la referencia por WhatsApp y te pasamos el presupuesto.'],
+      },
+    ],
+  },
+  {
+    slug: 'impresion-3d-resina-joyeria',
+    nombre: 'Impresión 3D',
+    tarjeta: 'impresion',
+    tipo: 'impresion',
+    meta: {
+      title: 'Impresión 3D en resina para joyería en CABA | Vulcan',
+      description: 'Imprimimos tus modelos de joyería en resina de alto detalle para modelos maestros y moldes, en ABS para prototipos y en PLA para fundir directo. Belgrano, CABA.',
+    },
+    titulo: 'Impresión 3D de modelos para joyería',
+    bajada: 'Mandanos el archivo y lo imprimimos en el material que necesita tu taller.',
+    foto: { archivo: 'casos/arqueria-4-impresion', alt: 'Un anillo impreso en resina transparente, sostenido entre los dedos, con un calibre atrás', etiqueta: 'Impresión en resina' },
+    proporcion: '3 / 4',
+    preguntas: [
+      {
+        pregunta: '¿Qué archivo necesito para imprimir?',
+        respuesta: ['Un STL, OBJ, 3DM o STEP. Si todavía no tenés el modelo, lo hacemos nosotros.'],
+        link: { texto: 'Modelado 3D de joyería', href: '/servicios/modelado-3d-joyeria' },
+      },
+      {
+        pregunta: '¿Resina, ABS o PLA?',
+        respuesta: [
+          'Resina de alto detalle para el modelo maestro y el molde. Es resistente y se puede lijar.',
+          'ABS para un prototipo, cuando querés probar la forma y el tamaño en la mano.',
+          'PLA para fundir directo, sin molde: es el PLA perdido.',
+        ],
+      },
+      {
+        pregunta: '¿Se puede fundir directo?',
+        respuesta: ['Sí, con el modelo en PLA, que se quema dentro del yeso igual que la cera. Si vas a hacer varias piezas iguales, te conviene el modelo en resina y un molde de silicona.'],
+      },
+    ],
+  },
+  {
+    slug: 'fundicion-para-joyeros',
+    nombre: 'Fundición y producción',
+    tarjeta: 'marcas',
+    tipo: 'gremio',
+    meta: {
+      title: 'Fundición a la cera perdida para joyeros y marcas | Vulcan',
+      description: 'Molde de silicona, cera inyectada y fundición a la cera perdida en plata 925, oro 18k, alpaca o bronce. Sin mínimo de unidades, con descuento por cantidad.',
+    },
+    titulo: 'Fundición y producción para tu taller o tu marca',
+    bajada: 'Del modelo en resina sacamos el molde, y del molde, las ceras que van a fundición, en el metal que elijas.',
+    foto: { archivo: 'proceso/4-fundicion', alt: 'Un anillo sello recién fundido en metal claro, sostenido en la mano', etiqueta: 'Pieza fundida' },
+    proporcion: '3 / 4',
+    preguntas: [
+      {
+        pregunta: '¿Qué metales funden?',
+        respuesta: ['Plata 925, oro 18k, alpaca y bronce. El metal se cobra con la cotización del día.'],
+        link: { texto: 'Mirá el precio de los metales hoy', href: '/taller#metales' },
+      },
+      {
+        pregunta: '¿Hacen el molde de silicona?',
+        respuesta: ['Sí. Lo sacamos del modelo maestro en resina, y con el molde inyectamos las ceras.'],
+      },
+      {
+        pregunta: '¿Se guarda el molde?',
+        respuesta: ['Sí, queda en el taller. Si después necesitás más piezas, salen del mismo molde.'],
+      },
+      {
+        pregunta: '¿Cuál es el mínimo de piezas?',
+        respuesta: ['No hay mínimo. Con cantidad hay descuento: consultanos, depende de la pieza.'],
+      },
+      {
+        pregunta: '¿Cuánto tarda la fundición?',
+        respuesta: ['Depende de la pieza y de los tiempos del fundidor. Si estás apurado, hay fundición exprés: en dos semanas está fundida.'],
+      },
+    ],
+  },
+];
+
+export const servicioPagina = {
+  otros: 'Otros servicios',
+  proceso: { texto: 'Ver el proceso completo', href: '/taller' },
 };
 
 export const metales = {
@@ -534,15 +668,16 @@ export const preguntas: { titulo: string; otra: { texto: string; enlace: string 
     },
     {
       pregunta: '¿Cuánto tarda una pieza?',
-      // TODO Rodrigo: sumar plazos reales por etapa (diseño, prototipo, fundición, terminación).
-      respuesta: ['Depende del diseño y del metal. Te damos el plazo junto con el presupuesto, antes de empezar.'],
+      respuesta: [
+        'En general, unos dos meses desde el primer mensaje hasta la pieza terminada. Depende de lo compleja que sea la pieza, en diseño y en modelado, y de los tiempos del fundidor.',
+        'Si la necesitás antes, hay fundición exprés: en dos semanas está fundida. Te confirmamos el plazo junto con el presupuesto.',
+      ],
     },
     {
       pregunta: '¿Se puede hacer una sola unidad?',
       respuesta: [
         'Sí. Y si después querés más iguales, el molde ya está hecho.',
-        // TODO Rodrigo: cuando esté definido, sumar el mínimo de producción para marcas.
-        'Si tenés una marca, consultanos el mínimo de producción.',
+        'Si tenés una marca, no hay mínimo de producción. Con cantidad hay descuento: consultanos, depende de la pieza.',
       ],
     },
     {
@@ -551,16 +686,21 @@ export const preguntas: { titulo: string; otra: { texto: string; enlace: string 
         'No. La impresión 3D se usa para el modelo; la joya final es metal fundido y pulido a mano. Lo que cambia es el diseño: formas y texturas que a mano casi no se pueden lograr.',
       ],
     },
-    // TODO Rodrigo: confirmar retiro en CABA y alcance de los envíos; hasta entonces la pregunta no se publica.
-    // {
-    //   pregunta: '¿Hacen envíos?',
-    //   respuesta: ['…'],
-    // },
+    {
+      pregunta: '¿Hacen envíos?',
+      respuesta: ['Sí, con mensajería privada en moto. Si preferís retirarla, lo coordinamos por WhatsApp.'],
+    },
+    {
+      pregunta: '¿Dónde están? ¿Puedo ir al taller?',
+      respuesta: [
+        'Estamos en Belgrano, CABA, lejos de la zona de joyerías de la calle Libertad: no hace falta ir al centro.',
+        'No es un local a la calle. Si querés venir, escribinos por WhatsApp y coordinamos la visita.',
+      ],
+    },
     {
       pregunta: 'Soy joyero, ¿me imprimen un modelo que ya tengo?',
       respuesta: [
-        // TODO Rodrigo: sumar los formatos de archivo que aceptás (STL, OBJ, 3DM…).
-        'Sí. Mandanos el archivo y te decimos qué material conviene: resina para el modelo maestro o PLA para fundir directo.',
+        'Sí. Mandanos el archivo en STL, OBJ, 3DM o STEP y te decimos qué material conviene: resina para el modelo maestro o PLA para fundir directo.',
       ],
     },
     {

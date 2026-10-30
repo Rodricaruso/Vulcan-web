@@ -1,11 +1,13 @@
 ---
 // El taller: lo que la home resume. Primero el anillo que se revela (del 3D a la plata),
-// después el mismo anillo en tres etapas, el paso a paso, metales y preguntas.
+// después el mismo anillo en tres etapas, el paso a paso, los servicios para joyeros y marcas
+// (cada uno con su página), metales y preguntas.
 import Base from '../layouts/Base.astro';
 import Navbar from '../components/Navbar.astro';
 import RevelarAnillo from '../components/RevelarAnillo.astro';
 import TresEtapas from '../components/TresEtapas.astro';
 import Proceso from '../components/Proceso.astro';
+import Servicios from '../components/Servicios.astro';
 import Metales from '../components/Metales.astro';
 import Preguntas from '../components/Preguntas.astro';
 import CtaFinal from '../components/CtaFinal.astro';
@@ -23,6 +25,7 @@ import { taller } from '../content';
     </header>
     <TresEtapas {...taller.etapas} />
     <Proceso />
+    <Servicios />
     <Metales />
     <Preguntas />
     <CtaFinal />

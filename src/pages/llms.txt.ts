@@ -1,7 +1,7 @@
 // llms.txt (llmstxt.org): resumen del sitio en markdown para ChatGPT, Perplexity, Gemini y Claude.
 // Se arma desde content.ts y productos.ts, así se actualiza solo. Lo que tiene [pendientes] no sale.
 import type { APIRoute } from 'astro';
-import { sitio, proceso, servicios, preguntas, casos, catalogo, taller } from '../content';
+import { sitio, proceso, servicios, paginasServicio, preguntas, casos, catalogo, taller } from '../content';
 import { productos, tipos } from '../data/productos';
 
 const sinPendientes = (texto: string) => !texto.includes('[');
@@ -13,9 +13,9 @@ export const GET: APIRoute = ({ site }) => {
   const texto = [
     `# ${sitio.nombre}`,
     '',
-    `> Taller de joyería a medida en la Ciudad Autónoma de Buenos Aires. Hace anillos sello y joyas por encargo, una sola o iguales para una familia o un grupo, con modelado 3D, impresión en resina y fundición a la cera perdida. Los pedidos se hacen por WhatsApp.`,
+    `> Taller de joyería a medida en Belgrano, Ciudad Autónoma de Buenos Aires, fuera de la zona de joyerías del centro. Hace anillos sello y joyas por encargo, una sola o iguales para una familia o un grupo, con modelado 3D, impresión en resina y fundición a la cera perdida. Los pedidos se hacen por WhatsApp; no es un local a la calle y las visitas se coordinan antes.`,
     '',
-    `Contacto: WhatsApp ${sitio.telefonoVisible} (https://wa.me/${sitio.whatsapp}).`,
+    `Contacto: WhatsApp ${sitio.telefonoVisible} (https://wa.me/${sitio.whatsapp}). Instagram: ${sitio.instagram}. Formas de pago: ${sitio.formasDePago.toLowerCase()}.`,
     '',
     `## ${proceso.titulo}`,
     '',
@@ -36,6 +36,10 @@ export const GET: APIRoute = ({ site }) => {
     `- [Inicio](${url('/')}): ${sitio.description}`,
     `- [El taller](${url('/taller')}): ${taller.meta.description}`,
     `- [${catalogo.titulo}](${url('/catalogo')}): ${catalogo.meta.description}`,
+    '',
+    '## Servicios para joyeros y marcas',
+    '',
+    ...paginasServicio.map((s) => `- [${s.titulo}](${url(`/servicios/${s.slug}`)}): ${s.meta.description}`),
     '',
     '## Casos',
     '',

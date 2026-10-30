@@ -1,0 +1,199 @@
+---
+// Un servicio para joyeros y marcas con página propia: modelado, impresión y fundición.
+// Las viñetas salen de la tarjeta de El taller; las preguntas son los subtítulos y el FAQPage.
+import Base from '../../layouts/Base.astro';
+import Navbar from '../../components/Navbar.astro';
+import Foto from '../../components/Foto.astro';
+import BotonContacto from '../../components/BotonContacto.astro';
+import Footer from '../../components/Footer.astro';
+import { paginasServicio, servicioPagina, servicios, type PaginaServicio } from '../../content';
+import { imagenParaCompartir } from '../../lib/imagenes';
+import { idNegocio } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return paginasServicio.map((servicio) => ({ params: { slug: servicio.slug }, props: { servicio } }));
+}
+
+interface Props {
+  servicio: PaginaServicio;
+}
+
+const { servicio } = Astro.props;
+const ruta = `/servicios/${servicio.slug}`;
+const ref = `web-servicio-${servicio.tarjeta}`;
+const tarjeta = servicios.tarjetas.find((t) => t.tipo === servicio.tarjeta)!;
+const otros = paginasServicio.filter((s) => s.slug !== servicio.slug);
+const imagen = await imagenParaCompartir(servicio.foto.archivo, Astro.site);
+const url = new URL(ruta, Astro.site).href;
+
+const esquema = [
+  {
+    '@type': 'Service',
+    '@id': `${url}#servicio`,
+    name: servicio.nombre,
+    serviceType: servicio.titulo,
+    description: servicio.meta.description,
+    provider: { '@id': idNegocio(Astro.site) },
+    areaServed: 'AR',
+    audience: { '@type': 'BusinessAudience', name: 'Joyeros y marcas de joyería' },
+    url,
+  },
+  {
+    '@type': 'FAQPage',
+    mainEntity: servicio.preguntas.map((p) => ({
+      '@type': 'Question',
+      name: p.pregunta,
+      acceptedAnswer: { '@type': 'Answer', text: p.respuesta.join(' ') },
+    })),
+  },
+];
+---
+
+<Base
+  title={servicio.meta.title}
+  description={servicio.meta.description}
+  migas={[{ nombre: 'Inicio', ruta: '/' }, { nombre: 'El taller', ruta: '/taller' }, { nombre: servicio.nombre, ruta }]}
+  esquema={esquema}
+  imagen={imagen}
+>
+  <Navbar />
+  <main id="contenido" tabindex="-1">
+    <header class="contenedor servicio__cabecera">
+      <div class="servicio__texto">
+        <h1>{servicio.titulo}</h1>
+        <p class="bajada">{servicio.bajada}</p>
+        <ul class="lista servicio__items">
+          {tarjeta.items.map((item) => <li>{item}</li>)}
+        </ul>
+        <BotonContacto origen={ref} tipo={servicio.tipo} />
+      </div>
+      <div class="servicio__foto">
+        <Foto foto={servicio.foto} proporcion={servicio.proporcion} carga="eager" prioridad sizes="(min-width: 900px) 45vw, 100vw" />
+      </div>
+    </header>
+
+    <section class="contenedor servicio__preguntas" aria-label="Preguntas sobre el servicio">
+      {servicio.preguntas.map((p) => (
+        <div class="servicio__pregunta">
+          <h2>{p.pregunta}</h2>
+          {p.respuesta.map((parrafo) => <p>{parrafo}</p>)}
+          {p.link && <p><a href={p.link.href}>{p.link.texto}</a></p>}
+        </div>
+      ))}
+    </section>
+
+    <nav class="contenedor servicio__otros" aria-labelledby="otros-servicios">
+      <h2 id="otros-servicios">{servicioPagina.otros}</h2>
+      <ul>
+        {otros.map((s) => <li><a href={`/servicios/${s.slug}`}>{s.titulo}</a></li>)}
+        <li><a href={servicioPagina.proceso.href}>{servicioPagina.proceso.texto}</a></li>
+      </ul>
+      <p class="servicio__pie">{servicios.pie}</p>
+    </nav>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .servicio__cabecera {
+    display: grid;
+    gap: var(--space-7);
+    padding-block: var(--space-8) var(--space-8);
+  }
+
+  .servicio__texto {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+    justify-items: start;
+  }
+
+  .servicio__texto h1 {
+    max-width: 16ch;
+  }
+
+  .servicio__texto .bajada {
+    color: var(--color-text-muted);
+    max-width: 44ch;
+  }
+
+  .servicio__items {
+    color: var(--color-text-muted);
+    font-size: var(--text-small);
+    margin-bottom: var(--space-3);
+  }
+
+  .servicio__foto {
+    overflow: hidden;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    align-self: start;
+  }
+
+  .servicio__foto :global(.foto) {
+    border-radius: 0;
+  }
+
+  .servicio__preguntas {
+    display: grid;
+    gap: var(--space-6);
+    padding-bottom: var(--seccion);
+  }
+
+  .servicio__pregunta {
+    display: grid;
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+    max-width: 62ch;
+  }
+
+  .servicio__pregunta h2 {
+    font-size: var(--text-h3);
+  }
+
+  .servicio__pregunta p {
+    color: var(--color-text-muted);
+  }
+
+  .servicio__otros {
+    display: grid;
+    gap: var(--space-4);
+    padding-bottom: var(--seccion);
+  }
+
+  .servicio__otros h2 {
+    font-size: var(--text-h3);
+  }
+
+  .servicio__otros ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .servicio__otros a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tactil);
+  }
+
+  .servicio__pie {
+    color: var(--color-text-muted);
+    max-width: 62ch;
+  }
+
+  @media (min-width: 900px) {
+    .servicio__cabecera {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+      align-items: center;
+    }
+
+    .servicio__preguntas {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: clamp(3rem, 6vw, 6rem);
+    }
+  }
+</style>

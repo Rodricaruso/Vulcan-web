@@ -2,7 +2,7 @@
 // Privacidad queda afuera (no aporta a búsquedas), aunque sigue siendo indexable.
 import type { APIRoute } from 'astro';
 import { execFileSync } from 'node:child_process';
-import { casos } from '../content';
+import { casos, paginasServicio } from '../content';
 import { productos } from '../data/productos';
 import { imagenAbsoluta } from '../lib/imagenes';
 
@@ -21,6 +21,11 @@ const entradas: Entrada[] = [
   { ruta: '/', archivos: ['src/pages/index.astro', 'src/components/home', 'src/content.ts'] },
   { ruta: '/catalogo', archivos: ['src/pages/catalogo.astro', 'src/data/productos.ts'] },
   { ruta: '/taller', archivos: ['src/pages/taller.astro', 'src/content.ts'] },
+  ...paginasServicio.map((s) => ({
+    ruta: `/servicios/${s.slug}`,
+    archivos: ['src/pages/servicios/[slug].astro', 'src/content.ts'],
+    fotos: [s.foto.archivo],
+  })),
   ...casos.map((c) => ({
     ruta: `/casos/${c.slug}`,
     archivos: ['src/pages/casos/[slug].astro', 'src/content.ts'],
