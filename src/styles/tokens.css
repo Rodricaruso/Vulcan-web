@@ -146,6 +146,7 @@
   --acento: var(--color-accent-on-light);
   --borde: rgb(29 6 5 / 0.14); /* Forja al 14 % */
   --foco: var(--color-accent-on-light);
+  --boton-secundario-borde: var(--color-accent-on-light);
 }
 
 /* ------------------------------------------------------------------ 3. Componentes -- */
